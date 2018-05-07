@@ -5,10 +5,10 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@include file="../appGlobal/pageTop.jsp"%>
+<%@include file="../../appGlobal/pageTop.jsp"%>
 <%--<%@page import="com.fz.tms.params.model.Branch"%>
 <%@page import="com.fz.tms.params.model.Customer"%>--%>
-<%run(new com.fz.tms.params.Customer.CustError());%>
+<%run(new com.fz.tms.params.Error());%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -16,7 +16,7 @@
         <title>Customer Attr</title>
     </head>
     <body>
-        <%@include file="../appGlobal/bodyTop.jsp"%>
+        <%@include file="../../appGlobal/bodyTop.jsp"%>
         <%--script src="../appGlobal/jquery.dataTables.min.js"></script>
         <script src="../appGlobal/datatables.min.js"></script>
         <script src="../appGlobal/datatables.js"></script>--%>
@@ -82,6 +82,7 @@
             });
         </script>
         <form class="container" action="LoadBranchCust.jsp" method="post">
+            <h4>Filter Customer</h4>
             <div class="fzErrMsg">
                 <%=get("errMsg")%>
             </div>
@@ -120,6 +121,6 @@
             <br><br>
             <button class="btn fzButton" type="submit">GO</button>
         </form>        
-        <%@include file="../appGlobal/bodyBottom.jsp"%>
+        <%@include file="../../appGlobal/bodyBottom.jsp"%>
     </body>
 </html>

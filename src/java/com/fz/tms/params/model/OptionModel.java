@@ -12,4 +12,6 @@ package com.fz.tms.params.model;
 public class OptionModel {
     public String Display;
     public String Value;
+    public String Desc;
+    public String Branch;
 }

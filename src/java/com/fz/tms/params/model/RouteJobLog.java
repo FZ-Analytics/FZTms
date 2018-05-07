@@ -20,7 +20,6 @@ public class RouteJobLog {
     public String arrive = "";
     public String depart = "";
     public String runId = "";
-    public String createDtm = "";
     public String branch = "";
     public String shift = "";
     public String lon = "";
@@ -30,4 +29,5 @@ public class RouteJobLog {
     public int transportCost = 0;
     public double activityCost = 0;
     public double dist = 0;
+    public String isFix = "";
 }
