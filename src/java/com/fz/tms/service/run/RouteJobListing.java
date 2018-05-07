@@ -40,6 +40,9 @@ import javax.servlet.jsp.PageContext;
  */
 public class RouteJobListing implements BusinessLogic {
     //DecimalFormat df = new DecimalFormat("##.0");
+    Set<String> vehicles = new HashSet<String>();
+    String shift = "";
+    String branch = "";
         
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
@@ -50,11 +53,22 @@ public class RouteJobListing implements BusinessLogic {
         String channel = FZUtil.getHttpParam(request, "channel");
         String dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
         request.setAttribute("channel", channel);
-        List<RouteJob> js = new ArrayList<RouteJob>();
+        List<RouteJob> js = getAll(runID, OriRunID);
         request.setAttribute("JobList", js);
         request.setAttribute("OriRunID", OriRunID);
-        request.setAttribute("nextRunId", getTimeID());
+        request.setAttribute("nextRunId", getNextRunId(runID));
         request.setAttribute("dateDeliv", dateDeliv);
+        
+        request.setAttribute("vehicleCount", 
+                String.valueOf(vehicles.size()));
+        request.setAttribute("runID", runID);
+        request.setAttribute("branch", branch);
+        request.setAttribute("shift", shift);
+        request.setAttribute("OriRunID", OriRunID);
+    }
+    
+    public List<RouteJob> getAll(String runID, String OriRunID) throws Exception{
+        List<RouteJob> js = new ArrayList<RouteJob>();
         
         String sql = "SELECT\n" +
                 "	j.customer_ID,\n" +
@@ -227,7 +241,7 @@ public class RouteJobListing implements BusinessLogic {
                 // populate list
                 RouteJob prevJ = null;
                 int km = 0;
-                Set<String> vehicles = new HashSet<String>();
+                
                 VehicleAttrDB ar = new VehicleAttrDB();
                 int a = 1;
                     
@@ -312,10 +326,8 @@ public class RouteJobListing implements BusinessLogic {
                     // if no prev job/first time
                     // , keep header infos in request attrib
                     if (prevJ == null){
-                        request.setAttribute("runID", runID);
-                        request.setAttribute("branch", j.branch);
-                        request.setAttribute("shift", j.shift);
-                        request.setAttribute("OriRunID", OriRunID);
+                        branch = j.branch;
+                        shift = j.shift;
                     }
                     // else if has prev job within same route
                     else if (prevJ.routeNb == j.routeNb){
@@ -342,10 +354,14 @@ public class RouteJobListing implements BusinessLogic {
                     if(js.get(x).DONum.length() > 0){
                         while(y < px.size()){  
                             //cek jika do sama
-                            if(js.get(x).DONum.equalsIgnoreCase(px.get(y).get("DOPR"))){
+                            if(js.get(x).DONum.equalsIgnoreCase("8020103331; 8020103633")&& px.get(y).get("DOPR").equalsIgnoreCase("8020103633")){
+                                //System.out.println("test()"+js.get(x).DONum+"+");
+                                //System.out.println(js.get(x).DONum+"()"+px.get(y).get("DOPR"));
+                            }                            
+                            if(js.get(x).DONum.contains(px.get(y).get("DOPR"))){
                                 //cek shipmentplsn 
-                                if(js.get(x).DONum.equalsIgnoreCase("8020102726")){
-                                    System.out.println("com.fz.tms.service.run.RouteJobListing.run()");
+                                if(js.get(x).DONum.equalsIgnoreCase("8020103633")){
+                                    //System.out.println(px.get(y).get("DOSP")+"()"+px.get(y).toString());
                                 }
                                 if(px.get(y).get("DOSP") == null
                                         || px.get(y).get("DOSS") != null
@@ -364,9 +380,6 @@ public class RouteJobListing implements BusinessLogic {
                     }                    
                     x++;
                 }
-                request.setAttribute("vehicleCount"
-                        , String.valueOf(vehicles.size()));
-                
             }
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
@@ -379,11 +392,27 @@ public class RouteJobListing implements BusinessLogic {
             pl.put("dates", dateFormat.format(date).toString());
             Other.insertLog(pl);
         }
+        
+        return js;
     }
-    public static String getTimeID() {
-        String id = (new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(
-                        new java.util.Date()));
-        return id;
+    public static String getNextRunId(String runId) {
+        String[] id = runId.split("_");
+        String date = id[0];
+        String time = "";
+        System.out.println("CHAR AT 0: " + id[1].charAt(0));
+        //Jam 10 pagi ke atas
+        if(id[1].charAt(0) != '0') {
+            int waktu = 0;
+            waktu = Integer.parseInt(id[1]) + 1;
+            time = "" + waktu;
+        } 
+        //Sebelum jam 10 pagi
+        else {
+            int waktu = 0;
+            waktu = Integer.parseInt(id[1]) + 1;
+            time = "0" + waktu;
+        }
+        return date + "_" + time;
     }
 
     public String sendSAP(Vehicle he) throws Exception{
@@ -517,7 +546,8 @@ public class RouteJobListing implements BusinessLogic {
                     pl.put("DOPR", rs.getString("DOPR"));
                     pl.put("DOSP", rs.getString("DOSP"));
                     pl.put("DOSS", rs.getString("DOSS"));
-                    pl.put("DORS", rs.getString("DORS"));                    
+                    pl.put("DORS", rs.getString("DORS")); 
+                    //System.out.println("pl"+pl.toString());
                     px.add(pl);
 
                     //con.setAutoCommit(false);

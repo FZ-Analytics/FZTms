@@ -3,7 +3,7 @@
     Created on : Oct 31, 2017, 5:07:49 PM
     Author     : dwi.rangga
 --%>
-<%@include file="../appGlobal/pageTop.jsp"%>
+<%@include file="../../appGlobal/pageTop.jsp"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="com.fz.tms.params.model.SummaryVehicle"%>
 <%run(new com.fz.tms.params.PopUp.popupDetilRunId());%>
@@ -83,7 +83,7 @@
 
                     //if opened from runResult, runID is run id and oriRunID is next run id
                     //if opened from whatIf, runID is run id and ori run id is ori run id
-                    var jsonForServer = '{\"runId\": \"' + $("#runID").text() + '\", \"oriRunId\":\"' + $("#oriRunID").val() + '\", \"vehicle_no\":\"' + vNo + '\"}';
+                    var jsonForServer = '{\"runId\": \"' + $("#runID").text() + '\", \"oriRunId\":\"' + $("#oriRunID").val() + '\", \"vehicle_no\":\"' + vNo + '\", \"flag\":\"' + $("#flag").val() + '\"}';
 
                     $("#body").fadeOut();
                     $("#loader").fadeIn();
@@ -102,6 +102,10 @@
                 });
             });
         </script>
+        <img src="../img/ffbtoplogo.png">
+        <br>
+        <h4>Summary <span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span></h4>
+        
         <div id="loader" style="text-align: center;">
             <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             <p>Processing</p>
@@ -113,6 +117,7 @@
 
             <br>
             <input class="fzInput" id="oriRunID" name="oriRunID" value="<%=get("oriRunID")%>" hidden="true"/>
+            <input class="fzInput" id="flag" name="flag" value="<%=get("flag")%>" hidden="true"/>
             <label class="fzLabel">RunID:</label> 
             <label class="fzLabel" id="runID"><%=get("runID")%></label> 
 
@@ -151,10 +156,12 @@
                     <%if (s.isFix.equals("1")) {%>
                     <th class="" onclick="" style="">
                         <button id="<%=s.truckid%>" class="btn btn-success btn-xs disabled">Submitting</button>
+                        <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
                     </th>
                     <%} else if (Character.isDigit(s.isFix.charAt(0)) && s.isFix.length() == 10) {%>
                     <th class="" onclick="" style="">
                         <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>"><%=s.isFix%></button>
+                        <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
                     </th>
                     <%} else if(s.isFix.equals("er")) {%>
                     <th class="" onclick="" style="">

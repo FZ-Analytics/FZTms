@@ -47,6 +47,7 @@ public class popupDetilRunId implements BusinessLogic {
 
     String runID = "";
     String oriRunID = "";
+    String flag = "";
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -56,11 +57,14 @@ public class popupDetilRunId implements BusinessLogic {
         //w.renderLngLat();
         runID = FZUtil.getHttpParam(request, "runID");
         oriRunID = FZUtil.getHttpParam(request, "oriRunID");
+        flag = FZUtil.getHttpParam(request, "flag");
+        branch = FZUtil.getHttpParam(request, "branch");
 
         try {
             List<SummaryVehicle> asd = getSummary(runID);
             request.setAttribute("oriRunID", oriRunID);
             request.setAttribute("runID", runID);
+            request.setAttribute("flag", flag);
             request.setAttribute("cap", df.format(tcap).toString());
             request.setAttribute("kub", df.format(tkub).toString());
             request.setAttribute("ttravel", df.format(ttravel).toString());
@@ -247,7 +251,8 @@ public class popupDetilRunId implements BusinessLogic {
                     tamount = tamount.add(BigDecimal.valueOf(Long.valueOf(amount)));
                     sq.DOcount = FZUtil.getRsString(rs, i++, "");
                     tcust = tcust.add(BigDecimal.valueOf(Long.valueOf(sq.DOcount)));
-                    branch = FZUtil.getRsString(rs, i++, "");
+                    //branch = FZUtil.getRsString(rs, i++, "");
+                    i++;
                     String time = FZUtil.getRsString(rs, i++, "");
                     //System.out.println("ttravel " + time + " " +df.format(BigDecimal.valueOf(Long.valueOf(time)).divide(BigDecimal.valueOf(60), MathContext.DECIMAL128)));
                     //System.out.println("tservice "+BigDecimal.valueOf(Long.valueOf(time)).divide(BigDecimal.valueOf(60), MathContext.DECIMAL128));
@@ -268,7 +273,14 @@ public class popupDetilRunId implements BusinessLogic {
                     tkm = tkm.add(km);
 
                     //Check error submit SAP
-                    ArrayList<String> alDo = getDo(runID, sq.truckid);
+                    ArrayList<String> alDo = new ArrayList<>();
+                    if(flag.equals("runResultEditResult")) {
+                        System.out.println(runID + " " + oriRunID);
+                        alDo = getDo(oriRunID, runID, sq.truckid);
+                    } else {
+                        alDo = getDo(runID, runID, sq.truckid);
+                    }
+                    
                     for (int j = 0; j < alDo.size(); j++) {
                         String doNum = alDo.get(j);
 
@@ -308,7 +320,6 @@ public class popupDetilRunId implements BusinessLogic {
                         sq.isFix = "er";
                         sq.error = "Capacity and kubikasi overload";
                     }
-
                     asd.add(sq);
                 }
                 tcap = tcap.divide(BigDecimal.valueOf(asd.size()), MathContext.DECIMAL128);
@@ -329,7 +340,7 @@ public class popupDetilRunId implements BusinessLogic {
         return vSplit[1] + vSplit[3];
     }
 
-    public ArrayList<String> getDo(String runId, String vehicleCode) throws Exception {
+    public ArrayList<String> getDo(String oriRunId, String runId, String vehicleCode) throws Exception {
         ArrayList<String> alDo = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
@@ -360,7 +371,8 @@ public class popupDetilRunId implements BusinessLogic {
 //                        + "             prj.Request_Delivery_Date = sp.Request_Delivery_Date\n"
 //			+ "		and prj.DO_Number = sp.DO_Number\n"
                         + "WHERE \n"
-                        + "	prj.RunId = '" + runId + "'";
+                        + "	prj.RunId = '" + oriRunId + "'\n"
+                        + "     AND prj.Batch <> 'NULL'";
 
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {

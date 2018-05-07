@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@include file="../appGlobal/pageTop.jsp"%>
+<%@include file="../../appGlobal/pageTop.jsp"%>
 <%run(new com.fz.tms.params.PopUp.popupEditCust());%>
 <!DOCTYPE html>
 <html>
@@ -111,6 +111,8 @@
                 });
             };
         </script>
+        <img src="../img/ffbtoplogo.png">
+        <br>
         <h1>Edit Customer</h1>
         <div class="fzErrMsg">
             <%=get("errMsg")%>

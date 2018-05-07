@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@include file="../appGlobal/pageTop.jsp"%>
+<%@include file="../../appGlobal/pageTop.jsp"%>
 <%@page import="com.fz.tms.params.model.Vehicle"%>
 <%run(new com.fz.tms.params.PopUp.ShowPreRouteVehicle());%>
 <!DOCTYPE html>
@@ -49,7 +49,7 @@
                 $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                     if(data == 'OK'){
                         alert( 'sukses' );
-                        location.reload();
+                        //location.reload();
                     }else{
                         alert( 'submit error' ); 
                     }
@@ -72,6 +72,9 @@
                 });
             }
         </script>
+        <img src="../img/ffbtoplogo.png">
+        <br>
+        <h4>Vehicle Editor<span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span></h4>
         <br>
         <label class="fzLabel">RunID:</label> 
         <label class="fzLabel" id="runId" ><%=get("runId")%></label> 

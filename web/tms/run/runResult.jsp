@@ -14,10 +14,24 @@
             }
         </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
+        <%
+            url = request.getRequestURL().toString();
+            String str =  url + "?" + request.getQueryString();
+            str = str.replace("http://","");
+            str = str.replace(":","9ETR9");
+            str = str.replace(".","9DOT9");
+            str = str.replace("/","9AK9");
+            str = str.replace("?","9ASK9");
+            str = str.replace("&","9END9");
+            str = str.replace("=","9EQU9");
+            str = str.replace("-","9MIN9");
+            String urls =  url + "?" + request.getQueryString();
+        %>
+        <input type="hidden" value="<%=str%>" id="urls"/>
         <link href="../appGlobal/eFreezeTable.css" rel="stylesheet">
         <script src="../appGlobal/eFreezeTable.js"></script>
         <script>
-            $(document).ready(function () {
+            $(document).ready(function () {                
                 $('#table').eFreezeTableHead();
                 $('.custIDClick').click(function () {
                     //Some code
@@ -41,7 +55,7 @@
                     //Some code
                     //alert( $("#runID").text()+"&vCode="+$(this).text() ); 
                     if ($(this).text().length > 0) {
-                        window.open("../Params/PopUp/popupDetilRunId.jsp?runID=" + $("#RunIdClick").text() + "&oriRunID=" + $("#nextRunId").text(), null,
+                        window.open("../Params/PopUp/popupDetilRunId.jsp?runID=" + $("#RunIdClick").text() + "&oriRunID=" + $("#nextRunId").text() + "&flag=runResult" + "&branch=" + $("#branch").text(), null,
                                 "scrollbars=1,resizable=1,height=500,width=850");
                         return true;
                     }
@@ -59,7 +73,7 @@
                 $('#reRun').click(function () {
                     var dateNow = $.datepicker.formatDate('yy-mm-dd', new Date());//currentDate.getFullYear()+"-"+(currentDate.getMonth()+1)+"-"+currentDate.getDate();
 
-                    var win = window.open('runProcess.jsp?shift=1&dateDeliv=' + dateNow + '&branch=' + $('#branch').text() + '&runId=' + $("#RunIdClick").text() + '&oriRunID=' + $("#OriRunID").val() + '&reRun=A' + '&channel=' + $('#channel').text(), '_blank');
+                    var win = window.location.replace('runProcess.jsp?shift=1&dateDeliv=' + dateNow + '&branch=' + $('#branch').text() + '&runId=' + $("#RunIdClick").text() + '&oriRunID=' + $("#OriRunID").val() + '&reRun=A' + '&channel=' + $('#channel').text() + '&url=' + $("#urls").val(), '_blank');
                     if (win) {
                         //Browser has allowed it to be opened
                         win.focus();
@@ -88,10 +102,9 @@
                             );
                 }
 
-                var win = window.open('runResultEdit.jsp?&OriRunID=' + $('#RunIdClick').text() + '&runId=' + $('#nextRunId').text() + '&channel=' + $('#channel').text() +
-                        '&branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&vehicles=' + $('#vehicles').text() + '&dateDeliv=' + $('#dateDeliv').text() + 
-                        '&tableArr=' + tableArr);
-
+                var win = window.location.replace('runResultEdit.jsp?&OriRunID=' + $('#RunIdClick').text() + '&runId=' + $('#nextRunId').text() + '&channel=' + $('#channel').text() +
+                        '&branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&vehicles=' + $('#vehicles').text() + '&dateDeliv=' + $('#dateDeliv').text());
+                 //+ '&tableArr=' + tableArr);
                 if (win) {
                     //Browser has allowed it to be opened
                     win.focus();
@@ -193,8 +206,25 @@
                         'scrollbars=1,resizable=1,height=500,width=950');
 
             }
+            function saveHistory() {
+                var $apiAddress = '../../api/popupEditCustBfror/savehistory';
+                var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
+                var data = [];
+
+                $.post($apiAddress, {json: jsonForServer}).done(function (data) {
+                    if(data == 'OK'){
+                        alert( 'sukses' );
+                        //location.reload();
+                    }else{
+                        alert( 'submit error' ); 
+                    }
+                });
+            }
         </script>
-        <h3>Runs</h3>
+        <h4>Routing Result 
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span>
+            <span class="glyphicon glyphicon-list-alt" aria-hidden="true" onclick="saveHistory()"></span>
+        </h4>
 
         <label class="fzInput" id="nextRunId" hidden="true"><%=get("nextRunId")%></label>
         <label class="fzInput" id="dateDeliv" hidden="true"><%=get("dateDeliv")%></label>
@@ -229,11 +259,11 @@
         <label class="fzLabel" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
 
         <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />
-
+        
         <br><br>
         <table id="table" border1="1" style="border-color: lightgray;">
             <thead>
-                <tr style="background-color:orange">
+                <tr style="background-color:orange;">
                     <th width="100px" class="fzCol">No.</th>
                     <th width="100px" class="fzCol">Truck</th>
                     <th width="100px" class="fzCol">CustID</th>
@@ -245,8 +275,8 @@
                     <th width="100px" class="fzCol">Priority</th>
                     <th width="100px" class="fzCol">Dist Chl</th>
                     <th width="100px" class="fzCol">Street</th>
-                    <th width="100px" class="fzCol">Weight</th>
-                    <th width="100px" class="fzCol">Volume</th>
+                    <th width="100px" class="fzCol">Weight (KG)</th>
+                    <th width="100px" class="fzCol">Volume (M3)</th>
                     <th width="100px" class="fzCol">RDD</th>
                     <th width="100px" class="fzCol">Transport Cost</th>
                     <th width="100px" class="fzCol">Dist</th>

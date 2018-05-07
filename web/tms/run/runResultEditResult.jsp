@@ -26,6 +26,19 @@
 
         </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
+        <%
+            url = request.getRequestURL().toString();
+            String str =  url + "?" + request.getQueryString();
+            str = str.replace("http://","");
+            str = str.replace(":","9ETR9");
+            str = str.replace(".","9DOT9");
+            str = str.replace("/","9AK9");
+            str = str.replace("?","9ASK9");
+            str = str.replace("&","9END9");
+            str = str.replace("=","9EQU9");
+            str = str.replace("-","9MIN9");
+            String urls =  url + "?" + request.getQueryString();
+        %>
         <link href="../appGlobal/eFreezeTable.css" rel="stylesheet">
         <script src="../appGlobal/eFreezeTable.js"></script>
         <script>
@@ -47,7 +60,7 @@
                 });
                 $('#RunIdClick').click(function () {
                     if ($(this).text().length > 0) {
-                        window.open("../Params/PopUp/popupDetilRunId.jsp?runID=" + $("#RunIdClick").text() + "&oriRunID=" + $("#OriRunID").val(), null,
+                        window.open("../Params/PopUp/popupDetilRunId.jsp?runID=" + $("#RunIdClick").text() + "&oriRunID=" + $("#OriRunID").val() + "&flag=runResultEditResult" + "&branch=" + $("#branch").text(), null,
                                 "scrollbars=1,resizable=1,height=500,width=850");
                         return true;
                     }
@@ -96,10 +109,27 @@
 
                 return (sa);
             }
+            function saveHistory() {
+                var $apiAddress = '../../api/popupEditCustBfror/savehistory';
+                var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
+                var data = [];
+
+                $.post($apiAddress, {json: jsonForServer}).done(function (data) {
+                    if(data == 'OK'){
+                        alert( 'sukses' );
+                        //location.reload();
+                    }else{
+                        alert( 'submit error' ); 
+                    }
+                });
+            }
 
         </script>
         <div id="body">
-            <h3>Runs</h3>
+            <h3>Runs 
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span>
+                <span class="glyphicon glyphicon-list-alt" aria-hidden="true" onclick="saveHistory()"></span>
+            </h3>
 
             <input class="fzInput" id="OriRunID" name="OriRunID" value="<%=get("oriRunId")%>" hidden="true"/>
 

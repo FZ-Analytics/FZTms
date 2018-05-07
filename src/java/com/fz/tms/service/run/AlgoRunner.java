@@ -10,6 +10,7 @@ import com.fz.generic.Db;
 import com.fz.tms.params.service.Other;
 import com.fz.util.FZUtil;
 import com.fz.util.UrlResponseGetter;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +43,17 @@ public class AlgoRunner implements BusinessLogic {
         String reRun = FZUtil.getHttpParam(request, "reRun");
         String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
+        String urls = FZUtil.getHttpParam(request, "url");
+        
+        if(urls != null || urls.length() > 0){
+            urls = urls.replace("9ETR9",":");
+            urls = urls.replace("9DOT9",".");
+            urls = urls.replace("9AK9","/");
+            urls = urls.replace("9ASK9","?");
+            urls = urls.replace("9END9","&");
+            urls = urls.replace("9EQU9","=");
+            urls = urls.replace("9MIN9","-");
+        }
 
         String maxIter = FZUtil.getHttpParam(request, "shift");
         if (maxIter.length() == 0) {
@@ -129,12 +141,14 @@ public class AlgoRunner implements BusinessLogic {
                     
                     //cek error data
                     if (resp.equalsIgnoreCase("OK")){
+                        px = replace(px);
                         errMsg = cekData(runID, runId, "ori", px);
                         resp = errMsg;
                     }
                     
                     if (resp.equalsIgnoreCase("OK")){
-                        errMsg = cluster(runId, runID, px);
+                        List<HashMap<String, String>> zx = px;
+                        errMsg = cluster(runId, runID, zx);
                         resp = errMsg;
                     }
                     
@@ -145,6 +159,7 @@ public class AlgoRunner implements BusinessLogic {
                     
                     if (resp.equalsIgnoreCase("OK")){
                         px = selectCust(runId, runID);
+                        px = replace(px);
                         errMsg = "Insert PreRouteJob Copy ori Error";
                         resp = insertPreRouteJobCopy(runID, runId, branchCode, dateDeliv, "ori", px);
                     }
@@ -170,7 +185,7 @@ public class AlgoRunner implements BusinessLogic {
                     } 
                     
                     if (!resp.equalsIgnoreCase("OK")){
-                        throw new Exception(); 
+                        throw new Exception(errMsg); 
                     }
                     
                 } else if (reRun.equals("N")) {
@@ -201,7 +216,7 @@ public class AlgoRunner implements BusinessLogic {
                     }
                     
                     if (!resp.equalsIgnoreCase("OK")){
-                        throw new Exception(); 
+                        throw new Exception(errMsg); 
                     }
 
                 }
@@ -214,7 +229,7 @@ public class AlgoRunner implements BusinessLogic {
             pl.put("fileNmethod", "AlgoRunner&run Exc");
             pl.put("datas", "");
             String str = getStackTrace(e);
-            pl.put("msg", errMsg +" | "+ str);
+            pl.put("msg", urls + " | " + errMsg +" | "+ str);
             System.out.println("Exception " + str);
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             Date date = new Date();
@@ -592,7 +607,7 @@ public class AlgoRunner implements BusinessLogic {
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setEscapeProcessing(true);
-            ps.setQueryTimeout(15);
+            //ps.setQueryTimeout(150);
             ps.setString(1, branchCode);
             ps.execute();
             str = "OK";
@@ -955,50 +970,34 @@ public class AlgoRunner implements BusinessLogic {
         
             List<HashMap<String, String>> ins = new ArrayList<HashMap<String, String>>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");            
-            Calendar c = Calendar.getInstance();
+            Calendar calendar = Calendar.getInstance();
             Date dDeliv = sdf.parse(dateDeliv);
             System.out.println("QueryCust()");
             for(int a = 0;a<asd.size();a++){ 
-                c = Calendar.getInstance();
+                //calendar = Calendar.getInstance();
+                calendar.setTime(dDeliv);
                 pl = new HashMap<String, String>();
                 Date rdd = sdf.parse(asd.get(a).get("Request_Delivery_Date"));
                 pl = asd.get(a);      
                 //System.out.println(pl.toString());
                 
-                //cek hari buka
-                
-                int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+                //cek hari buka                
+                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
                 //System.out.println(dayOfWeek);
-                if(pl.get("DO_Number").equals("8020089252")){
-                    System.out.println(rdd);
+                if(pl.get("DO_Number").equals("8020109240")){
+                    //System.out.println(pl.get("Customer_ID"));
+                    //System.out.println(pl.get("DayWinEnd"));
+                    //System.out.println(asd.get(a).get("DayWinEnd"));
                     String g = edt;
                     //System.out.println(dayOfWeek + "()" + Integer.parseInt(asd.get(a).get("DayWinStart")));
                     //System.out.println(pl.get("5820002148"));
-                }
+                }                
+                
                 if(dayOfWeek >= Integer.parseInt(asd.get(a).get("DayWinStart"))
                         && dayOfWeek <= Integer.parseInt(asd.get(a).get("DayWinEnd"))){
-                    //System.out.println(asd.get(a).get("DayWinStart") + "()" + asd.get(a).get("DayWinEnd"));
-                    //System.out.println(asd.get(a).get("DeliveryDeadline") + " " + asd.get(a).get("Request_Delivery_Date"));
-                    
-                    
-                    //cek rule
-                    /*
-                    if(!asd.get(a).get("DeliveryDeadline").equals("AFTR")){
-                        if(dDeliv.compareTo(rdd) <= 0){
-                            pl = tree(asd.get(a), rdd, dDeliv, asd.get(a).get("DeliveryDeadline"), chn);
-                        }else{
-                            pl = new HashMap<String, String>();
-                        }
-                    }else if(asd.get(a).get("DeliveryDeadline").equals("AFTR")){
-                        c.setTime(rdd);
-                        c.add(Calendar.DATE, 7);
-                        rdd = sdf.parse(sdf.format(c.getTime()));
-                        if(dDeliv.compareTo(rdd) <= 0){
-                            pl = tree(asd.get(a), rdd, dDeliv, asd.get(a).get("DeliveryDeadline"), chn);
-                        }else{
-                            pl = new HashMap<String, String>();
-                        }
-                    }*/
+                    if(Integer.parseInt(asd.get(a).get("DayWinEnd")) == 6){
+                        System.out.println(pl.get("Customer_ID") +" : "+ pl.get("DayWinEnd"));
+                    }
                     
                     if(dDeliv.compareTo(rdd) <= 7){
                         pl = tree(asd.get(a), dDeliv, asd.get(a).get("DeliveryDeadline"), chn);
@@ -1009,9 +1008,6 @@ public class AlgoRunner implements BusinessLogic {
                     if(pl != null){
                         ins.add(pl);
                     }
-                    
-                    //System.out.println("dDeliv.compareTo(rdd) " + dDeliv.compareTo(rdd));
-                    //System.out.println(pl.toString());
                 }                
             }
             
@@ -1127,22 +1123,23 @@ public class AlgoRunner implements BusinessLogic {
                     else                            pl.replace("Customer_priority", String.valueOf(10));
                 }
             }else{
-                pl.replace("Customer_priority", String.valueOf(2));
                 //repale channel to GT
                 //pl.replace("Distribution_Channel", "GT");
-                /*
+                
                 if(pl.get("DeliveryDeadline").equalsIgnoreCase("BFOR")){
-                    if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
-                    else if(str > 0)                pl.replace("Customer_priority", String.valueOf(3));
-                    else if(str < 0)                pl.replace("Customer_priority",  String.valueOf(10));
+                    //if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
+                    //else if(str > 0)                pl.replace("Customer_priority", String.valueOf(3));
+                    if(str < 0)                 pl.replace("Customer_priority",  String.valueOf(10));
+                    else                        pl.replace("Customer_priority", String.valueOf(2));
                 }else if(pl.get("DeliveryDeadline").equalsIgnoreCase("AFTR")){
-                    if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
+                                                pl.replace("Customer_priority", String.valueOf(2));
+                    /*if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
                     else if(str > 0)                pl.replace("Customer_priority", String.valueOf(3));
-                    else if(str < 0)                pl.replace("Customer_priority", String.valueOf(2));
+                    else if(str < 0)                pl.replace("Customer_priority", String.valueOf(2));*/
                 }else if(pl.get("DeliveryDeadline").equalsIgnoreCase("ONDL")){
-                    if(str == 0)            pl.replace("Customer_priority", String.valueOf(1));
-                    else                    pl.replace("Customer_priority", String.valueOf(10));
-                }*/
+                    if(str == 0)                pl.replace("Customer_priority", String.valueOf(2));
+                    else                        pl.replace("Customer_priority", String.valueOf(10));
+                }
             }//System.out.println(pl.get("Customer_ID"));
 
             if(pl.get("Customer_ID").equals("5820001001") || pl.get("Customer_ID").equals("5820000348")){
@@ -1326,7 +1323,7 @@ public class AlgoRunner implements BusinessLogic {
             Object[] keys = py.keySet().toArray();
             
             if(py.get("Customer_ID").equalsIgnoreCase("5810002739")){
-                System.out.println("com.fz.tms.service.run.AlgoRunner.cekData()");
+                //System.out.println("com.fz.tms.service.run.AlgoRunner.cekData()");
             }
             
             while(j <py.size()){
@@ -1338,8 +1335,10 @@ public class AlgoRunner implements BusinessLogic {
                 }
                 
                 if(keys[j].equals("Long") || keys[j].equals("Lat")){
-                    if(py.get("Customer_ID").equalsIgnoreCase("5810110214")){
-                        System.out.println("com.fz.tms.service.run.AlgoRunner.cekData()");
+                    //System.out.println(py.get("Customer_ID"));          
+                    if(py.get("Customer_ID").equalsIgnoreCase("5810003561")){
+                        System.out.println(py.get("Customer_ID"));                       
+                        
                     }
                     if(tmp.replaceAll("[^.]", "").length() > 1){
                         err += ". ";
@@ -1350,6 +1349,31 @@ public class AlgoRunner implements BusinessLogic {
                     if(tmp.equalsIgnoreCase("0")){
                         err += "0 ";
                     }
+                    try{
+                        if(keys[j].equals("Long")){
+                            Double start = Double.parseDouble("95.31644");
+                            Double end = Double.parseDouble("140.71813");
+
+                            Double lng = Double.parseDouble(tmp);
+                            if ( lng < start
+                                    || end < lng ) {
+                                err += "Long ";
+                            }
+                        }
+                        if(keys[j].equals("Lat")){
+                            Double start = Double.parseDouble("-10.1718");
+                            Double end = Double.parseDouble("5.88969");
+
+                            Double lat = Double.parseDouble(tmp);
+                            if ( lat < start
+                                    || end < lat ) {
+                                err += "Lat ";
+                            }
+                        }
+                    }catch(Exception e){
+                        err += "Long ";
+                        err += "Lat ";
+                    }                    
                 }
                 
                 if(tmp.contains("\"")){
@@ -1375,6 +1399,47 @@ public class AlgoRunner implements BusinessLogic {
         
         if(err.equalsIgnoreCase(""))    err = "OK";
         return err;
+    }
+    
+    public List<HashMap<String, String>> replace(List<HashMap<String, String>> zx) throws Exception{
+        String err = "";
+        List<HashMap<String, String>> asd = zx;
+        HashMap<String, String> py = new HashMap<String, String>();
+        
+        int i = 0;
+        while(i < asd.size()){
+            py = zx.get(i);
+            
+            int j = 0;
+            Object[] keys = py.keySet().toArray();
+            
+            if(py.get("Customer_ID").equalsIgnoreCase("5810005710")){
+                System.out.println("com.fz.tms.service.run.AlgoRunner.cekData()");
+            }
+            
+            while(j <py.size()){
+                String tmp = py.get(keys[j]) == null ? "-" : py.get(keys[j]);
+                //System.out.print(j + str);
+                String re = "";
+                if(tmp.contains("'"))                
+                    re = py.get(keys[j]).replace("'", "");
+                
+                if(tmp.contains("\""))
+                    re = py.get(keys[j]).replace("\"", "");
+                
+                if(re.length() > 0){
+                    zx.remove(i);
+                    py.replace(keys[j].toString(), re);
+                    zx.add(i, py);
+                }
+                
+                j++;
+            }
+            //System.out.println();
+            i++;
+        }
+        
+        return zx;
     }
     
     public String cluster(String runId, String nextRunID, List<HashMap<String, String>> zx) throws Exception{

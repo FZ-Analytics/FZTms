@@ -87,6 +87,7 @@ public class VehicleAttrDB {
                     "				WHEN vh.vehicle_code IS NULL THEN va.vehicle_type\n" +
                     "				ELSE vh.vehicle_type\n" +
                     "			END AS vehicle_type,\n" +
+                    "			va.channel,\n" +
                     "			va.included\n" +
                     "		FROM\n" +
                     "			BOSNET1.dbo.Vehicle vh\n" +
@@ -107,6 +108,7 @@ public class VehicleAttrDB {
                     "			va.volume,\n" +
                     "			va.branch AS plant,\n" +
                     "			va.vehicle_type,\n" +
+                    "			va.channel,\n" +
                     "			va.included\n" +
                     "		FROM\n" +
                     "			BOSNET1.dbo.TMS_VehicleAtr va\n" +
@@ -131,6 +133,7 @@ public class VehicleAttrDB {
                         c.vehicle_type = rs.getString("vehicle_type");
                         c.weight = rs.getString("weight");
                         c.volume = rs.getString("volume");
+                        c.Channel = rs.getString("channel");
                         c.included = rs.getString("included");
                         ar.add(c);
                     }
@@ -286,7 +289,7 @@ public class VehicleAttrDB {
         return ex;
     }
     
-    public List<Branch> getBranch() throws Exception{
+    public List<Branch> getBranch(String br) throws Exception{
         Branch c = new Branch();
         List<Branch> ar = new ArrayList<Branch>();
         
@@ -294,8 +297,12 @@ public class VehicleAttrDB {
             try (Statement stm = con.createStatement()){
             
                 // create sql
+                String str = "";
+                if(br.length() > 0){
+                    str = "where SalOffCode = '" + br + "'";
+                }
                 String sql ;
-                sql = "SELECT SalOffCode, SalOffName FROM BOSNET1.dbo.TMS_SALESOFFICE order by SalOffName asc;";
+                sql = "SELECT SalOffCode, SalOffName FROM BOSNET1.dbo.TMS_SALESOFFICE "+str+" order by SalOffCode asc;";
                 
                 // query
                 try (ResultSet rs = stm.executeQuery(sql)){

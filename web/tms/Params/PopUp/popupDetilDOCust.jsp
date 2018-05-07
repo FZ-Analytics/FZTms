@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@include file="../appGlobal/pageTop.jsp"%>
+<%@include file="../../appGlobal/pageTop.jsp"%>
 <%run(new com.fz.tms.params.PopUp.PopupDetilDo());%>
 <%@page import="com.fz.tms.params.model.DODetil"%>
 <!DOCTYPE html>
@@ -16,6 +16,9 @@
     </head>
     <body>
         <%@include file="../appGlobal/bodyTop.jsp"%>
+        <img src="../img/ffbtoplogo.png">
+        <br>
+        <h4>Param Attr<span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span></h4>
         <br>
         <label class="fzLabel">Branch:</label> 
         <label class="fzLabel"><%=get("branch")%></label>        

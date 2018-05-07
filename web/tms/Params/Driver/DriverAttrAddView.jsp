@@ -3,7 +3,7 @@
     Created on : Mar 14, 2018, 1:50:16 PM
     Author     : dwi.oktaviandi
 --%>
-<%@include file="../appGlobal/pageTop.jsp"%>
+<%@include file="../../appGlobal/pageTop.jsp"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="com.fz.tms.params.model.ForwadingAgent"%>
 <%run(new com.fz.tms.params.Driver.DriverAttrAddView());%>
@@ -60,14 +60,16 @@
                 $('#inc').val(inc);
             }
         </script>
-        <div style="width: 100%">
+        <h4>Vendor Attribute <span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span></h4>
+        <br>
+        <br>
+        <div style="width: 100%;height: 500px;">
             <div style="width: 30%; float:left;">
                 <div class="fzErrMsg" id="errMsg">
                     <%=get("errMsg")%>
                 </div>
-
-                <br>
-                <label class="fzLabel">Driver Id:</label> 
+                <h4>Editor</h4>
+                <label class="fzLabel">Vendor Id:</label> 
                 <input class="fzInput" type="text" id="Service_agent_id" name="Service_agent_id" readonly="true">
 
                 <br>
@@ -75,7 +77,7 @@
                 <input class="fzInput" type="text" id="Driver_Name" name="Driver_Name" readonly="true">
 
                 <br>
-                <label class="fzLabel">Branch:</label> 
+                <label class="fzLabel">Vendor:</label> 
                 <select id="branchId" name="branchId">
                     <option value="D000" >D000</option>
                     <%for (Branch hd : (List<Branch>) getList("ListBranch")) { %>
@@ -94,11 +96,11 @@
                 <br><br>
                 <button class="btn fzButton" type="submit" id="btn">submit</button>
             </div>
-            <div style="width: 70%; float:left;" >
+            <div style="width: 50%; float:left;" >
                 <table cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered">
                     <thead>
                         <tr>
-                            <th>Driver Id</th>
+                            <th>Vendor Id</th>
                             <th>Name</th>
                             <th>Branch</th>
                             <th>Inc</th>
