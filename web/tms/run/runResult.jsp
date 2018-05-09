@@ -10,7 +10,16 @@
     </head>
     <body style="height: 760px">
         <style>
-            tr { border-bottom: 2px solid lightgray;
+            tr { 
+                border-bottom: 2px solid lightgray;
+            }
+            
+            .hover:hover {
+               cursor: pointer; 
+            }
+            
+            .center {
+                text-align: center;
             }
         </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
@@ -394,8 +403,8 @@
             }
         </script>
         <h4>Routing Result 
-            <span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span>
-            <span class="glyphicon glyphicon-list-alt" aria-hidden="true" onclick="saveHistory()"></span>
+            <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
+            <span class="glyphicon glyphicon-list-alt hover" aria-hidden="true" onclick="saveHistory()"></span>
         </h4>
 
         <label class="fzInput" id="nextRunId" hidden="true"><%=get("nextRunId")%></label>
@@ -422,13 +431,13 @@
 
         <br>
         <label class="fzLabel">RunID:</label> 
-        <label class="fzLabel" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
+        <label class="fzLabel hover" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
 
         <br>
         <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
-        <label class="fzLabel" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
-        <label class="fzLabel" id="reRun" style="color: blue;">Re-Routing</label>
-        <label class="fzLabel" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
+        <label class="fzLabel hover" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
+        <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
+        <label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
 
         <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />
         <br><br>
@@ -437,25 +446,25 @@
                 <table id="table" border1="1" style="border-color: lightgray;">
                     <thead>
                         <tr style="background-color:orange;">
-                            <th width="100px" class="fzCol">color</th>
-                            <th width="100px" class="fzCol">No.</th>
-                            <th width="100px" class="fzCol">Truck</th>
-                            <th width="100px" class="fzCol">CustID</th>
-                            <th width="100px" class="fzCol">Arrv</th>
-                            <th width="100px" class="fzCol">Depart</th>
-                            <th width="100px" class="fzCol">DO</th>
-                            <th width="100px" class="fzCol">Srvc Time</th>
-                            <th width="100px" class="fzCol">Name</th>
-                            <th width="100px" class="fzCol">Priority</th>
-                            <th width="100px" class="fzCol">Dist Chl</th>
-                            <th width="100px" class="fzCol">Street</th>
-                            <th width="100px" class="fzCol">Weight (KG)</th>
-                            <th width="100px" class="fzCol">Volume (M3)</th>
-                            <th width="100px" class="fzCol">RDD</th>
-                            <th width="100px" class="fzCol">Transport Cost</th>
-                            <th width="100px" class="fzCol">Dist</th>
+                            <th width="100px" class="fzCol center">color</th>
+                            <th width="100px" class="fzCol center">No.</th>
+                            <th width="100px" class="fzCol center">Truck</th>
+                            <th width="100px" class="fzCol center">CustID</th>
+                            <th width="100px" class="fzCol center">Arrv</th>
+                            <th width="100px" class="fzCol center">Depart</th>
+                            <th width="100px" class="fzCol center">DO</th>
+                            <th width="100px" class="fzCol center">Srvc Time</th>
+                            <th width="100px" class="fzCol center">Name</th>
+                            <th width="100px" class="fzCol center">Priority</th>
+                            <th width="100px" class="fzCol center">Dist Chl</th>
+                            <th width="100px" class="fzCol center">Street</th>
+                            <th width="100px" class="fzCol center">Weight (KG)</th>
+                            <th width="100px" class="fzCol center">Volume (M3)</th>
+                            <th width="100px" class="fzCol center">RDD</th>
+                            <th width="100px" class="fzCol center">Transport Cost</th>
+                            <th width="100px" class="fzCol center">Dist</th>
         <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
-                            <th width="100px" class="fzCol">Edit</th>
+                            <th width="100px" class="fzCol center">Edit</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -469,31 +478,31 @@
                             style="background-color: #e6ffe6"
                             <%}%> >
                             <td class="fzCell" style="background-color: <%=j.color%>"></td>
-                            <td class="fzCell"><%=j.no%></td>
-                            <td class="vCodeClick" style="color: blue;"><%=j.vehicleCode%></td>
-                            <td class="custIDClick" style="color: blue;"><%=j.custID%></td>
-                            <td class="fzCell"><%=j.arrive%></td>
-                            <td class="fzCell"><%=j.depart%></td>                    
-                            <td class="fzCell" <%if (j.bat == "1" ) {%> 
+                            <td class="fzCell center"><%=j.no%></td>
+                            <td class="vCodeClick center" style="color: blue;"><%=j.vehicleCode%></td>
+                            <td class="custIDClick center" style="color: blue;"><%=j.custID%></td>
+                            <td class="fzCell center"><%=j.arrive%></td>
+                            <td class="fzCell center"><%=j.depart%></td>                    
+                            <td class="fzCell center" <%if (j.bat == "1" ) {%> 
                                 style="background-color: #ffe6e6" <%}%> ><%=j.DONum%></td>
-                            <td class="fzCell"><%=j.getServiceTime()%></td>
-                            <td class="fzCell">
+                            <td class="fzCell center"><%=j.getServiceTime()%></td>
+                            <td class="fzCell center">
                                 <%if (j.arrive.length() > 0) {%>
                                 <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
                                 <%} else {%><%=j.name1%><%}%>
-                            <td class="fzCell"><%=j.custPriority%></td>
-                            <td class="fzCell"><%=j.distrChn%></td>
-                            <td class="fzCell"><%=j.street%></td>
-                            <td class="fzCell"><%=j.weight%></td>
-                            <td class="fzCell"><%=j.volume%></td>
-                            <td class="fzCell"><%=j.rdd%></td>
-                            <td class="fzCell"><%=j.transportCost%></td>
-                            <td class="fzCell"><%=j.dist%></td>
+                            <td class="fzCell center"><%=j.custPriority%></td>
+                            <td class="fzCell center"><%=j.distrChn%></td>
+                            <td class="fzCell center"><%=j.street%></td>
+                            <td class="fzCell center"><%=j.weight%></td>
+                            <td class="fzCell center"><%=j.volume%></td>
+                            <td class="fzCell center"><%=j.rdd%></td>
+                            <td class="fzCell center"><%=j.transportCost%></td>
+                            <td class="fzCell center"><%=j.dist%></td>
         <!--                    <td class="fzCell" 
                                 <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
                                 onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
                                 <%}%> ><%=j.send%></td>-->
-                            <td class="editCust" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
+                            <td class="editCust center" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
                         </tr>
 
                         <%} // for ProgressRecord %>
