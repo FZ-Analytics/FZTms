@@ -32,7 +32,7 @@
         <script src="../appGlobal/eFreezeTable.js"></script>
         <script>
             $(document).ready(function () {                
-                $('#table').eFreezeTableHead();
+                //$('#table').eFreezeTableHead();
                 runMapAll();
                 $('.custIDClick').click(function () {
                     //Some code
@@ -425,7 +425,7 @@
         <label class="fzLabel" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
 
         <br>
-        <label class="fzLabel" id="mapAll" style="color: blue;">Map</label> 
+        <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
         <label class="fzLabel" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
         <label class="fzLabel" id="reRun" style="color: blue;">Re-Routing</label>
         <label class="fzLabel" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
@@ -433,16 +433,17 @@
         <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />
         <br><br>
         <div id="cover" style="width: 100%">
-            <div id="thediv" style="float: left;overflow-y: scroll;height: 510px; width: 55%">                
+            <div id="thediv" style="float: left;overflow-y: scroll;height: 510px; width: 65%">                
                 <table id="table" border1="1" style="border-color: lightgray;">
                     <thead>
                         <tr style="background-color:orange;">
+                            <th width="100px" class="fzCol">color</th>
                             <th width="100px" class="fzCol">No.</th>
                             <th width="100px" class="fzCol">Truck</th>
                             <th width="100px" class="fzCol">CustID</th>
                             <th width="100px" class="fzCol">Arrv</th>
                             <th width="100px" class="fzCol">Depart</th>
-                            <th width="100px" class="fzCol">DO Count</th>
+                            <th width="100px" class="fzCol">DO</th>
                             <th width="100px" class="fzCol">Srvc Time</th>
                             <th width="100px" class="fzCol">Name</th>
                             <th width="100px" class="fzCol">Priority</th>
@@ -466,15 +467,15 @@
                             style="background-color: lightyellow"
                             <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
                             style="background-color: #e6ffe6"
-                            <%} else if (j.bat == "1" ) {%>
-                            style="background-color: #ffe6e6"
                             <%}%> >
+                            <td class="fzCell" style="background-color: <%=j.color%>"></td>
                             <td class="fzCell"><%=j.no%></td>
                             <td class="vCodeClick" style="color: blue;"><%=j.vehicleCode%></td>
                             <td class="custIDClick" style="color: blue;"><%=j.custID%></td>
                             <td class="fzCell"><%=j.arrive%></td>
                             <td class="fzCell"><%=j.depart%></td>                    
-                            <td class="fzCell"><%=j.DONum%></td>
+                            <td class="fzCell" <%if (j.bat == "1" ) {%> 
+                                style="background-color: #ffe6e6" <%}%> ><%=j.DONum%></td>
                             <td class="fzCell"><%=j.getServiceTime()%></td>
                             <td class="fzCell">
                                 <%if (j.arrive.length() > 0) {%>
@@ -499,7 +500,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="float: left;width: 45%;">
+            <div style="float: left;width: 35%;">
                 <script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
                 <input type="text" id="txt" value='<%=request.getAttribute("test")%>' hidden="true"/>
                 <div id="map" style="width: 100%;height: 500px;"></div>

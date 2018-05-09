@@ -265,6 +265,9 @@ public class RouteJobListing implements BusinessLogic {
                 VehicleAttrDB ar = new VehicleAttrDB();
                 int a = 1;
                     
+                GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+                int p = 0;
+                String vehicleCode = "";
                 while (rs.next()) {
                     
                     RouteJob j = new RouteJob();
@@ -309,6 +312,21 @@ public class RouteJobListing implements BusinessLogic {
                     
                     if(j.custID.equalsIgnoreCase("5820001166")){
                         //System.out.println("com.fz.tms.service.run.RouteJobListing.run()");
+                    }
+                    
+                    //color row
+                    if(!j.vehicleCode.equalsIgnoreCase("NA")){                        
+                        
+                        if(!j.vehicleCode.equalsIgnoreCase(vehicleCode)
+                                && j.getServiceTime().equalsIgnoreCase("0")){
+                            vehicleCode = j.vehicleCode;                            
+                            
+                            p++;
+                        }
+                        
+                        j.color = "#"+map.myList[(p-1)].toUpperCase();
+                        System.out.println(j.no+"()"+j.color);
+                        
                     }
                     
                     //System.out.println(j.toString());

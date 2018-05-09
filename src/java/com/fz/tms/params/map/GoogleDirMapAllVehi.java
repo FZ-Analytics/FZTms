@@ -39,7 +39,14 @@ import javax.servlet.jsp.PageContext;
  */
 public class GoogleDirMapAllVehi implements BusinessLogic {
     String key = Constava.googleKey;
-    List<String> vehi = new ArrayList<String>();    
+    List<String> vehi = new ArrayList<String>();  
+    
+    public String[] myList = {"FAEBD7","00FFFF","7FFFD4","0000FF","8A2BE2","A52A2A","DEB887","5F9EA0","7FFF00",
+                    "D2691E","FF7F50","6495ED","FFF8DC","DC143C","00FFFF","00008B","008B8B","B8860B","A9A9A9","006400","BDB76B",
+                    "8B008B","8B0000","556B2F","FF8C00","9932CC","E9967A","8FBC8F","483D8B","00CED1","9400D3","00CED1","9400D3",
+                    "FF1493","B22222","00BFFF","228B22","FF00FF","1E90FF","FFD700","008000","FF69B4","CD5C5C","DAA520","ADFF2F",
+                    "4B0082","F0E68C","FFF0F5","7CFC00","ADD8E6","F08080","90EE90","FFB6C1","FFA07A","20B2AA","00FF00","B0C4DE",
+                    "87CEFA","FF00FF","66CDAA","BA55D3","9370DB","3CB371"};
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -178,13 +185,7 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                 //https://www.w3schools.com/colors/colors_names.asp
                 /*String[] myList = {"ff5050", "ffff52", "52ff52", "52ffff", "5252ff", "ff52ff", "ff7d52", "d4ff52", "52ff7d", 
                     "52d4ff", "7d52ff", "ff52d4", "ffa852", "a8ff52", "52ffa8", "52a8ff", "a852ff", "ff52a8", "ffd452", 
-                    "7dff52", "52ffd4", "527dff", "d452ff", "ff527d"};*/
-                String[] myList = {"FAEBD7","00FFFF","7FFFD4","0000FF","8A2BE2","A52A2A","DEB887","5F9EA0","7FFF00",
-                    "D2691E","FF7F50","6495ED","FFF8DC","DC143C","00FFFF","00008B","008B8B","B8860B","A9A9A9","006400","BDB76B",
-                    "8B008B","8B0000","556B2F","FF8C00","9932CC","E9967A","8FBC8F","483D8B","00CED1","9400D3","00CED1","9400D3",
-                    "FF1493","B22222","00BFFF","228B22","FF00FF","1E90FF","FFD700","008000","FF69B4","CD5C5C","DAA520","ADFF2F",
-                    "4B0082","F0E68C","FFF0F5","7CFC00","ADD8E6","F08080","90EE90","FFB6C1","FFA07A","20B2AA","00FF00","B0C4DE",
-                    "87CEFA","FF00FF","66CDAA","BA55D3","9370DB","3CB371"};
+                    "7dff52", "52ffd4", "527dff", "d452ff", "ff527d"};*/                
                 int p = 0;
 
                 String vehi = "";
