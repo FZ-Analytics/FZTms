@@ -479,8 +479,8 @@
                             <%}%> >
                             <td class="fzCell" style="background-color: <%=j.color%>"></td>
                             <td class="fzCell center"><%=j.no%></td>
-                            <td class="vCodeClick center" style="color: blue;"><%=j.vehicleCode%></td>
-                            <td class="custIDClick center" style="color: blue;"><%=j.custID%></td>
+                            <td class="vCodeClick center  hover" style="color: blue;"><%=j.vehicleCode%></td>
+                            <td class="custIDClick center  hover" style="color: blue;"><%=j.custID%></td>
                             <td class="fzCell center"><%=j.arrive%></td>
                             <td class="fzCell center"><%=j.depart%></td>                    
                             <td class="fzCell center" <%if (j.bat == "1" ) {%> 
@@ -502,7 +502,7 @@
                                 <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
                                 onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
                                 <%}%> ><%=j.send%></td>-->
-                            <td class="editCust center" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
+                            <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
                         </tr>
 
                         <%} // for ProgressRecord %>
