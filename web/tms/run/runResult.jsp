@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Jobs</title>
     </head>
-    <body>
+    <body style="height: 760px">
         <style>
             tr { border-bottom: 2px solid lightgray;
             }
@@ -33,6 +33,7 @@
         <script>
             $(document).ready(function () {                
                 $('#table').eFreezeTableHead();
+                runMapAll();
                 $('.custIDClick').click(function () {
                     //Some code
                     //alert( $(this).text() ); 
@@ -220,6 +221,177 @@
                     }
                 });
             }
+            function setSize() {
+                var height = $(window).height();
+                height = height + (height/2);
+                alert(height);
+                console.log($(window).height()+''+height);
+                document.getElementById('cover').style.height= height;
+                
+                //document.getElementById('body').style.height= height;
+            }
+            
+            function runMapAll() {
+                console.log("detikawal" + new Date().getTime());
+                var map = null;
+                var infowindow = new google.maps.InfoWindow();
+                var bounds = new google.maps.LatLngBounds();
+
+                //label dibuat beda
+                var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                var labelx = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                var labelIndex = 0;
+                var labelxIndex = 0;
+                var tr = null;
+
+                //The list of points to be connected
+                var txt = document.getElementById("txt").value;
+                //var markers = eval(txt);
+                //alert(txt);
+                var mark = null;
+                var markers = JSON.parse(txt);
+
+                var service = new google.maps.DirectionsService();
+                var directionsTaskTimer;
+
+                //    var map;
+                function initialize() {
+                    mark = markers[0];
+                    var mapOptions = {
+                        center: new google.maps.LatLng(
+                                parseFloat(mark[0].lat),
+                                parseFloat(mark[0].lng)),
+                        zoom: 30,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    };
+
+                    var infoWindow = new google.maps.InfoWindow();
+                    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                    var lat_lng = new Array();
+
+                    
+                    for (var a = 0; a < markers.length; a++) {
+                        mark = null;
+                        mark = markers[a];
+                        labelIndex = 0;
+                        //t = labelx[labelxIndex++ % labelx.length];
+                        //sleep(a);
+                        var nt = 1;
+                        for (var i = 0; i < mark.length; i++) {
+                            if ((i + 1) < mark.length && mark[i].jobNb != "0") {
+                                var clr = mark[i].color;
+
+                                tr = labels[labelIndex++ % labels.length];
+                                var src = new google.maps.LatLng(parseFloat(mark[i].lat),
+                                        parseFloat(mark[i].lng));
+                                var descriptionSrc = mark[i].description;
+                                createMarker(src, descriptionSrc, nt++, clr, mark[i].channel);
+
+                                tr = null;
+                                var des = new google.maps.LatLng(parseFloat(mark[i + 1].lat),
+                                        parseFloat(mark[i + 1].lng));
+                                var descriptionDes = mark[i + 1].description;
+                                //createMarker(des, descriptionDes, tr, mark[i].color);
+                                //  poly.setPath(path);     
+
+                                //directionsTaskTimer = setInterval(function () {                              
+                                recursive(src, des, a, i, clr);
+                            }else if(mark[i].jobNb == "0"){
+                                console.log(mark[i].jobNb);
+                                var clr = mark[i].color;
+
+                                //tr = labels[labelIndex++ % labels.length];
+                                var src = new google.maps.LatLng(parseFloat(mark[i].lat),
+                                        parseFloat(mark[i].lng));
+                                var descriptionSrc = mark[i].description;
+                                createMarker(src, descriptionSrc, 0, clr, mark[i].channel);
+                            }
+                        }
+
+                        //sleep();
+                    }
+                    //console.log("final?" + new Date().getTime());
+                    //service = new google.maps.DirectionsService();
+                }
+
+                function recursive(src, des, a, b, clr)
+                {
+                    //window.clearInterval(directionsTaskTimer);
+                    //console.log("clearInterval " + directionsTaskTimer);
+                    var d = new Date();
+                    //console.log("route awal " + a + " ; " + b + " status: awal" + "detik " + d.getSeconds());                    
+                    //sleep(a);
+                    //console.log("send src " + src + " des " + des + " " + a + " " + b);
+                    setTimeout(function () {
+                        service.route({
+                            origin: src,
+                            destination: des,
+                            travelMode: google.maps.DirectionsTravelMode.DRIVING
+                        }, function (result, status) {
+                            if (status === google.maps.DirectionsStatus.OK) {
+                                //console.log("recieve src " + src + " des " + des + " " + a + " " + b);
+                                var path = new google.maps.MVCArray();
+                                var poly = new google.maps.Polyline({
+                                    map: map,
+                                    strokeColor: '#'+clr//,
+                                            //strokeWidth : 1,
+                                            //width : 1
+                                });
+                                for (var i = 0, len = result.routes[0].overview_path.length; i < len; i++) {
+                                    path.push(result.routes[0].overview_path[i]);
+                                }
+                                poly.setPath(path);
+                                map.fitBounds(bounds);
+
+                                //console.log("line" + a +" ; " + b);
+                            } else if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                                //console.log("resend src " + src + " des " + des + " Status" + status);
+                                //sleep(src, des);
+                                recursive(src, des, a, b, clr);
+                            }
+                        });
+                    }, 3000);
+                }
+
+                function createMarker(latLng, str, lbl, clr, channel) {
+                    //alert(clr);
+                    if(lbl > 0){
+                        if(lbl == 1){
+                            str = 'DEPO'; 
+                            var pinImage = new google.maps.MarkerImage('http://chart.apis.google.com/chart?chst=d_map_xpin_icon&chld=pin|civic-building|ffffff|000000',
+                                new google.maps.Size(21, 34),
+                                new google.maps.Point(0, 0),
+                                new google.maps.Point(10, 34));
+                        }else if(lbl > 1){
+                            var url = 'http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|';
+                            var pinImage = new google.maps.MarkerImage(url+clr+'|8|b|'+(lbl-1),
+                                new google.maps.Size(21, 34),
+                                new google.maps.Point(0, 0),
+                                new google.maps.Point(10, 34));
+                        }
+                        
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            map: map,
+                            draggable: false,
+                            icon: pinImage
+                        });
+                    }else if(lbl == 0){
+                        //untuk NA
+                        var marker = new google.maps.Marker({position:latLng});
+                        marker.setMap(map);
+                    }                   
+                    
+                    bounds.extend(marker.getPosition());
+                    google.maps.event.addListener(marker, "click", function (evt) {
+                        infowindow.setContent(str);
+                        infowindow.open(map, this);
+                    });
+                }
+                //console.log("detikakhira" + new Date().getTime());
+                google.maps.event.addDomListener(window, 'load', initialize());
+                //console.log("detikakhirb" + new Date().getTime());
+            }
         </script>
         <h4>Routing Result 
             <span class="glyphicon glyphicon-refresh" aria-hidden="true" onclick="location.reload();"></span>
@@ -259,72 +431,81 @@
         <label class="fzLabel" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
 
         <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />
-        
         <br><br>
-        <table id="table" border1="1" style="border-color: lightgray;">
-            <thead>
-                <tr style="background-color:orange;">
-                    <th width="100px" class="fzCol">No.</th>
-                    <th width="100px" class="fzCol">Truck</th>
-                    <th width="100px" class="fzCol">CustID</th>
-                    <th width="100px" class="fzCol">Arrv</th>
-                    <th width="100px" class="fzCol">Depart</th>
-                    <th width="100px" class="fzCol">DO Count</th>
-                    <th width="100px" class="fzCol">Srvc Time</th>
-                    <th width="100px" class="fzCol">Name</th>
-                    <th width="100px" class="fzCol">Priority</th>
-                    <th width="100px" class="fzCol">Dist Chl</th>
-                    <th width="100px" class="fzCol">Street</th>
-                    <th width="100px" class="fzCol">Weight (KG)</th>
-                    <th width="100px" class="fzCol">Volume (M3)</th>
-                    <th width="100px" class="fzCol">RDD</th>
-                    <th width="100px" class="fzCol">Transport Cost</th>
-                    <th width="100px" class="fzCol">Dist</th>
-<!--                    <th width="100px" class="fzCol">Send SAP</th>-->
-                    <th width="100px" class="fzCol">Edit</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
-                <tr 
-                    <%if (j.vehicleCode.equals("NA")) {%>
-                    style="color: red"
-                    <%} else if (j.arrive.length() == 0 && j.depart.length() > 0) {%>
-                    style="background-color: lightyellow"
-                    <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
-                    style="background-color: #e6ffe6"
-                    <%} else if (j.bat == "1" ) {%>
-                    style="background-color: #ffe6e6"
-                    <%}%> >
-                    <td class="fzCell"><%=j.no%></td>
-                    <td class="vCodeClick" style="color: blue;"><%=j.vehicleCode%></td>
-                    <td class="custIDClick" style="color: blue;"><%=j.custID%></td>
-                    <td class="fzCell"><%=j.arrive%></td>
-                    <td class="fzCell"><%=j.depart%></td>                    
-                    <td class="fzCell"><%=j.DONum%></td>
-                    <td class="fzCell"><%=j.getServiceTime()%></td>
-                    <td class="fzCell">
-                        <%if (j.arrive.length() > 0) {%>
-                        <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
-                        <%} else {%><%=j.name1%><%}%>
-                    <td class="fzCell"><%=j.custPriority%></td>
-                    <td class="fzCell"><%=j.distrChn%></td>
-                    <td class="fzCell"><%=j.street%></td>
-                    <td class="fzCell"><%=j.weight%></td>
-                    <td class="fzCell"><%=j.volume%></td>
-                    <td class="fzCell"><%=j.rdd%></td>
-                    <td class="fzCell"><%=j.transportCost%></td>
-                    <td class="fzCell"><%=j.dist%></td>
-<!--                    <td class="fzCell" 
-                        <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
-                        onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
-                        <%}%> ><%=j.send%></td>-->
-                    <td class="editCust" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
-                </tr>
+        <div id="cover" style="width: 100%">
+            <div id="thediv" style="float: left;overflow-y: scroll;height: 510px; width: 55%">                
+                <table id="table" border1="1" style="border-color: lightgray;">
+                    <thead>
+                        <tr style="background-color:orange;">
+                            <th width="100px" class="fzCol">No.</th>
+                            <th width="100px" class="fzCol">Truck</th>
+                            <th width="100px" class="fzCol">CustID</th>
+                            <th width="100px" class="fzCol">Arrv</th>
+                            <th width="100px" class="fzCol">Depart</th>
+                            <th width="100px" class="fzCol">DO Count</th>
+                            <th width="100px" class="fzCol">Srvc Time</th>
+                            <th width="100px" class="fzCol">Name</th>
+                            <th width="100px" class="fzCol">Priority</th>
+                            <th width="100px" class="fzCol">Dist Chl</th>
+                            <th width="100px" class="fzCol">Street</th>
+                            <th width="100px" class="fzCol">Weight (KG)</th>
+                            <th width="100px" class="fzCol">Volume (M3)</th>
+                            <th width="100px" class="fzCol">RDD</th>
+                            <th width="100px" class="fzCol">Transport Cost</th>
+                            <th width="100px" class="fzCol">Dist</th>
+        <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
+                            <th width="100px" class="fzCol">Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
+                        <tr 
+                            <%if (j.vehicleCode.equals("NA")) {%>
+                            style="color: red"
+                            <%} else if (j.arrive.length() == 0 && j.depart.length() > 0) {%>
+                            style="background-color: lightyellow"
+                            <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
+                            style="background-color: #e6ffe6"
+                            <%} else if (j.bat == "1" ) {%>
+                            style="background-color: #ffe6e6"
+                            <%}%> >
+                            <td class="fzCell"><%=j.no%></td>
+                            <td class="vCodeClick" style="color: blue;"><%=j.vehicleCode%></td>
+                            <td class="custIDClick" style="color: blue;"><%=j.custID%></td>
+                            <td class="fzCell"><%=j.arrive%></td>
+                            <td class="fzCell"><%=j.depart%></td>                    
+                            <td class="fzCell"><%=j.DONum%></td>
+                            <td class="fzCell"><%=j.getServiceTime()%></td>
+                            <td class="fzCell">
+                                <%if (j.arrive.length() > 0) {%>
+                                <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
+                                <%} else {%><%=j.name1%><%}%>
+                            <td class="fzCell"><%=j.custPriority%></td>
+                            <td class="fzCell"><%=j.distrChn%></td>
+                            <td class="fzCell"><%=j.street%></td>
+                            <td class="fzCell"><%=j.weight%></td>
+                            <td class="fzCell"><%=j.volume%></td>
+                            <td class="fzCell"><%=j.rdd%></td>
+                            <td class="fzCell"><%=j.transportCost%></td>
+                            <td class="fzCell"><%=j.dist%></td>
+        <!--                    <td class="fzCell" 
+                                <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
+                                onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
+                                <%}%> ><%=j.send%></td>-->
+                            <td class="editCust" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
+                        </tr>
 
-                <%} // for ProgressRecord %>
-            </tbody>
-        </table>
+                        <%} // for ProgressRecord %>
+                    </tbody>
+                </table>
+            </div>
+            <div style="float: left;width: 45%;">
+                <script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
+                <input type="text" id="txt" value='<%=request.getAttribute("test")%>' hidden="true"/>
+                <div id="map" style="width: 100%;height: 500px;"></div>
+            </div>
+        </div>
+        
 
         <br><br>
         <iframe id="txtArea1" style="display:none"></iframe>

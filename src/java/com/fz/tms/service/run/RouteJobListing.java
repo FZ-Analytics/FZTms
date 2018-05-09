@@ -8,12 +8,17 @@ package com.fz.tms.service.run;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.tms.params.map.Constava;
+import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.DODetil;
+import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.SummaryVehicle;
 import com.fz.tms.params.model.Vehicle;
 import com.fz.tms.params.service.Other;
 import com.fz.tms.params.service.VehicleAttrDB;
 import com.fz.util.FZUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,6 +48,7 @@ public class RouteJobListing implements BusinessLogic {
     Set<String> vehicles = new HashSet<String>();
     String shift = "";
     String branch = "";
+    String key = Constava.googleKey;
         
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
@@ -52,6 +58,20 @@ public class RouteJobListing implements BusinessLogic {
         String OriRunID = FZUtil.getHttpParam(request, "OriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
         String dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
+        
+        GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+        List<OptionModel> jss = new ArrayList<OptionModel>();
+
+        List<List<HashMap<String, String>>> all = map.runs(runID, jss);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jsonOutput = gson.toJson(all);
+        System.out.println(jsonOutput);
+
+        request.setAttribute("key", key);
+        request.setAttribute("test", jsonOutput.toString());
+        request.setAttribute("JobOptionModel", jss);
+        
         request.setAttribute("channel", channel);
         List<RouteJob> js = getAll(runID, OriRunID);
         request.setAttribute("JobList", js);
@@ -380,7 +400,7 @@ public class RouteJobListing implements BusinessLogic {
                     }                    
                     x++;
                 }
-            }
+            }            
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
             pl.put("ID", OriRunID+ "_" +runID);
