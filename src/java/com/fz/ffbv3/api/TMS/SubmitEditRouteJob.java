@@ -8,7 +8,6 @@ package com.fz.ffbv3.api.TMS;
 import com.fz.generic.Db;
 import com.fz.tms.params.model.Delivery;
 import com.fz.tms.params.model.RouteJobLog;
-import static com.fz.tms.service.run.RouteJobListingResultEdit.getTimeStamp;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.UnsupportedEncodingException;
@@ -17,11 +16,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -801,6 +802,15 @@ public class SubmitEditRouteJob {
             throw new Exception(e.getMessage());
         }
         return d;
+    }
+
+    public static Timestamp getTimeStamp() throws ParseException {
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(Calendar.getInstance().getTime());
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date date = (Date) formatter.parse(timeStamp);
+        java.sql.Timestamp timeStampDate = new Timestamp(date.getTime());
+
+        return timeStampDate;
     }
 
     private String getVolume(String custId, String runId) throws Exception {
