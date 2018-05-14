@@ -420,8 +420,6 @@
             <label class="fzLabel hover" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
             
             <br>
-            <label class="fzLabel">Branch:</label> 
-            <label class="fzLabel" id="branch"><%=get("branch")%></label>            
 
             <br>
             <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
@@ -434,21 +432,26 @@
         
         <div style="float: left; width: 50%">
             <br>
+            <label class="fzLabel">Channel:</label> 
+            <label class="fzLabel" id="channel"><%=get("channel")%></label>     
+            
+            <%--<br>
             <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel" id="shift"><%=get("shift")%></label>
+            <label class="fzLabel" id="shift"><%=get("shift")%></label>--%>
             
             <br>
-            <label class="fzLabel">Channel:</label> 
-            <label class="fzLabel" id="channel"><%=get("channel")%></label> 
+            <label class="fzLabel">Branch:</label> 
+            <label class="fzLabel" id="branch"><%=get("branch")%></label>      
             
             <br>
             <label class="fzLabel">Vehicles:</label> 
             <label class="fzLabel" id="vehicles"><%=get("vehicleCount")%></label>
         </div>
         
-        <br><br>
+        <br><br><br><br><br><br>
         <div id="cover" style="width: 100%">
-            <div id="thediv" style="float: left;overflow-y: scroll;height: 510px; width: 65%">                
+            <div id="thediv" style="float: left;overflow-y: scroll;height: 543px; width: 65%; border-style: double">     
+                <div style="width: 100%; text-align: center"><h4>Result Detail</h4></div>
                 <table id="table" border1="1" style="border-color: lightgray;">
                     <thead>
                         <tr style="background-color:orange;">
@@ -515,7 +518,8 @@
                     </tbody>
                 </table>
             </div>
-            <div style="float: left;width: 35%;">
+            <div style="float: left;width: 35%; border-style: double">
+                <div style="width: 100%; text-align: center"><h4>MAP</h4></div>
                 <script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
                 <input type="text" id="txt" value='<%=request.getAttribute("test")%>' hidden="true"/>
                 <div id="map" style="width: 100%;height: 500px;"></div>

@@ -15,8 +15,71 @@
             .hover:hover {
                cursor: pointer; 
             }
-            .center {
-                text-align: center;
+            
+            #wrapper {
+                <%--position: absolute;--%>
+              top: 100px;
+              bottom: 0;
+              left: 0;
+              right: 0;              
+            }
+
+            .cell {
+              <%--position: absolute;--%>
+              overflow: hidden;
+            }
+
+            .col1 {
+              left: 0;
+              width: 100px;
+              border-right: 2px black solid;
+            }
+
+            .col2 {
+              left: 100px;
+              right: 0;
+            }
+
+            .row1 {
+              top: 0;
+              height: 50px;
+              border-bottom: 2px black solid;
+            }
+
+            .row2 {
+              top: 50px;
+              bottom: 0;
+            }
+
+            #col-wrapper {
+              bottom: 17px;
+            }
+
+            #row-wrapper {
+              right: 17px;
+            }
+
+            #row,
+            #col {
+              position: relative;
+            }
+
+            #table {
+              overflow: scroll;
+              height: 450px;
+            }
+
+            th,
+            tr {
+              height: 50px;
+            }
+
+            th,
+            td {
+              border: 1px solid black;
+              text-align: center;
+              font-variant: small-caps;
+              <%--min-width: 150px;--%>
             }
             #exclude {
                 float: right;
@@ -25,7 +88,7 @@
             }
         </style>
     </head>
-    <body>
+    <body >
         <div style="width: 100%; height: 700px;">
             <%@include file="../appGlobal/bodyTop.jsp"%>
             <%
@@ -50,100 +113,186 @@
             </h4>
 
             <input type="hidden" value="<%=str%>" id="urls"/>
-            <br>
-            <label class="fzLabel">Branch:</label> 
-            <label class="fzLabel" id="branch"><%=get("branchCode")%></label>
+            <div style="float: left; width: 50%">
+                <br>
+                <label class="fzLabel">Branch:</label> 
+                <label class="fzLabel" id="branch"><%=get("branchCode")%></label>
 
-            <br>
-            <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel"><%=get("shift")%></label>
+                <%--<br>
+                <label class="fzLabel">Shift:</label> 
+                <label class="fzLabel"><%=get("shift")%></label>--%>
 
-            <br>
-            <label class="fzLabel">Date Deliv:</label> 
-            <label class="fzLabel" id="dateDeliv"><%=get("dateDeliv")%></label>
+                <br>
+                <label class="fzLabel">Date Deliv:</label> 
+                <label class="fzLabel" id="dateDeliv"><%=get("dateDeliv")%></label>
 
-            <br>
-            <label class="fzLabel">RunID:</label> 
-            <label class="fzLabel" id="runId"><%=get("runId")%></label> 
+                <br>
+                <label class="fzLabel">RunID:</label> 
+                <label class="fzLabel" id="runId"><%=get("runId")%></label> 
+            </div>
+            <div style="float: left; width: 50%">
+                <br>
+                <label class="fzLabel">Ori RunID:</label> 
+                <label class="fzLabel" id="oriRunID"><%=get("oriRunID")%></label> 
 
-            <br>
-            <label class="fzLabel">Ori RunID:</label> 
-            <label class="fzLabel" id="oriRunID"><%=get("oriRunID")%></label> 
+                <%--<br>
+                <label class="fzLabel">Prev RunID:</label> 
+                <label class="fzLabel" id="reRun"><%=get("reRun")%></label> --%>
 
-            <br>
-            <label class="fzLabel">Prev RunID:</label> 
-            <label class="fzLabel" id="reRun"><%=get("reRun")%></label> 
+                <br>
+                <label class="fzLabel">Channel:</label> 
+                <label class="fzLabel" id="channel"><%=get("channel")%></label> 
 
+                <br>
+                <label class="fzLabel hover" id="re_Run" style="color: blue;">Routing</label>
+                <label class="fzLabel hover" id="Vvehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
+                <%--<input id="clickMe" class="btn fzButton" type="button" value="Manual Route" onclick="openManualRoutePage();" />--%>
+            </div>
+            
             <br>
-            <label class="fzLabel">Channel:</label> 
-            <label class="fzLabel" id="channel"><%=get("channel")%></label> 
-
-            <br>
-            <label class="fzLabel hover" id="re_Run" style="color: blue;">Routing</label>
-            <label class="fzLabel hover" id="Vvehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
-            <%--<input id="clickMe" class="btn fzButton" type="button" value="Manual Route" onclick="openManualRoutePage();" />--%>
-
-            <br><br>
+            <div style="width: 100%"> 
+                <input style="" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type in a name">
+            </div>
+            
             <input id="exclude" class="btn fzButton" type="button" value="Exclude Selected" onclick="exlcudeViaCheckBox();" />
-            <table cellpadding="0" cellspacing="0" border="0" id="table" class="datatable table table-striped table-bordered">
+            <br><br>                
+            <div style="width: 100%">                
+                <div id="wrapper" tabindex="0">
+                    <%--<div class="cell col1 row1">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>IR</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>--%>
+                    <div id="row-wrapper" class="cell col2 row1">
+                        <div id="row">
+                            <table style="width: 100%">
+                                <thead>
+                                    <tr style="background-color:orange;">
+                                        <th onclick="sortTable(0)" class="text-center" style="width: 100px">customer id</th>
+                                        <th onclick="sortTable(1)" class="text-center" style="width: 100px">do number</th>
+                                        <th onclick="sortTable(2)" class="text-center" style="width: 150px">long</th>
+                                        <th onclick="sortTable(3)" class="text-center" style="width: 150px">lat</th>
+                                        <th onclick="sortTable(4)" class="text-center" style="width: 80px">priority</th>
+                                        <th onclick="sortTable(5)" class="text-center" style="width: 70px">Channel</th>
+                                        <th onclick="sortTable(6)" class="text-center" style="width: 80px">RDD</th>
+                                        <th onclick="sortTable(7)" class="text-center" style="width: 70px">service time</th>
+                                        <th onclick="sortTable(8)" class="text-center" style="width: 70px">deliv start</th>
+                                        <th onclick="sortTable(9)" class="text-center" style="width: 70px">deliv end</th>
+                                        <th onclick="sortTable(10)" class="text-center" style="width: 180px">vehicle type list</th>
+                                        <th onclick="sortTable(11)" class="text-center" style="width: 40px">inc</th>
+                                        <th onclick="sortTable(12)" class="text-center" style="width: 50px">Edit</th>
+                                        <th onclick="sortTable(13)" class="text-center" >remove</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <%--<div id="col-wrapper" class="cell col1 row2">
+                        <div id="col">
+                            <table>
+                                <tbody>
+                                    <%for (Customer j : (List<Customer>) getList("CustList")) {%> 
+                                    <tr><td></td></tr>
+                                    <%} // for ProgressRecord %>
+                                </tbody>
+                            </table>
+                        </div>
+    </div>--%>
+                    <div id="table" class="cell col2 row2">
+                        <table id="myTable"style="width: 100%">
+                            <tbody>
+                                <%for (Customer j : (List<Customer>) getList("CustList")) {%> 
+                                <tr >
+                                    <td style="width: 100px" class="custId"><%=j.customer_id%></td>
+                                    <td style="width: 100px" class="doNum"><%=j.do_number%></td>
+                                    <td style="width: 150px"><%=j.lng%></td>
+                                    <td style="width: 150px"><%=j.lat%></td>
+                                    <td style="width: 80px"><%=j.customer_priority%></td>
+                                    <td style="width: 70px"><%=j.channel%></td>
+                                    <td style="width: 80px"><%=j.rdd%></td>
+                                    <td style="width: 70px"><%=j.service_time%></td>
+                                    <td style="width: 70px"><%=j.deliv_start%></td>
+                                    <td style="width: 70px"><%=j.deliv_end%></td>
+                                    <td style="width: 180px"><%=j.vehicle_type_list%></td>
+                                    <td style="width: 40px"><%=j.isInc%></td>
+                                    <td class="hover" onclick="klik('<%=j.customer_id%>')" style="width: 50px">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    </td>
+                                    <!--<td class="hover" onclick="exclude('<%=j.customer_id%>','<%=j.do_number%>')" >
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    </td>-->
+                                    <td class="hover">
+                                        <input type="checkbox" name="remove" value="remove" id="remove">
+                                    </td>
+                                </tr>
+
+                                <%} // for ProgressRecord %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>            
+            <%--<table cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered">
                 <thead>
                     <tr style="background-color:orange">
-                        <th width="100px" class="fzCol center">Cust. ID</th>
-                        <th width="100px" class="fzCol center">DO Number</th>
-                        <th width="100px" class="fzCol center">Long</th>
-                        <th width="100px" class="fzCol center">Lat</th>
-                        <th width="100px" class="fzCol center">Priority</th>
-                        <th width="100px" class="fzCol center">Channel</th>
-                        <th width="100px" class="fzCol center">RDD</th>
-                        <th width="100px" class="fzCol center">Serv. Time</th>
-                        <th width="100px" class="fzCol center">Store Open</th>
-                        <th width="100px" class="fzCol center">Store Close</th>
-                        <th width="100px" class="fzCol center">Vehicle Type List</th>
-                        <th width="100px" class="fzCol center">Inc/Exc</th>
-                        <th width="100px" class="fzCol center">Edit</th>
-<!--                        <th width="100px" class="fzCol">remove</th>-->
-                        <th width="100px" class="fzCol">Remove</th>
+                        <th width="100px" class="fzCol">customer id</th>
+                        <th width="100px" class="fzCol">do number</th>
+                        <th width="100px" class="fzCol">long</th>
+                        <th width="100px" class="fzCol">lat</th>
+                        <th width="100px" class="fzCol">customer priority</th>
+                        <th width="100px" class="fzCol">Channel</th>
+                        <th width="100px" class="fzCol">RDD</th>
+                        <th width="100px" class="fzCol">service time</th>
+                        <th width="100px" class="fzCol">deliv start</th>
+                        <th width="100px" class="fzCol">deliv end</th>
+                        <th width="100px" class="fzCol">vehicle type list</th>
+                        <th width="100px" class="fzCol">inc</th>
+                        <th width="100px" class="fzCol">Edit</th>
+                        <th width="100px" class="fzCol">remove</th>
                     </tr>
                 </thead>
                 <tbody>
                     <%for (Customer j : (List<Customer>) getList("CustList")) {%> 
                     <tr >
-                        <td class="fzCell center custId" ><%=j.customer_id%></td>
-                        <td class="fzCell center doNum" ><%=j.do_number%></td>
-                        <td class="fzCell center" ><%=j.lng%></td>
-                        <td class="fzCell center" ><%=j.lat%></td>
-                        <td class="fzCell center" ><%=j.customer_priority%></td>
-                        <td class="fzCell center" ><%=j.channel%></td>
-                        <td class="fzCell center" ><%=j.rdd%></td>
-                        <td class="fzCell center" ><%=j.service_time%></td>
-                        <td class="fzCell center" ><%=j.deliv_start%></td>
-                        <td class="fzCell center" ><%=j.deliv_end%></td>
-                        <td class="fzCell center" ><%=j.vehicle_type_list%></td>
-                        <td class="fzCell center" ><%=j.isInc%></td>
-                        <td class="fzCell hover center" onclick="klik('<%=j.customer_id%>')" >
+                        <td class="fzCell" ><%=j.customer_id%></td>
+                        <td class="fzCell" ><%=j.do_number%></td>
+                        <td class="fzCell" ><%=j.lng%></td>
+                        <td class="fzCell" ><%=j.lat%></td>
+                        <td class="fzCell" ><%=j.customer_priority%></td>
+                        <td class="fzCell" ><%=j.channel%></td>
+                        <td class="fzCell" ><%=j.rdd%></td>
+                        <td class="fzCell" ><%=j.service_time%></td>
+                        <td class="fzCell" ><%=j.deliv_start%></td>
+                        <td class="fzCell" ><%=j.deliv_end%></td>
+                        <td class="fzCell" ><%=j.vehicle_type_list%></td>
+                        <td class="fzCell" ><%=j.isInc%></td>
+                        <td class="fzCell hover" onclick="klik('<%=j.customer_id%>')" >
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                         </td>
-<!--                        <td class="fzCell hover" onclick="exclude('<%=j.customer_id%>','<%=j.do_number%>')">
+                        <td class="fzCell hover" onclick="exclude('<%=j.customer_id%>','<%=j.do_number%>')">
                             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        </td>-->
-                        <td class="fzCell center" >
-                            <input type="checkbox" name="remove" value="remove" id="remove">
                         </td>
                     </tr>
 
                     <%} // for ProgressRecord %>
                 </tbody>
                 <tfoot></tfoot>
-            </table>
+            </table>--%>
 
             <script src="../appGlobal/jquery.dataTables.min.js"></script>
             <script src="../appGlobal/datatables.js"></script>
             <script >
                 $(document).ready(function () {
+                    tables();
                     $('input[type=checkbox]').each(function() { 
                         this.checked = false; 
-                    }); 
-                    $('.datatable').dataTable({
+                    });
+                    //setLength();
+                    /*$('.datatable').dataTable({
                         "sPaginationType": "bs_normal"
                     });
                     $('.datatable').each(function () {
@@ -155,7 +304,7 @@
                         // LENGTH - Inline-Form control
                         var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
                         length_sel.addClass('form-control input-sm');
-                    });
+                    });*/
                     $('#re_Run').click(function () {
                         //setTimeout(function () {
                             //alert($("#urls").text());
@@ -170,7 +319,7 @@
                         //}, 3000);
                     });
                 });
-
+                
                 function exlcudeViaCheckBox() {
                     var found = false;
                     var doNumber = "";
@@ -215,7 +364,6 @@
                     var $apiAddress = '../../../api/popupEditCustBfror/excludeDO';
                     var jsonForServer = '{\"runId\": \"' + custId + '\",\"data\":\"' + doAndCustId  + '\",\"excInc\":\"exc\"}';
                     var data = [];
-
                     $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                         if(data == 'OK'){
                             alert( 'sukses' );
@@ -225,6 +373,7 @@
                         }
                     });
                 }
+                
                 function saveHistory() {
                     var $apiAddress = '../../../api/popupEditCustBfror/savehistory';
                     var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
@@ -238,6 +387,184 @@
                             alert( 'submit error' ); 
                         }
                     });
+                }
+                function tables() {
+                    function scrollHandler(e) {
+                        $('#row').css('left', -$('#table').get(0).scrollLeft);
+                        $('#col').css('top', -$('#table').get(0).scrollTop);
+                      }
+                      $('#table').scroll(scrollHandler);
+                      $('#table').resize(scrollHandler);
+
+                      var animate = false;
+                      $('#wrapper').keydown(function(event) {
+                        if (animate) {
+                          event.preventDefault();
+                        };
+                        if (event.keyCode == 37 && !animate) {
+                          animate = true;
+                          $('#table').animate({
+                            scrollLeft: "-=200"
+                          }, "fast", function() {
+                            animate = false;
+                          });
+                          event.preventDefault();
+                        } else if (event.keyCode == 39 && !animate) {
+                          animate = true;
+                          $('#table').animate({
+                            scrollLeft: "+=200"
+                          }, "fast", function() {
+                            animate = false;
+                          });
+                          event.preventDefault();
+                        } else if (event.keyCode == 38 && !animate) {
+                          animate = true;
+                          $('#table').animate({
+                            scrollTop: "-=200"
+                          }, "fast", function() {
+                            animate = false;
+                          });
+                          event.preventDefault();
+                        } else if (event.keyCode == 40 && !animate) {
+                          animate = true;
+                          $('#table').animate({
+                            scrollTop: "+=200"
+                          }, "fast", function() {
+                            animate = false;
+                          });
+                          event.preventDefault();
+                        }
+                      });
+                }
+                
+                function setLength() {
+                    /*var table = document.getElementById("myTable");
+                    var tr = table.getElementsByTagName("tr");
+
+                    var rows = document.getElementById("myTable").rows[0].cells.length;
+                    var ty = 0;
+                    
+                    var td;
+                    
+                    //cek posisi data                     
+                    //collumn
+                    for (x = 0;x<rows;x++){
+                        //row
+                        for (i = 0; i < tr.length; i++) {
+                            td = tr[i].getElementsByTagName("td")[x];       
+                            var t = document.getElementsByTagName("td").rows[1].cells[1].offsetWidth;
+                            console.log(x + "|" + i + " " + t);
+                        }
+                    }*/
+                    var rows = document.getElementById("myTable").rows[0].cells.length;
+                    for (x = 0;x<rows;x++){
+                        var footer = document.getElementsByTagName('td')[x];
+                        var header = document.getElementsByTagName('th')[x];
+                        
+                        var num = null;
+                        if(header.offsetWidth > footer.offsetWidth){
+                            num = header.offsetWidth+'px';
+                            footer.style.width = '200px';
+                            num = header.offsetWidth+'px';
+                            console.log(header.offsetWidth + "|" + footer.offsetWidth + "header" + num);
+                        }else{
+                            num = footer.offsetWidth+'px';
+                            header.style.width = num;
+                            console.log(header.offsetWidth + "|" + footer.offsetWidth + "footer" + num);
+                        }
+                    }                    
+                }
+                
+                function sortTable(n) {
+                    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                    table = document.getElementById("myTable");
+                    switching = true;
+                    //Set the sorting direction to ascending:
+                    dir = "asc"; 
+                    /*Make a loop that will continue until
+                    no switching has been done:*/
+                    while (switching) {
+                      //start by saying: no switching is done:
+                      switching = false;
+                      rows = table.getElementsByTagName("TR");
+                      /*Loop through all table rows (except the
+                      first, which contains table headers):*/
+                      for (i = 0; i < (rows.length - 1); i++) {
+                        //start by saying there should be no switching:
+                        shouldSwitch = false;
+                        /*Get the two elements you want to compare,
+                        one from current row and one from the next:*/
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];
+                        /*check if the two rows should switch place,
+                        based on the direction, asc or desc:*/
+                        if (dir == "asc") {
+                          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            //if so, mark as a switch and break the loop:
+                            shouldSwitch= true;
+                            break;
+                          }
+                        } else if (dir == "desc") {
+                          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            //if so, mark as a switch and break the loop:
+                            shouldSwitch= true;
+                            break;
+                          }
+                        }
+                      }
+                      if (shouldSwitch) {
+                        /*If a switch has been marked, make the switch
+                        and mark that a switch has been done:*/
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        //Each time a switch is done, increase this count by 1:
+                        switchcount ++;      
+                      } else {
+                        /*If no switching has been done AND the direction is "asc",
+                        set the direction to "desc" and run the while loop again.*/
+                        if (switchcount == 0 && dir == "asc") {
+                          dir = "desc";
+                          switching = true;
+                        }
+                      }
+                    }
+                }
+                function myFunction() {
+                    var input, filter, table, tr, td, i;
+                    input = document.getElementById("myInput");
+                    filter = input.value.toUpperCase();
+                    table = document.getElementById("myTable");
+                    tr = table.getElementsByTagName("tr");
+
+                    var rows = document.getElementById("myTable").rows[0].cells.length;
+                    var ty = 0;
+                    //cek posisi data 
+                    //row
+                    for (i = 0; i < tr.length; i++) {
+                        //collumn
+                        for (x = 0;x<rows;x++){
+                            td = tr[i].getElementsByTagName("td")[x];                            
+                            if (td) {                                                          
+                                if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                                    ty = x;
+                                    //console.log(td.innerHTML.toUpperCase());
+                                }
+                            } 
+                        }
+                    }
+                    
+                    //hilangkan yang tidak cocok
+                    //row
+                    for (i = 0; i < tr.length; i++) {                        
+                        td = tr[i].getElementsByTagName("td")[ty];
+                        if (td) {
+                            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                                tr[i].style.display = "";
+                            } else {
+                                tr[i].style.display = "none";
+                            }
+                        }                        
+                    }
                 }
             </script>
         </div>

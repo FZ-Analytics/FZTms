@@ -49,6 +49,7 @@ public class RouteJobListing implements BusinessLogic {
     String shift = "";
     String branch = "";
     String key = Constava.googleKey;
+    List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
         
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
@@ -62,7 +63,7 @@ public class RouteJobListing implements BusinessLogic {
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
 
-        List<List<HashMap<String, String>>> all = map.runs(runID, jss);
+        all = map.runs(runID, jss);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonOutput = gson.toJson(all);
@@ -268,6 +269,7 @@ public class RouteJobListing implements BusinessLogic {
                 GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
                 int p = 0;
                 String vehicleCode = "";
+                
                 while (rs.next()) {
                     
                     RouteJob j = new RouteJob();
@@ -317,16 +319,22 @@ public class RouteJobListing implements BusinessLogic {
                     //color row
                     if(!j.vehicleCode.equalsIgnoreCase("NA")){                        
                         
+                        for(int op = 0;op<all.size();op++){
+                            for(int os = 0;os<all.get(op).size();os++){
+                                if(all.get(op).get(os).get("description").contains(j.vehicleCode)){
+                                    j.color = "#"+all.get(op).get(os).get("color").toUpperCase();
+                                    //System.out.println(j.color);
+                                }
+                                //System.out.println(all.get(op).get(os));
+                            }                            
+                        }
+                        
                         if(!j.vehicleCode.equalsIgnoreCase(vehicleCode)
                                 && j.getServiceTime().equalsIgnoreCase("0")){
                             vehicleCode = j.vehicleCode;                            
                             
                             p++;
                         }
-                        
-                        j.color = "#"+map.myList[(p-1)].toUpperCase();
-                        System.out.println(j.no+"()"+j.color);
-                        
                     }
                     
                     //System.out.println(j.toString());
