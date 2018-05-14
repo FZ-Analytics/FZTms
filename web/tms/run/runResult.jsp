@@ -413,33 +413,39 @@
         <input class="fzInput" id="OriRunID" 
                name="OriRunID" value="<%=get("OriRunID")%>" hidden="true"/>
 
-        <br>
-        <label class="fzLabel">Branch:</label> 
-        <label class="fzLabel" id="branch"><%=get("branch")%></label>
+        <div style="float: left; width: 50%">
+            
+            <br>
+            <label class="fzLabel">RunID:</label> 
+            <label class="fzLabel hover" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
+            
+            <br>
+            <label class="fzLabel">Branch:</label> 
+            <label class="fzLabel" id="branch"><%=get("branch")%></label>            
 
-        <br>
-        <label class="fzLabel">Shift:</label> 
-        <label class="fzLabel" id="shift"><%=get("shift")%></label>
+            <br>
+            <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
+            <label class="fzLabel hover" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
+            <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
+            <label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
 
-        <br>
-        <label class="fzLabel">Channel:</label> 
-        <label class="fzLabel" id="channel"><%=get("channel")%></label> 
-
-        <br>
-        <label class="fzLabel">Vehicles:</label> 
-        <label class="fzLabel" id="vehicles"><%=get("vehicleCount")%></label>
-
-        <br>
-        <label class="fzLabel">RunID:</label> 
-        <label class="fzLabel hover" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
-
-        <br>
-        <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
-        <label class="fzLabel hover" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
-        <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
-        <label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
-
-        <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />
+            <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />            
+        </div>
+        
+        <div style="float: left; width: 50%">
+            <br>
+            <label class="fzLabel">Shift:</label> 
+            <label class="fzLabel" id="shift"><%=get("shift")%></label>
+            
+            <br>
+            <label class="fzLabel">Channel:</label> 
+            <label class="fzLabel" id="channel"><%=get("channel")%></label> 
+            
+            <br>
+            <label class="fzLabel">Vehicles:</label> 
+            <label class="fzLabel" id="vehicles"><%=get("vehicleCount")%></label>
+        </div>
+        
         <br><br>
         <div id="cover" style="width: 100%">
             <div id="thediv" style="float: left;overflow-y: scroll;height: 510px; width: 65%">                
