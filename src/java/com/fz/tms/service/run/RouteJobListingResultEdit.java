@@ -91,7 +91,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
 //        }
         ArrayList<Delivery> alTableData = getTableData(oriRunId);
 
-        insertToRouteJob(alRjl, runId);
+        insertToRouteJob(getListRouteJob(oriRunId, runId), runId);
         insertToPreRouteJob(getListPreRouteJob(oriRunId, runId), runId);
         insertPreRouteVehicle(getListPreRouteVehicle(oriRunId, runId), runId);
 
@@ -135,40 +135,47 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         + "FROM \n"
                         + "	[BOSNET1].[dbo].[TMS_RouteJob] rj\n"
                         + "LEFT JOIN(\n"
-                        + "	SELECT DISTINCT\n"
-                        + "		prj.customer_ID,\n"
+                        + "	SELECT \n"
+                        + "         *\n"
+                        + "	FROM (\n"
+                        + "         SELECT\n"
+                        + " 		prj.customer_ID,\n"
                         + "		(SELECT\n"
-                        + "			(stuff(\n"
-                        + "					(SELECT\n"
-                        + "						'; ' + DO_Number\n"
-                        + "					FROM\n"
-                        + "						bosnet1.dbo.TMS_PreRouteJob\n"
-                        + "					WHERE\n"
-                        + "						Is_Edit = 'edit'\n"
-                        + "						AND Customer_ID = prj.Customer_ID\n"
-                        + "						AND RunId = '" + runId + "'\n"
-                        + "					GROUP BY\n"
-                        + "						DO_Number FOR xml PATH('')\n"
-                        + "					),\n"
-                        + "				1,\n"
-                        + "				2,\n"
-                        + "				''\n"
-                        + "				)\n"
-                        + "			)\n"
-                        + "		) AS DO_number,\n"
-                        + "		prj.Service_time,\n"
-                        + "		prj.RunId,\n"
-                        + "		prj.Name1,\n"
-                        + "		prj.Long,\n"
-                        + "		prj.Lat,\n"
-                        + "		prj.Customer_priority,\n"
-                        + "		prj.Distribution_Channel,\n"
-                        + "		prj.Street,\n"
-                        + "		prj.Request_Delivery_Date\n"
-                        + "	FROM \n"
-                        + "		[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
-                        + "	WHERE \n"
-                        + "		Is_Edit = 'edit'\n"
+                        + "                 (stuff(\n"
+                        + "                     (SELECT\n"
+                        + "                         '; ' + DO_Number\n"
+                        + "                      FROM\n"
+                        + "                         bosnet1.dbo.TMS_PreRouteJob\n"
+                        + "                      WHERE\n"
+                        + "                         Is_Edit = 'edit'\n"
+                        + "                      AND Customer_ID = prj.Customer_ID\n"
+                        + "                         AND RunId = '"+runId+"'\n"
+                        + "                      GROUP BY\n"
+                        + "                         DO_Number FOR xml PATH('')\n"
+                        + "			),\n"
+                        + "                     1,\n"
+                        + "                     2,\n"
+                        + "                     ''\n"
+                        + "                     )\n"
+                        + "                 )\n"
+                        + "             ) AS DO_number,\n"
+                        + "             prj.Service_time,\n"
+                        + "             prj.RunId,\n"
+                        + "             prj.Name1,\n"
+                        + "             prj.Long,\n"
+                        + "             prj.Lat,\n"
+                        + "             prj.Customer_priority,\n"
+                        + "             prj.Distribution_Channel,\n"
+                        + "             prj.Street,\n"
+                        + "             prj.Request_Delivery_Date,\n"
+                        + "             ROW_NUMBER() OVER(PARTITION BY prj.customer_ID ORDER BY prj.Name1 DESC) rn\n"
+                        + "         FROM \n"
+                        + "             [BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
+                        + "         WHERE \n"
+                        + "             Is_Edit = 'edit' AND RunId = '"+runId+"'\n"
+                        + "         ) a\n"
+                        + "     WHERE\n"
+                        + "         rn = 1"
                         + ") prj ON rj.runID = prj.RunId and rj.customer_id = prj.Customer_ID\n"
                         + "LEFT JOIN(\n"
                         + "	SELECT\n"
@@ -265,43 +272,43 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         /*
                          * Object to be pushed to DB
                          */
-                        RouteJobLog rjl = new RouteJobLog(); //Used to push to DB
-                        if (!prevVehiCode.equals(ld.vehicleCode) && !ld.vehicleCode.equals("NA")) {
-                            jobNb = 1;
-                            routeNb++;
-                        }
-                        if (!ld.vehicleCode.equals("") && !ld.vehicleCode.equals("NA") && ld.custId.equals("")) {
-                            rjl.jobId = "DEPO";
-                        } else {
-                            rjl.jobId = ld.custId;
-                        }
-                        rjl.custId = ld.custId;
-                        rjl.countDoNo = "" + countDoNo(ld.doNum);
-                        rjl.vehicleCode = ld.vehicleCode;
-                        if (!ld.vehicleCode.equals("NA")) {
-                            rjl.activity = "start";
-                            rjl.routeNb = routeNb;
-                            rjl.jobNb = jobNb;
-                        } else {
-                            rjl.routeNb = 0;
-                            rjl.jobNb = 0;
-                        }
-                        rjl.arrive = ld.arrive;
-                        rjl.depart = ld.depart;
-                        rjl.runId = this.runId;
-                        //rjl.createDtm = getTimeStamp(); in insertRouteJob method
-                        rjl.branch = branch;
-                        rjl.shift = shift;
-                        rjl.lon = ld.lon2;
-                        rjl.lat = ld.lat2;
-                        rjl.weight = ld.weight;
-                        rjl.volume = ld.volume;
-                        rjl.transportCost = ld.transportCost;
-                        rjl.dist = Double.parseDouble(ld.dist);
-
-                        alRjl.add(rjl);
-                        jobNb++;
-                        prevVehiCode = rjl.vehicleCode;
+//                        RouteJobLog rjl = new RouteJobLog(); //Used to push to DB
+//                        if (!prevVehiCode.equals(ld.vehicleCode) && !ld.vehicleCode.equals("NA")) {
+//                            jobNb = 1;
+//                            routeNb++;
+//                        }
+//                        if (!ld.vehicleCode.equals("") && !ld.vehicleCode.equals("NA") && ld.custId.equals("")) {
+//                            rjl.jobId = "DEPO";
+//                        } else {
+//                            rjl.jobId = ld.custId;
+//                        }
+//                        rjl.custId = ld.custId;
+//                        rjl.countDoNo = "" + countDoNo(ld.doNum);
+//                        rjl.vehicleCode = ld.vehicleCode;
+//                        if (!ld.vehicleCode.equals("NA")) {
+//                            rjl.activity = "start";
+//                            rjl.routeNb = routeNb;
+//                            rjl.jobNb = jobNb;
+//                        } else {
+//                            rjl.routeNb = 0;
+//                            rjl.jobNb = 0;
+//                        }
+//                        rjl.arrive = ld.arrive;
+//                        rjl.depart = ld.depart;
+//                        rjl.runId = this.runId;
+//                        //rjl.createDtm = getTimeStamp(); in insertRouteJob method
+//                        rjl.branch = branch;
+//                        rjl.shift = shift;
+//                        rjl.lon = ld.lon2;
+//                        rjl.lat = ld.lat2;
+//                        rjl.weight = ld.weight;
+//                        rjl.volume = ld.volume;
+//                        rjl.transportCost = ld.transportCost;
+//                        rjl.dist = Double.parseDouble(ld.dist);
+//
+//                        alRjl.add(rjl);
+//                        jobNb++;
+//                        prevVehiCode = rjl.vehicleCode;
                     }
                 }
             }
@@ -1080,6 +1087,51 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         }
         return arlistPrv;
     }
+    
+    public ArrayList<RouteJobLog> getListRouteJob(String oriRunId, String runId) throws Exception {
+        ArrayList<RouteJobLog> arlistRj = new ArrayList<>();
+        Timestamp createTime = getTimeStamp();
+        try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
+            try (Statement stm = con.createStatement()) {
+                String sql = "SELECT job_id, customer_id, do_number, vehicle_code, activity, routeNb, jobNb, arrive, depart, runID, create_dtm, branch, shift, "
+                        + "lon, lat, weight, volume, transportCost, activityCost, Dist, isFix "
+                        + "FROM BOSNET1.dbo.TMS_RouteJob "
+                        + "WHERE RunId = '" + oriRunId + "';";
+                try (ResultSet rs = stm.executeQuery(sql)) {
+                    while (rs.next()) {
+                        RouteJobLog p = new RouteJobLog();
+                        p.jobId = rs.getString("job_id");
+                        p.custId = rs.getString("customer_id");
+                        p.countDoNo = rs.getString("do_number");
+                        p.vehicleCode = rs.getString("vehicle_code");
+                        p.activity = rs.getString("activity");
+                        p.routeNb = rs.getInt("routeNb");
+                        p.jobNb = rs.getInt("jobNb");
+                        p.arrive = rs.getString("arrive");
+                        p.depart = rs.getString("depart");
+                        p.runId = runId;
+                        p.createTime = createTime;
+                        p.branch = rs.getString("branch");
+                        p.shift = rs.getString("shift");
+                        p.lon = rs.getString("lon");
+                        p.lat = rs.getString("lat");
+                        p.weight = rs.getString("weight");
+                        p.volume = rs.getString("volume");
+                        p.transportCost = rs.getInt("transportCost");
+                        p.activityCost = rs.getDouble("activityCost");
+                        p.dist = rs.getDouble("Dist");
+                        p.isFix = rs.getString("isFix");
+
+                        arlistRj.add(p);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+        return arlistRj;
+    }
+    
 //
 //    private String getVolume(String custId, String runId) throws Exception {
 //        String volume = "";

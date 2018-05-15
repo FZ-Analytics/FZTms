@@ -5,6 +5,8 @@
  */
 package com.fz.tms.params.model;
 
+import java.sql.Timestamp;
+
 /**
  *
  * @author Administrator
@@ -20,6 +22,7 @@ public class RouteJobLog {
     public String arrive = "";
     public String depart = "";
     public String runId = "";
+    public Timestamp createTime;
     public String branch = "";
     public String shift = "";
     public String lon = "";

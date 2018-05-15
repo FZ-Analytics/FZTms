@@ -358,6 +358,7 @@
                             row.insertCell(i).innerHTML = arrOfRow[i];
                         }
                     }
+                    cell.style.textAlign = "center";
                     row.setAttribute('id', 'tableRow');
                     row.setAttribute('class', 'tableRows');
                 }
@@ -488,9 +489,9 @@
         <label class="fzLabel">Branch:</label> 
         <label class="fzLabel" id="branch"><%=get("branch")%></label>
 
-        <br>
+<!--        <br>
         <label class="fzLabel">Shift:</label> 
-        <label class="fzLabel" id="shift"><%=get("shift")%></label>
+        <label class="fzLabel" id="shift"><%=get("shift")%></label>-->
 
         <br>
         <label class="fzLabel">Channel:</label> 

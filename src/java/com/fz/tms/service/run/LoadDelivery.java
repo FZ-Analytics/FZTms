@@ -60,7 +60,7 @@ public class LoadDelivery implements BusinessLogic {
         shift = FZUtil.getHttpParam(request, "shift");
         dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
         String channel = FZUtil.getHttpParam(request, "channel");
-        String vehicle = FZUtil.getHttpParam(request, "vehicle");
+        String vehicle = "" + getVehicleNum(runId);
         oriRunId = FZUtil.getHttpParam(request, "oriRunId");
 
 //        String[] tableArrSplit = tableArr(runId).split("split");//tableArr.split("split");
@@ -131,40 +131,47 @@ public class LoadDelivery implements BusinessLogic {
                         + "FROM \n"
                         + "	[BOSNET1].[dbo].[TMS_RouteJob] rj\n"
                         + "LEFT JOIN(\n"
-                        + "	SELECT DISTINCT\n"
-                        + "		prj.customer_ID,\n"
+                        + "	SELECT \n"
+                        + "         *\n"
+                        + "	FROM (\n"
+                        + "         SELECT\n"
+                        + " 		prj.customer_ID,\n"
                         + "		(SELECT\n"
-                        + "			(stuff(\n"
-                        + "					(SELECT\n"
-                        + "						'; ' + DO_Number\n"
-                        + "					FROM\n"
-                        + "						bosnet1.dbo.TMS_PreRouteJob\n"
-                        + "					WHERE\n"
-                        + "						Is_Edit = 'edit'\n"
-                        + "						AND Customer_ID = prj.Customer_ID\n"
-                        + "						AND RunId = '" + runId + "'\n"
-                        + "					GROUP BY\n"
-                        + "						DO_Number FOR xml PATH('')\n"
-                        + "					),\n"
-                        + "				1,\n"
-                        + "				2,\n"
-                        + "				''\n"
-                        + "				)\n"
-                        + "			)\n"
-                        + "		) AS DO_number,\n"
-                        + "		prj.Service_time,\n"
-                        + "		prj.RunId,\n"
-                        + "		prj.Name1,\n"
-                        + "		prj.Long,\n"
-                        + "		prj.Lat,\n"
-                        + "		prj.Customer_priority,\n"
-                        + "		prj.Distribution_Channel,\n"
-                        + "		prj.Street,\n"
-                        + "		prj.Request_Delivery_Date\n"
-                        + "	FROM \n"
-                        + "		[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
-                        + "	WHERE \n"
-                        + "		Is_Edit = 'edit'\n"
+                        + "                 (stuff(\n"
+                        + "                     (SELECT\n"
+                        + "                         '; ' + DO_Number\n"
+                        + "                      FROM\n"
+                        + "                         bosnet1.dbo.TMS_PreRouteJob\n"
+                        + "                      WHERE\n"
+                        + "                         Is_Edit = 'edit'\n"
+                        + "                      AND Customer_ID = prj.Customer_ID\n"
+                        + "                         AND RunId = '" + runId + "'\n"
+                        + "                      GROUP BY\n"
+                        + "                         DO_Number FOR xml PATH('')\n"
+                        + "			),\n"
+                        + "                     1,\n"
+                        + "                     2,\n"
+                        + "                     ''\n"
+                        + "                     )\n"
+                        + "                 )\n"
+                        + "             ) AS DO_number,\n"
+                        + "             prj.Service_time,\n"
+                        + "             prj.RunId,\n"
+                        + "             prj.Name1,\n"
+                        + "             prj.Long,\n"
+                        + "             prj.Lat,\n"
+                        + "             prj.Customer_priority,\n"
+                        + "             prj.Distribution_Channel,\n"
+                        + "             prj.Street,\n"
+                        + "             prj.Request_Delivery_Date,\n"
+                        + "             ROW_NUMBER() OVER(PARTITION BY prj.customer_ID ORDER BY prj.Name1 DESC) rn\n"
+                        + "         FROM \n"
+                        + "             [BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
+                        + "         WHERE \n"
+                        + "             Is_Edit = 'edit' AND RunId = '" + runId + "'\n"
+                        + "         ) a\n"
+                        + "     WHERE\n"
+                        + "         rn = 1"
                         + ") prj ON rj.runID = prj.RunId and rj.customer_id = prj.Customer_ID\n"
                         + "LEFT JOIN(\n"
                         + "	SELECT\n"
@@ -271,7 +278,7 @@ public class LoadDelivery implements BusinessLogic {
                             ldBreak.rdd = "null";
                             ldBreak.transportCost = 0;
                             ldBreak.dist = "null";
-                            
+
                             hasBreak = true;
                             breakTime = getBreakTime(getDayByDate(dateDeliv));
                             alDelivery.add(ldBreak);
@@ -540,6 +547,26 @@ public class LoadDelivery implements BusinessLogic {
 //            }
 //        }
 //    }
+    public int getVehicleNum(String runId) throws Exception {
+        int count = -1;
+        try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
+            try (Statement stm = con.createStatement()) {
+                String sql = "";
+                sql = "SELECT distinct vehicle_code\n"
+                        + "  FROM [BOSNET1].[dbo].[TMS_RouteJob]\n"
+                        + "  where runID = '"+runId+"'\n"
+                        + "  group by vehicle_code";
+                try (ResultSet rs = stm.executeQuery(sql)) {
+                    while (rs.next()) {
+                        count++;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+        return count;
+    }
 
     public int getBreakTime(String day) throws Exception {
         int breakTime = 0;
@@ -562,7 +589,7 @@ public class LoadDelivery implements BusinessLogic {
         }
         return breakTime;
     }
-    
+
 //    public ArrayList<Double> getParam() throws Exception {
 //        ArrayList<Double> alParam = new ArrayList<>();
 //        try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
@@ -683,6 +710,7 @@ public class LoadDelivery implements BusinessLogic {
 //        return ((distanceMtr / 1000) / speedKmPHr * 60);
 //    }
 //
+
     public String isTimeinRange(String arrive, ArrayList<String> al) {
         String[] truckArriveSplit = arrive.split(":");
         String[] custOpenSplit = al.get(0).split(":");
@@ -820,6 +848,7 @@ public class LoadDelivery implements BusinessLogic {
 ////        return startTime;
 ////    }
 ////
+
     public ArrayList<String> getTruckTime(String runId, String vNo) throws Exception {
         ArrayList<String> al = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
