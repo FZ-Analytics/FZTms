@@ -145,9 +145,9 @@
             <label class="fzLabel">Branch:</label> 
             <label class="fzLabel" id="branch"><%=get("branchId")%></label>
 
-            <br>
+<!--            <br>
             <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel"><%=get("shift")%></label>
+            <label class="fzLabel"><%=get("shift")%></label>-->
 
             <br>
             <label class="fzLabel">Channel:</label> 

@@ -109,7 +109,8 @@ public class SubmitToSapAPI {
                     break;
                 }
                 if (getFromShipmentPlan(runId, alCustId.get(i)).isEmpty()) {
-                    ret = "Aborted: Already Shipment is Y or Batch is NULL for DO on Customer ID: " + alCustId.get(i);
+                    ret = "Aborted: Goods is already sent or Batch is NULL for DO on Customer ID: " + alCustId.get(i);
+                    isRouteNull = true;
                     break;
                 }
             }
