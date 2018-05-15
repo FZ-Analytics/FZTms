@@ -43,54 +43,67 @@
 
             .column1 {
                 min-width: 80px;
+                width: 80px;
             }
 
             .column2 {
                 min-width: 100px;
+                width: 100px;
             }
 
             .column3 {
                 min-width: 150px;
+                width: 150px;
             }
 
             .column4 {
                 min-width: 150px;
+                width: 150px;
             }
 
             .column5 {
                 min-width: 65px;
+                width: 65px;
             }
 
             .column6 {
                 min-width: 60px;
+                width: 60px;
             }
 
             .column7 {
                 min-width: 80px;
+                width: 80px;
             }
 
             .column8 {
                 min-width: 70px;
+                width: 70px;
             }
 
             .column9 {
                 min-width: 60px;
+                width: 60px;
             }
 
             .column10 {
                 min-width: 60px;
+                width: 60px;
             }
 
             .column11 {
                 min-width: 160px;
+                width: 160px;
             }
 
             .column12 {
                 min-width: 40px;
+                width: 40px;
             }
 
             .column13 {
                 min-width: 50px;
+                width: 50px;
             }
             
             .column14 {
