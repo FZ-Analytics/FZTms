@@ -244,6 +244,13 @@
                         arrOfRow[i] = document.getElementById('table').rows[rowIdx].cells[i].innerHTML;
                     }
                     document.getElementById("table").deleteRow(rowIdx);
+                    var nextVehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
+                    var prevArrive = document.getElementById('table').rows[rowIdx-1].cells[3].innerHTML;
+                    var nextDepart = document.getElementById('table').rows[rowIdx+1].cells[4].innerHTML;
+                    if(nextVehicleCode.length == 0 && prevArrive.length == 0 && nextDepart.length == 0) {
+                        document.getElementById("table").deleteRow(rowIdx);
+                    }
+                    
                 }
                 klikStatus = 2;
                 orderNo();
