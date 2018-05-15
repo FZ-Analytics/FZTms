@@ -135,9 +135,11 @@
                 <label class="fzLabel">Ori RunID:</label> 
                 <label class="fzLabel" id="oriRunID"><%=get("oriRunID")%></label> 
 
-                <%--<br>--%>
+                <%--<br>
                 <label class="fzLabel" hidden="true">Prev RunID:</label> 
-                <label class="fzLabel" id="reRun" hidden="true"><%=get("reRun")%></label> 
+                <label class="fzLabel" id="reRun" hidden="true"><%=get("reRun")%></label> --%>
+                
+                <input type="hidden" value='<%=get("reRun")%>' id="reRun"/>
 
                 <br>
                 <label class="fzLabel">Channel:</label> 
@@ -311,7 +313,7 @@
                             //var dateNow = $.datepicker.formatDate('yy-mm-dd', new Date());//currentDate.getFullYear()+"-"+(currentDate.getMonth()+1)+"-"+currentDate.getDate();
                             //alert($('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text() + '&channel=' + $("#channel").text());
                             //var win = window.open('../../run/runProcess.jsp?tripCalc=M&shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text(), null);
-                            var win = window.location.replace('../../run/runProcess.jsp?shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text() + '&channel=' + $("#channel").text() + '&url=' + $("#urls").val());
+                            var win = window.location.replace('../../run/runProcess.jsp?shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").val() + '&channel=' + $("#channel").text() + '&url=' + $("#urls").val());
                             if (win) {
                                 //Browser has allowed it to be opened
                                 win.focus();
