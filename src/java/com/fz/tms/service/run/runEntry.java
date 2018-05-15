@@ -26,7 +26,7 @@ public class runEntry implements BusinessLogic {
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
             , PageContext pc) throws Exception {
-        String br = (String) pc.getSession().getAttribute("WorkplaceID");
+        String br = (String) pc.getSession().getAttribute("WorkplaceID");        
         List<Branch> lBr = getBranch(br);
         request.setAttribute("ListBranch", lBr);
     }

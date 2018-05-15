@@ -3,38 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package com.fz.tms.service.run;
+package com.fz.tms.params.Detail;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
-import com.fz.tms.params.map.Constava;
 import com.fz.tms.params.map.GoogleDirMapAllVehi;
-import com.fz.tms.params.model.DODetil;
 import com.fz.tms.params.model.OptionModel;
-import com.fz.tms.params.model.SummaryVehicle;
-import com.fz.tms.params.model.Vehicle;
 import com.fz.tms.params.service.Other;
 import com.fz.tms.params.service.VehicleAttrDB;
+import com.fz.tms.service.run.RouteJob;
+import com.fz.tms.service.run.RouteJobListing;
 import com.fz.util.FZUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,53 +32,33 @@ import javax.servlet.jsp.PageContext;
 
 /**
  *
+ * @author dwi.oktaviandi
  */
-public class RouteJobListing implements BusinessLogic {
-    //DecimalFormat df = new DecimalFormat("##.0");
+public class runResultDetailController implements BusinessLogic {    
     Set<String> vehicles = new HashSet<String>();
     String shift = "";
     String branch = "";
-    String key = Constava.googleKey;
-    List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
-        
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
             , PageContext pc) throws Exception {
+        RouteJobListing rj = new RouteJobListing();
         
         String runID = FZUtil.getHttpParam(request, "runID");
         String OriRunID = FZUtil.getHttpParam(request, "OriRunID");
-        String channel = FZUtil.getHttpParam(request, "channel");
-        String dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
         
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
 
+        List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
         all = map.runs(runID, jss);
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String jsonOutput = gson.toJson(all);
-        System.out.println(jsonOutput);
-
-        request.setAttribute("key", key);
-        request.setAttribute("test", jsonOutput.toString());
-        request.setAttribute("JobOptionModel", jss);
         
-        request.setAttribute("channel", channel);
-        List<RouteJob> js = getAll(runID, OriRunID);
+        List<RouteJob> js = getAll(runID, OriRunID, all);
+        
         request.setAttribute("JobList", js);
-        request.setAttribute("OriRunID", OriRunID);
-        request.setAttribute("nextRunId", getNextRunId(runID));
-        request.setAttribute("dateDeliv", dateDeliv);
-        
-        request.setAttribute("vehicleCount", 
-                String.valueOf(vehicles.size()));
         request.setAttribute("runID", runID);
-        request.setAttribute("branch", branch);
-        request.setAttribute("shift", shift);
-        request.setAttribute("OriRunID", OriRunID);
     }
     
-    public List<RouteJob> getAll(String runID, String OriRunID) throws Exception{
+    public List<RouteJob> getAll(String runID, String OriRunID, List<List<HashMap<String, String>>> all) throws Exception{
         List<RouteJob> js = new ArrayList<RouteJob>();
         
         String sql = "SELECT\n" +
@@ -440,87 +410,6 @@ public class RouteJobListing implements BusinessLogic {
         }
         
         return js;
-    }
-    public static String getNextRunId(String runId) {
-        String[] id = runId.split("_");
-        String date = id[0];
-        String time = "";
-        System.out.println("CHAR AT 0: " + id[1].charAt(0));
-        //Jam 10 pagi ke atas
-        if(id[1].charAt(0) != '0') {
-            int waktu = 0;
-            waktu = Integer.parseInt(id[1]) + 1;
-            time = "" + waktu;
-        } 
-        //Sebelum jam 10 pagi
-        else {
-            int waktu = 0;
-            waktu = Integer.parseInt(id[1]) + 1;
-            time = "0" + waktu;
-        }
-        return date + "_" + time;
-    }
-
-    public String sendSAP(Vehicle he) throws Exception{
-        String str = "ERROR";
-        
-        String sql = "update\n"
-                + "	bosnet1.dbo.TMS_RouteJob\n"
-                + " set\n"
-                + "	isFix = '1'\n"
-                + " where\n"
-                + "	runID = '" + he.RunId + "'\n"
-                + "	and vehicle_code = '" + he.vehicle_code + "'\n"
-                + "	and isFix is null";
-        try (
-            Connection con = (new Db()).getConnection("jdbc/fztms");
-            PreparedStatement psHdr = con.prepareStatement(sql
-                    , Statement.RETURN_GENERATED_KEYS);
-            )  {
-            con.setAutoCommit(false);
-
-            psHdr.executeUpdate();
-            
-             con.setAutoCommit(true);
-             str = "OK";
-        }
-        return str;
-    }
-    
-    public String DeleteResultShipment(Vehicle he) throws Exception{
-        String str = "ERROR";
-        
-        String sql = "DELETE\n" +
-                "FROM\n" +
-                "	BOSNET1.dbo.TMS_Result_Shipment\n" +
-                "WHERE\n" +
-                "	Shipment_Number_Dummy = (SELECT\n" +
-                "		DISTINCT concat(\n" +
-                "			REPLACE(\n" +
-                "				runID,\n" +
-                "				'_',\n" +
-                "				''\n" +
-                "			),\n" +
-                "			vehicle_code\n" +
-                "		)\n" +
-                "	FROM\n" +
-                "		bosnet1.dbo.tms_RouteJob\n" +
-                "	WHERE\n" +
-                "		runID = '" + he.RunId + "'\n" +
-                "		AND vehicle_code = '" + he.vehicle_code + "')";
-        try (
-            Connection con = (new Db()).getConnection("jdbc/fztms");
-            PreparedStatement psHdr = con.prepareStatement(sql
-                    , Statement.RETURN_GENERATED_KEYS);
-            )  {
-            con.setAutoCommit(false);
-
-            psHdr.executeUpdate();
-            
-             con.setAutoCommit(true);
-             str = "OK";
-        }
-        return str;
     }
     
     public List<HashMap<String, String>> cekData(String runID, String custId) throws Exception{

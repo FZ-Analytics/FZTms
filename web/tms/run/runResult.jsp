@@ -401,6 +401,12 @@
                 google.maps.event.addDomListener(window, 'load', initialize());
                 //console.log("detikakhirb" + new Date().getTime());
             }
+            
+            window.onload = function(){
+                var a = document.getElementById('iframe1'); //or grab it by tagname etc
+                a.src = "../Params/Detail/runResultDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
+                //alert(a.src);
+            };
         </script>
         <h4>Routing Result 
             <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
@@ -450,9 +456,10 @@
         
         <br><br><br><br><br><br>
         <div id="cover" style="width: 100%">
-            <div id="thediv" style="float: left;overflow-y: scroll;height: 543px; width: 65%; border-style: double">     
+            <div id="thediv" style="float: left;width: 65%;"><%--overflow-y: scroll;--%>
                 <div style="width: 100%; text-align: center"><h4>Result Detail</h4></div>
-                <table id="table" border1="1" style="border-color: lightgray;">
+                <div style="height: 500px; width: 100%;border-style: double"><iframe name="iframe1" id="iframe1" src="" frameborder="0" height="100%" width="100%"></iframe></div>
+                <%--<table id="table" border1="1" style="border-color: lightgray;">
                     <thead>
                         <tr style="background-color:orange;">
                             <th width="100px" class="fzCol center">color</th>
@@ -516,13 +523,13 @@
 
                         <%} // for ProgressRecord %>
                     </tbody>
-                </table>
+                </table>--%>
             </div>
-            <div style="float: left;width: 35%; border-style: double">
+            <div style="float: left;width: 35%;">
                 <div style="width: 100%; text-align: center"><h4>MAP</h4></div>
                 <script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
                 <input type="text" id="txt" value='<%=request.getAttribute("test")%>' hidden="true"/>
-                <div id="map" style="width: 100%;height: 500px;"></div>
+                <div id="map" style="width: 100%;height: 500px;border-style: double"></div>
             </div>
         </div>
         

@@ -42,55 +42,59 @@
 
 
             .column1 {
-                width: 80px;
+                min-width: 80px;
             }
 
             .column2 {
-                width: 100px;
+                min-width: 100px;
             }
 
             .column3 {
-                width: 150px;
+                min-width: 150px;
             }
 
             .column4 {
-                width: 150px;
+                min-width: 150px;
             }
 
             .column5 {
-                width: 65px;
+                min-width: 65px;
             }
 
             .column6 {
-                width: 60px;
+                min-width: 60px;
             }
 
             .column7 {
-                width: 80px;
+                min-width: 80px;
             }
 
             .column8 {
-                width: 70px;
+                min-width: 70px;
             }
 
             .column9 {
-                width: 60px;
+                min-width: 60px;
             }
 
             .column10 {
-                width: 60px;
+                min-width: 60px;
             }
 
             .column11 {
-                width: 160px;
+                min-width: 160px;
             }
 
             .column12 {
-                width: 40px;
+                min-width: 40px;
             }
 
             .column13 {
-                width: 50px;
+                min-width: 50px;
+            }
+            
+            .column14 {
+                min-width: 50px;
             }
 
             .row1 {
@@ -343,287 +347,287 @@
             <script src="../appGlobal/jquery.dataTables.min.js"></script>
             <script src="../appGlobal/datatables.js"></script>
             <script >
-                                        $(document).ready(function () {
-                                            tables();
-                                            $('input[type=checkbox]').each(function () {
-                                                this.checked = false;
-                                            });
-                                            //setLength();
-                                            /*$('.datatable').dataTable({
-                                             "sPaginationType": "bs_normal"
-                                             });
-                                             $('.datatable').each(function () {
-                                             var datatable = $(this);
-                                             // SEARCH - Add the placeholder for Search and Turn this into in-line form control
-                                             var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
-                                             search_input.attr('placeholder', 'Search');
-                                             search_input.addClass('form-control input-sm');
-                                             // LENGTH - Inline-Form control
-                                             var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
-                                             length_sel.addClass('form-control input-sm');
-                                             });*/
-                                            $('#re_Run').click(function () {
-                                                //setTimeout(function () {
-                                                //alert($("#urls").text());
-                                                //var dateNow = $.datepicker.formatDate('yy-mm-dd', new Date());//currentDate.getFullYear()+"-"+(currentDate.getMonth()+1)+"-"+currentDate.getDate();
-                                                //alert($('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text() + '&channel=' + $("#channel").text());
-                                                //var win = window.open('../../run/runProcess.jsp?tripCalc=M&shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text(), null);
-                                                var win = window.location.replace('../../run/runProcess.jsp?shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text() + '&reRun=' + $("#reRun").val() + '&channel=' + $("#channel").text() + '&url=' + $("#urls").val());
-                                                if (win) {
-                                                    //Browser has allowed it to be opened
-                                                    win.focus();
-                                                }
-                                                //}, 3000);
-                                            });
-                                        });
+                $(document).ready(function () {
+                    tables();
+                    $('input[type=checkbox]').each(function () {
+                        this.checked = false;
+                    });
+                    //setLength();
+                    /*$('.datatable').dataTable({
+                     "sPaginationType": "bs_normal"
+                     });
+                     $('.datatable').each(function () {
+                     var datatable = $(this);
+                     // SEARCH - Add the placeholder for Search and Turn this into in-line form control
+                     var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
+                     search_input.attr('placeholder', 'Search');
+                     search_input.addClass('form-control input-sm');
+                     // LENGTH - Inline-Form control
+                     var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
+                     length_sel.addClass('form-control input-sm');
+                     });*/
+                    $('#re_Run').click(function () {
+                        //setTimeout(function () {
+                        //alert($("#urls").text());
+                        //var dateNow = $.datepicker.formatDate('yy-mm-dd', new Date());//currentDate.getFullYear()+"-"+(currentDate.getMonth()+1)+"-"+currentDate.getDate();
+                        //alert($('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text() + '&channel=' + $("#channel").text());
+                        //var win = window.open('../../run/runProcess.jsp?tripCalc=M&shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text(), null);
+                        var win = window.location.replace('../../run/runProcess.jsp?shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text() + '&reRun=' + $("#reRun").val() + '&channel=' + $("#channel").text() + '&url=' + $("#urls").val());
+                        if (win) {
+                            //Browser has allowed it to be opened
+                            win.focus();
+                        }
+                        //}, 3000);
+                    });
+                });
 
-                                        function exlcudeViaCheckBox() {
-                                            var found = false;
-                                            var doNumber = "";
-                                            $('#table').find('tr').each(function () {
-                                                var row = $(this);
-                                                if (row.find('input[type="checkbox"]').is(':checked')) {
-                                                    found = true;
-                                                    doNumber = doNumber.concat(row.find(".custId").html(), ",", row.find(".doNum").html(), ";");
-                                                } else {
+                function exlcudeViaCheckBox() {
+                    var found = false;
+                    var doNumber = "";
+                    $('#table').find('tr').each(function () {
+                        var row = $(this);
+                        if (row.find('input[type="checkbox"]').is(':checked')) {
+                            found = true;
+                            doNumber = doNumber.concat(row.find(".custId").html(), ",", row.find(".doNum").html(), ";");
+                        } else {
 
-                                                }
-                                            });
-                                            if (!found) {
-                                                alert("No data")
-                                            } else {
-                                                console.log(doNumber);
-                                                exclude($("#runId").text(), doNumber);
-                                            }
-                                        }
+                        }
+                    });
+                    if (!found) {
+                        alert("No data")
+                    } else {
+                        console.log(doNumber);
+                        exclude($("#runId").text(), doNumber);
+                    }
+                }
 
-                                        function klik(kode) {
-                                            window.open('popupEditCust.jsp?runId=' + $('#runId').text() + '&custId=' + kode, null,
-                                                    'scrollbars=1,resizable=1,height=500,width=750');
+                function klik(kode) {
+                    window.open('popupEditCust.jsp?runId=' + $('#runId').text() + '&custId=' + kode, null,
+                            'scrollbars=1,resizable=1,height=500,width=750');
 
-                                        }
+                }
 
-                                        function Vklik() {
-                                            window.open('ShowPreRouteVehicle.jsp?runId=' + $('#runId').text(), null,
-                                                    'scrollbars=1,resizable=1,height=500,width=950');
+                function Vklik() {
+                    window.open('ShowPreRouteVehicle.jsp?runId=' + $('#runId').text(), null,
+                            'scrollbars=1,resizable=1,height=500,width=950');
 
-                                        }
+                }
 
-                                        function openManualRoutePage() {
-                                            var win = window.open('../../run/runManualRoute.jsp?branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&oriRunId=' + $('#runId').text() + '&channel=' + $('#channel').val());
-                                            if (win) {
-                                                //Browser has allowed it to be opened
-                                                win.focus();
-                                            }
-                                        }
+                function openManualRoutePage() {
+                    var win = window.open('../../run/runManualRoute.jsp?branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&oriRunId=' + $('#runId').text() + '&channel=' + $('#channel').val());
+                    if (win) {
+                        //Browser has allowed it to be opened
+                        win.focus();
+                    }
+                }
 
-                                        function exclude(custId, doAndCustId) {
-                                            var $apiAddress = '../../../api/popupEditCustBfror/excludeDO';
-                                            var jsonForServer = '{\"runId\": \"' + custId + '\",\"data\":\"' + doAndCustId + '\",\"excInc\":\"exc\"}';
-                                            var data = [];
-                                            $.post($apiAddress, {json: jsonForServer}).done(function (data) {
-                                                if (data == 'OK') {
-                                                    alert('sukses');
-                                                    //location.reload();
-                                                } else {
-                                                    alert('submit error');
-                                                }
-                                            });
-                                        }
+                function exclude(custId, doAndCustId) {
+                    var $apiAddress = '../../../api/popupEditCustBfror/excludeDO';
+                    var jsonForServer = '{\"runId\": \"' + custId + '\",\"data\":\"' + doAndCustId + '\",\"excInc\":\"exc\"}';
+                    var data = [];
+                    $.post($apiAddress, {json: jsonForServer}).done(function (data) {
+                        if (data == 'OK') {
+                            alert('sukses');
+                            //location.reload();
+                        } else {
+                            alert('submit error');
+                        }
+                    });
+                }
 
-                                        function saveHistory() {
-                                            var $apiAddress = '../../../api/popupEditCustBfror/savehistory';
-                                            var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
-                                            var data = [];
+                function saveHistory() {
+                    var $apiAddress = '../../../api/popupEditCustBfror/savehistory';
+                    var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
+                    var data = [];
 
-                                            $.post($apiAddress, {json: jsonForServer}).done(function (data) {
-                                                if (data == 'OK') {
-                                                    alert('sukses');
-                                                    //location.reload();
-                                                } else {
-                                                    alert('submit error');
-                                                }
-                                            });
-                                        }
-                                        function tables() {
-                                            function scrollHandler(e) {
-                                                $('#row').css('left', -$('#table').get(0).scrollLeft);
-                                                $('#col').css('top', -$('#table').get(0).scrollTop);
-                                            }
-                                            $('#table').scroll(scrollHandler);
-                                            $('#table').resize(scrollHandler);
+                    $.post($apiAddress, {json: jsonForServer}).done(function (data) {
+                        if (data == 'OK') {
+                            alert('sukses');
+                            //location.reload();
+                        } else {
+                            alert('submit error');
+                        }
+                    });
+                }
+                function tables() {
+                    function scrollHandler(e) {
+                        $('#row').css('left', -$('#table').get(0).scrollLeft);
+                        $('#col').css('top', -$('#table').get(0).scrollTop);
+                    }
+                    $('#table').scroll(scrollHandler);
+                    $('#table').resize(scrollHandler);
 
-                                            var animate = false;
-                                            $('#wrapper').keydown(function (event) {
-                                                if (animate) {
-                                                    event.preventDefault();
-                                                }
-                                                ;
-                                                if (event.keyCode == 37 && !animate) {
-                                                    animate = true;
-                                                    $('#table').animate({
-                                                        scrollLeft: "-=200"
-                                                    }, "fast", function () {
-                                                        animate = false;
-                                                    });
-                                                    event.preventDefault();
-                                                } else if (event.keyCode == 39 && !animate) {
-                                                    animate = true;
-                                                    $('#table').animate({
-                                                        scrollLeft: "+=200"
-                                                    }, "fast", function () {
-                                                        animate = false;
-                                                    });
-                                                    event.preventDefault();
-                                                } else if (event.keyCode == 38 && !animate) {
-                                                    animate = true;
-                                                    $('#table').animate({
-                                                        scrollTop: "-=200"
-                                                    }, "fast", function () {
-                                                        animate = false;
-                                                    });
-                                                    event.preventDefault();
-                                                } else if (event.keyCode == 40 && !animate) {
-                                                    animate = true;
-                                                    $('#table').animate({
-                                                        scrollTop: "+=200"
-                                                    }, "fast", function () {
-                                                        animate = false;
-                                                    });
-                                                    event.preventDefault();
-                                                }
-                                            });
-                                        }
+                    var animate = false;
+                    $('#wrapper').keydown(function (event) {
+                        if (animate) {
+                            event.preventDefault();
+                        }
+                        ;
+                        if (event.keyCode == 37 && !animate) {
+                            animate = true;
+                            $('#table').animate({
+                                scrollLeft: "-=200"
+                            }, "fast", function () {
+                                animate = false;
+                            });
+                            event.preventDefault();
+                        } else if (event.keyCode == 39 && !animate) {
+                            animate = true;
+                            $('#table').animate({
+                                scrollLeft: "+=200"
+                            }, "fast", function () {
+                                animate = false;
+                            });
+                            event.preventDefault();
+                        } else if (event.keyCode == 38 && !animate) {
+                            animate = true;
+                            $('#table').animate({
+                                scrollTop: "-=200"
+                            }, "fast", function () {
+                                animate = false;
+                            });
+                            event.preventDefault();
+                        } else if (event.keyCode == 40 && !animate) {
+                            animate = true;
+                            $('#table').animate({
+                                scrollTop: "+=200"
+                            }, "fast", function () {
+                                animate = false;
+                            });
+                            event.preventDefault();
+                        }
+                    });
+                }
 
-                                        function setLength() {
-                                            /*var table = document.getElementById("myTable");
-                                             var tr = table.getElementsByTagName("tr");
-                                             
-                                             var rows = document.getElementById("myTable").rows[0].cells.length;
-                                             var ty = 0;
-                                             
-                                             var td;
-                                             
-                                             //cek posisi data                     
-                                             //collumn
-                                             for (x = 0;x<rows;x++){
-                                             //row
-                                             for (i = 0; i < tr.length; i++) {
-                                             td = tr[i].getElementsByTagName("td")[x];       
-                                             var t = document.getElementsByTagName("td").rows[1].cells[1].offsetWidth;
-                                             console.log(x + "|" + i + " " + t);
-                                             }
-                                             }*/
-                                            var rows = document.getElementById("myTable").rows[0].cells.length;
-                                            for (x = 0; x < rows; x++) {
-                                                var footer = document.getElementsByTagName('td')[x];
-                                                var header = document.getElementsByTagName('th')[x];
+                function setLength() {
+                    /*var table = document.getElementById("myTable");
+                     var tr = table.getElementsByTagName("tr");
 
-                                                var num = null;
-                                                if (header.offsetWidth > footer.offsetWidth) {
-                                                    num = header.offsetWidth + 'px';
-                                                    footer.style.width = '200px';
-                                                    num = header.offsetWidth + 'px';
-                                                    console.log(header.offsetWidth + "|" + footer.offsetWidth + "header" + num);
-                                                } else {
-                                                    num = footer.offsetWidth + 'px';
-                                                    header.style.width = num;
-                                                    console.log(header.offsetWidth + "|" + footer.offsetWidth + "footer" + num);
-                                                }
-                                            }
-                                        }
+                     var rows = document.getElementById("myTable").rows[0].cells.length;
+                     var ty = 0;
 
-                                        function sortTable(n) {
-                                            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-                                            table = document.getElementById("myTable");
-                                            switching = true;
-                                            //Set the sorting direction to ascending:
-                                            dir = "asc";
-                                            /*Make a loop that will continue until
-                                             no switching has been done:*/
-                                            while (switching) {
-                                                //start by saying: no switching is done:
-                                                switching = false;
-                                                rows = table.getElementsByTagName("TR");
-                                                /*Loop through all table rows (except the
-                                                 first, which contains table headers):*/
-                                                for (i = 0; i < (rows.length - 1); i++) {
-                                                    //start by saying there should be no switching:
-                                                    shouldSwitch = false;
-                                                    /*Get the two elements you want to compare,
-                                                     one from current row and one from the next:*/
-                                                    x = rows[i].getElementsByTagName("TD")[n];
-                                                    y = rows[i + 1].getElementsByTagName("TD")[n];
-                                                    /*check if the two rows should switch place,
-                                                     based on the direction, asc or desc:*/
-                                                    if (dir == "asc") {
-                                                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                                            //if so, mark as a switch and break the loop:
-                                                            shouldSwitch = true;
-                                                            break;
-                                                        }
-                                                    } else if (dir == "desc") {
-                                                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                                            //if so, mark as a switch and break the loop:
-                                                            shouldSwitch = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                if (shouldSwitch) {
-                                                    /*If a switch has been marked, make the switch
-                                                     and mark that a switch has been done:*/
-                                                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                                                    switching = true;
-                                                    //Each time a switch is done, increase this count by 1:
-                                                    switchcount++;
-                                                } else {
-                                                    /*If no switching has been done AND the direction is "asc",
-                                                     set the direction to "desc" and run the while loop again.*/
-                                                    if (switchcount == 0 && dir == "asc") {
-                                                        dir = "desc";
-                                                        switching = true;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        function myFunction() {
-                                            var input, filter, table, tr, td, i;
-                                            input = document.getElementById("myInput");
-                                            filter = input.value.toUpperCase();
-                                            table = document.getElementById("myTable");
-                                            tr = table.getElementsByTagName("tr");
+                     var td;
 
-                                            var rows = document.getElementById("myTable").rows[0].cells.length;
-                                            var ty = 0;
-                                            //cek posisi data 
-                                            //row
-                                            for (i = 0; i < tr.length; i++) {
-                                                //collumn
-                                                for (x = 0; x < rows; x++) {
-                                                    td = tr[i].getElementsByTagName("td")[x];
-                                                    if (td) {
-                                                        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                                                            ty = x;
-                                                            //console.log(td.innerHTML.toUpperCase());
-                                                        }
-                                                    }
-                                                }
-                                            }
+                     //cek posisi data                     
+                     //collumn
+                     for (x = 0;x<rows;x++){
+                     //row
+                     for (i = 0; i < tr.length; i++) {
+                     td = tr[i].getElementsByTagName("td")[x];       
+                     var t = document.getElementsByTagName("td").rows[1].cells[1].offsetWidth;
+                     console.log(x + "|" + i + " " + t);
+                     }
+                     }*/
+                    var rows = document.getElementById("myTable").rows[0].cells.length;
+                    for (x = 0; x < rows; x++) {
+                        var footer = document.getElementsByTagName('td')[x];
+                        var header = document.getElementsByTagName('th')[x];
 
-                                            //hilangkan yang tidak cocok
-                                            //row
-                                            for (i = 0; i < tr.length; i++) {
-                                                td = tr[i].getElementsByTagName("td")[ty];
-                                                if (td) {
-                                                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                                                        tr[i].style.display = "";
-                                                    } else {
-                                                        tr[i].style.display = "none";
-                                                    }
-                                                }
-                                            }
-                                        }
+                        var num = null;
+                        if (header.offsetWidth > footer.offsetWidth) {
+                            num = header.offsetWidth + 'px';
+                            footer.style.width = '200px';
+                            num = header.offsetWidth + 'px';
+                            console.log(header.offsetWidth + "|" + footer.offsetWidth + "header" + num);
+                        } else {
+                            num = footer.offsetWidth + 'px';
+                            header.style.width = num;
+                            console.log(header.offsetWidth + "|" + footer.offsetWidth + "footer" + num);
+                        }
+                    }
+                }
+
+                function sortTable(n) {
+                    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                    table = document.getElementById("myTable");
+                    switching = true;
+                    //Set the sorting direction to ascending:
+                    dir = "asc";
+                    /*Make a loop that will continue until
+                     no switching has been done:*/
+                    while (switching) {
+                        //start by saying: no switching is done:
+                        switching = false;
+                        rows = table.getElementsByTagName("TR");
+                        /*Loop through all table rows (except the
+                         first, which contains table headers):*/
+                        for (i = 0; i < (rows.length - 1); i++) {
+                            //start by saying there should be no switching:
+                            shouldSwitch = false;
+                            /*Get the two elements you want to compare,
+                             one from current row and one from the next:*/
+                            x = rows[i].getElementsByTagName("TD")[n];
+                            y = rows[i + 1].getElementsByTagName("TD")[n];
+                            /*check if the two rows should switch place,
+                             based on the direction, asc or desc:*/
+                            if (dir == "asc") {
+                                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                    //if so, mark as a switch and break the loop:
+                                    shouldSwitch = true;
+                                    break;
+                                }
+                            } else if (dir == "desc") {
+                                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                    //if so, mark as a switch and break the loop:
+                                    shouldSwitch = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (shouldSwitch) {
+                            /*If a switch has been marked, make the switch
+                             and mark that a switch has been done:*/
+                            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                            switching = true;
+                            //Each time a switch is done, increase this count by 1:
+                            switchcount++;
+                        } else {
+                            /*If no switching has been done AND the direction is "asc",
+                             set the direction to "desc" and run the while loop again.*/
+                            if (switchcount == 0 && dir == "asc") {
+                                dir = "desc";
+                                switching = true;
+                            }
+                        }
+                    }
+                }
+                function myFunction() {
+                    var input, filter, table, tr, td, i;
+                    input = document.getElementById("myInput");
+                    filter = input.value.toUpperCase();
+                    table = document.getElementById("myTable");
+                    tr = table.getElementsByTagName("tr");
+
+                    var rows = document.getElementById("myTable").rows[0].cells.length;
+                    var ty = 0;
+                    //cek posisi data 
+                    //row
+                    for (i = 0; i < tr.length; i++) {
+                        //collumn
+                        for (x = 0; x < rows; x++) {
+                            td = tr[i].getElementsByTagName("td")[x];
+                            if (td) {
+                                if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                                    ty = x;
+                                    //console.log(td.innerHTML.toUpperCase());
+                                }
+                            }
+                        }
+                    }
+
+                    //hilangkan yang tidak cocok
+                    //row
+                    for (i = 0; i < tr.length; i++) {
+                        td = tr[i].getElementsByTagName("td")[ty];
+                        if (td) {
+                            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                                tr[i].style.display = "";
+                            } else {
+                                tr[i].style.display = "none";
+                            }
+                        }
+                    }
+                }
             </script>
         </div>
         <%@include file="../appGlobal/bodyBottom.jsp"%>

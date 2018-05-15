@@ -220,6 +220,9 @@ public class PageTopUtils {
         String WorkplaceID = FZUtil.getHttpParam(request, "WorkplaceID");
         String Key = FZUtil.getHttpParam(request, "Key");
         
+        //bypass HO
+        WorkplaceID = WorkplaceID.equalsIgnoreCase("999")? "" : WorkplaceID;
+        
         if(UserID.length() > 0 && EmpyID.length() > 0 
                 && UserName.length() > 0 && Key.length() > 0 ){
             String sql = "SELECT\n" +
