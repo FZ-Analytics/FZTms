@@ -206,9 +206,7 @@
                                 <%=j.no%>
                             <%}%>
                         </td>
-                        <td class="vCodeClick hover center" style="color: blue;">
-                            <%=j.vehicleCode%>
-                        </td>
+                        <td class="vCodeClick hover center" id="vehicleCode" style="color: blue;"><%=j.vehicleCode%></td>
                         <td class="custIDClick hover center" id="custId" style="color: blue;"><%=j.custId%></td>
                         <td class="fzCell center"><%=j.arrive%></td>
                         <td class="fzCell center"><%=j.depart%></td>                    
