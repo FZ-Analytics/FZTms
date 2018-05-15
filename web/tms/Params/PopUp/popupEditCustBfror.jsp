@@ -135,9 +135,9 @@
                 <label class="fzLabel">Ori RunID:</label> 
                 <label class="fzLabel" id="oriRunID"><%=get("oriRunID")%></label> 
 
-                <%--<br>
-                <label class="fzLabel">Prev RunID:</label> 
-                <label class="fzLabel" id="reRun"><%=get("reRun")%></label> --%>
+                <%--<br>--%>
+                <label class="fzLabel" hidden="true">Prev RunID:</label> 
+                <label class="fzLabel" id="reRun" hidden="true"><%=get("reRun")%></label> 
 
                 <br>
                 <label class="fzLabel">Channel:</label> 
@@ -151,9 +151,9 @@
             
             <br>
             <div style="width: 100%"> 
-                <input style="" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type in a name">
+                
             </div>
-            
+            <input style="" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type in a name">
             <input id="exclude" class="btn fzButton" type="button" value="Exclude Selected" onclick="exlcudeViaCheckBox();" />
             <br><br>                
             <div style="width: 100%">                
