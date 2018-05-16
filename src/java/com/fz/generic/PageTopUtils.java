@@ -116,7 +116,7 @@ public class PageTopUtils {
                 if(str.equalsIgnoreCase("OK") && url.contains("/tms/")){ 
                     //redirect main
                     if(IsMain.equalsIgnoreCase("1")){
-                        if(!url.contains("/Params/") && url.contains("/tms/")){
+                        /*if(!url.contains("/Params/") && url.contains("/tms/")){
                             isParam = "../main2/main2.jsp";
                         }else if(url.contains("/Params/")){
                             isParam = "../../main2/main2.jsp";
@@ -126,7 +126,7 @@ public class PageTopUtils {
                         request.getSession()
                                     .setAttribute("IsMain", null);
                         request.getRequestDispatcher(isParam)
-                            .forward(request, (HttpServletResponse) pc.getResponse());
+                            .forward(request, (HttpServletResponse) pc.getResponse());*/
                     }
                     return true;
                 }else{
@@ -220,8 +220,8 @@ public class PageTopUtils {
         String WorkplaceID = FZUtil.getHttpParam(request, "WorkplaceID");
         String Key = FZUtil.getHttpParam(request, "Key");
         
-        //bypass HO
-        WorkplaceID = WorkplaceID.equalsIgnoreCase("999")? "" : WorkplaceID;
+        //bypass HO 999%20
+        WorkplaceID = WorkplaceID.substring(0,3).equalsIgnoreCase("999")? "" : WorkplaceID;
         
         if(UserID.length() > 0 && EmpyID.length() > 0 
                 && UserName.length() > 0 && Key.length() > 0 ){
