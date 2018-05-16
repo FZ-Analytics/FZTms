@@ -59,6 +59,7 @@ public class RouteJobListing implements BusinessLogic {
         String OriRunID = FZUtil.getHttpParam(request, "OriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
         String dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
+        branch = FZUtil.getHttpParam(request, "branch");
         
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
@@ -74,14 +75,14 @@ public class RouteJobListing implements BusinessLogic {
         request.setAttribute("JobOptionModel", jss);
         
         request.setAttribute("channel", channel);
-        List<RouteJob> js = getAll(runID, OriRunID);
-        request.setAttribute("JobList", js);
+        //List<RouteJob> js = getAll(runID, OriRunID);
+        //request.setAttribute("JobList", js);
         request.setAttribute("OriRunID", OriRunID);
         request.setAttribute("nextRunId", getNextRunId(runID));
         request.setAttribute("dateDeliv", dateDeliv);
         
         request.setAttribute("vehicleCount", 
-                String.valueOf(vehicles.size()));
+                vehiCount(runID));
         request.setAttribute("runID", runID);
         request.setAttribute("branch", branch);
         request.setAttribute("shift", shift);
@@ -604,5 +605,28 @@ public class RouteJobListing implements BusinessLogic {
         }
         
         return px;
+    }
+    
+    public String vehiCount(String runId) throws Exception{
+        String vehi = "";
+        
+        String sql = "select count(distinct vehicle_code) as cnt from BOSNET1.dbo.TMS_RouteJob where RunId = '"+runId+"' and vehicle_code <> 'NA'";
+        //List<HashMap<String, String>> px = new ArrayList<HashMap<String, String>>();
+        //HashMap<String, String> pl = new HashMap<String, String>();
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            //System.out.println(sql);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    vehi = rs.getString("cnt");
+
+                    //con.setAutoCommit(false);
+                    //ps.executeUpdate();
+                    //con.setAutoCommit(true);
+                }
+            }    
+        }
+        
+        return vehi;
     }
 }

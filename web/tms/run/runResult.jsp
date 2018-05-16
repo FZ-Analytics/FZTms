@@ -96,7 +96,7 @@
                 var table = document.getElementById("table");
 
                 var tableArr = [];
-                for (var i = 1; i < table.rows.length; i++) {
+                /*for (var i = 1; i < table.rows.length; i++) {
                     var no = table.rows[i].cells[0].innerHTML; //no
                     var truck = table.rows[i].cells[1].innerHTML; //truck
                     var custId = "";
@@ -110,7 +110,7 @@
                             truck,
                             custId
                             );
-                }
+                }*/
 
                 var win = window.location.replace('runResultEdit.jsp?&OriRunID=' + $('#RunIdClick').text() + '&runId=' + $('#nextRunId').text() + '&channel=' + $('#channel').text() +
                         '&branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&vehicles=' + $('#vehicles').text() + '&dateDeliv=' + $('#dateDeliv').text());
@@ -431,7 +431,7 @@
             <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
             <label class="fzLabel hover" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
             <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
-            <label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
+            <%--<label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>--%>
 
             <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />            
         </div>
@@ -533,7 +533,7 @@
             </div>
         </div>
         
-
+        <%--
         <br><br>
         <iframe id="txtArea1" style="display:none"></iframe>
         <table id="t_table" border1="1" style="border-color: lightgray;" hidden="true">
@@ -598,7 +598,7 @@
                     </table>                    
                 </td>
             </tr>
-        </table>
+        </table>--%>
         <%@include file="../appGlobal/bodyBottom.jsp"%>
     </body>
 </html>

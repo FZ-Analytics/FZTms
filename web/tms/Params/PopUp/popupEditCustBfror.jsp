@@ -159,6 +159,7 @@
         </style>
     </head>
     <body >
+        <link rel="shortcut icon" href="">
         <div style="width: 100%; height: 700px;">
             <%@include file="../appGlobal/bodyTop.jsp"%>
             <%
@@ -551,6 +552,7 @@
                 }
 
                 function sortTable(n) {
+                    console.log("test");
                     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
                     table = document.getElementById("myTable");
                     switching = true;
