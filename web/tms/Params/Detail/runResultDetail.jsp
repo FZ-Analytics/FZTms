@@ -159,22 +159,22 @@
                     <table>
                         <thead>
                             <tr style="background-color:orange;">
-                                <th style="min-width: 30px" class="fzCol center">No.</th>
-                                <th style="min-width: 180px" class="fzCol center">Truck</th>
-                                <th style="min-width: 85px" class="fzCol center">CustID</th>
-                                <th style="min-width: 45px" class="fzCol center">Arrv</th>
-                                <th style="min-width: 55px" class="fzCol center">Depart</th>
-                                <th style="min-width: 95px" class="fzCol center">DO</th>
-                                <th style="min-width: 35px" class="fzCol center">Srvc Time</th>
-                                <th style="min-width: 115px" class="fzCol center">Name</th>
-                                <th style="min-width: 65px" class="fzCol center">Priority</th>
-                                <th style="min-width: 35px" class="fzCol center">Dist Chl</th>
-                                <th style="min-width: 110px" class="fzCol center">Street</th>
-                                <th style="min-width: 55px" class="fzCol center">Weight (KG)</th>
-                                <th style="min-width: 55px" class="fzCol center">Volume (M3)</th>
-                                <th style="min-width: 40px" class="fzCol center">RDD</th>
-                                <th style="min-width: 75px" class="fzCol center">Transport Cost</th>
-                                <th style="min-width: 35px" class="fzCol center">Dist</th>
+                                <th style="min-width: 30px" class="fzCol text-center">No.</th>
+                                <th style="min-width: 180px" class="fzCol text-center">Truck</th>
+                                <th style="min-width: 85px" class="fzCol text-center">CustID</th>
+                                <th style="min-width: 45px" class="fzCol text-center">Arrv</th>
+                                <th style="min-width: 55px" class="fzCol text-center">Depart</th>
+                                <th style="min-width: 95px" class="fzCol text-center">DO</th>
+                                <th style="min-width: 35px" class="fzCol text-center">Srvc Time</th>
+                                <th style="min-width: 115px" class="fzCol text-center">Name</th>
+                                <th style="min-width: 65px" class="fzCol text-center">Priority</th>
+                                <th style="min-width: 35px" class="fzCol text-center">Dist Chl</th>
+                                <th style="min-width: 110px" class="fzCol text-center">Street</th>
+                                <th style="min-width: 55px" class="fzCol text-center">Weight (KG)</th>
+                                <th style="min-width: 55px" class="fzCol text-center">Volume (M3)</th>
+                                <th style="min-width: 40px" class="fzCol text-center">RDD</th>
+                                <th style="min-width: 75px" class="fzCol text-center">Transport Cost</th>
+                                <th style="min-width: 35px" class="fzCol text-center">Dist</th>
             <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
                                 <th width="100px" class="fzCol center" style="min-width: 35px">Edit</th>
                             </tr>
@@ -192,7 +192,11 @@
                                 <%
                                     List<RouteJob> js = (List<RouteJob>) request.getAttribute("JobList");
                                     for(RouteJob category : js) {
-                                        out.println("<tr style=\"height: 73px;\"><td  class=\"fzCell\" style=\"min-width: 50px; background-color: "+category.color+"\"></td></tr>");
+                                        //System.out.println(category.color);
+                                        out.println("<tr style=\"height: 73px;\">"
+                                                + "<td class=\"fzCells\" style=\"min-width: 50px; background-color: "+category.color+"\"></td>"
+                                                + "<td class=\"fzCells\" style=\"min-width: 95px;\">"+category.DONum+"</td>"
+                                                + "</tr>");
                                     }
                                 %>
                             </tbody>
@@ -200,7 +204,7 @@
                     </div>
                 </div>
                 <div id="table" class="cell col2 row2">
-                    <table>
+                    <table id="myTable">
                         <tbody>
                             <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
                                 <tr 
