@@ -246,11 +246,15 @@
                     document.getElementById("table").deleteRow(rowIdx);
                     var nextVehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
                     var prevArrive = document.getElementById('table').rows[rowIdx-1].cells[3].innerHTML;
-                    var nextDepart = document.getElementById('table').rows[rowIdx+1].cells[4].innerHTML;
-                    if(nextVehicleCode.length == 0 && prevArrive.length == 0 && nextDepart.length == 0) {
-                        document.getElementById("table").deleteRow(rowIdx);
+                    try {
+                        var nextDepart = document.getElementById('table').rows[rowIdx+1].cells[4].innerHTML;
+                        if(nextVehicleCode.length == 0 && prevArrive.length == 0 && nextDepart.length == 0) {
+                            document.getElementById("table").deleteRow(rowIdx);
+                        }
+                    } catch(err) {
+                        klikStatus = 2;
+                        orderNo();
                     }
-                    
                 }
                 klikStatus = 2;
                 orderNo();
@@ -428,7 +432,7 @@
                             custId = table.rows[i].cells[2].innerHTML + "split"; //custId
                         }
                         tableArr2.push(
-                                no,
+                                //no,
                                 truck,
                                 custId
                                 );
@@ -443,7 +447,7 @@
                 document.getElementById("submit").disabled = true;
                 $("#submit").val('Loading...');
                 var $apiAddress = '../../api/submitEditRouteJob/submitEditRouteJob';
-                var jsonForServer = '{\"table\": \"' + tableArr2 + '\", \"runId\":\"' + $("#RunIdClick").text() + '\", \"oriRunId\":\"' + $("#OriRunID").val() + '\", \"branch\":\"' + $("#branch").text() + '\", \"shift\":\"' + $("#shift").text() + '\"}';
+                var jsonForServer = '{\"table\": \"' + tableArr2 + '\", \"runId\":\"' + $("#RunIdClick").text() + '\"}';
                 $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                     if (data == 'OK') {
                         console.log("OK");
