@@ -151,10 +151,16 @@
                 font-variant: small-caps;
                 <%--min-width: 150px;--%>
             }
-            #exclude {
+            
+            #selectAll, #exclude {
                 float: right;
                 font-size: 13px;
                 margin-bottom: 5px;
+            }
+            
+            #selectAll {
+                margin-left: 10px;
+                padding: 4px;
             }
         </style>
     </head>
@@ -227,7 +233,12 @@
 
             </div>
             <input style="" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search..." title="Type in a name">
+            <div id="selectAll">
+                <span>Select All </span>
+                <input type="checkbox" name="select-all" id="select-all" />
+            </div>
             <input id="exclude" class="btn fzButton" type="button" value="Exclude Selected" onclick="exlcudeViaCheckBox();" />
+            
             <br><br>                
             <div style="width: 100%">                
                 <div id="wrapper" tabindex="0">
@@ -259,7 +270,6 @@
                                         <th onclick="sortTable(11)" class="text-center column12" style="">inc</th>
                                         <th onclick="sortTable(12)" class="text-center column13" style="">Edit</th>
                                         <th onclick="sortTable(13)" class="text-center column14" >remove</th>
-
                                     </tr>
                                 </thead>
                             </table>
@@ -365,6 +375,19 @@
                     tables();
                     $('input[type=checkbox]').each(function () {
                         this.checked = false;
+                    });
+                    
+                    $('#select-all').click(function(event) {   
+                        if(this.checked) {
+                            // Iterate each checkbox
+                            $(':checkbox').each(function() {
+                                this.checked = true;                        
+                            });
+                        } else {
+                            $(':checkbox').each(function() {
+                                this.checked = false;                       
+                            });
+                        }
                     });
                     //setLength();
                     /*$('.datatable').dataTable({
