@@ -405,6 +405,7 @@
             window.onload = function(){
                 var a = document.getElementById('iframe1'); //or grab it by tagname etc
                 a.src = "../Params/Detail/runResultDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
+                console.log(a.src);
                 //alert(a.src);
             };
         </script>

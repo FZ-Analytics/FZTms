@@ -43,7 +43,7 @@
             <select class="fzInput" id="branch" name="branch">
                 <%for (Branch hd : (List<Branch>) getList("ListBranch")) { %>
                 <%--<%= makeOption(hd.branchId, hd.branchId, hd.name)%>--%>
-                    <option value='<%=hd.branchId%>' <%if (hd.branchId.equals(WorkplaceID)) {%> selected="true" <%}%>><%=hd.branchId%></option>
+                    <option value='<%=hd.branchId%>' <%if (hd.branchId.equals(WorkplaceID)) {%> selected="true" <%}%>><%=hd.branchId%> - <%=hd.name%></option>
                 <% } /* end for Branch Id */ %>
             </select> 
 

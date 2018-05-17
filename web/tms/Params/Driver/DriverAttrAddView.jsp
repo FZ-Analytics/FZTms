@@ -81,7 +81,7 @@
                 <select id="branchId" name="branchId">
                     <option value="D000" >D000</option>
                     <%for (Branch hd : (List<Branch>) getList("ListBranch")) { %>
-                        <%= makeOption(hd.branchId, hd.branchId, hd.branchId)%>
+                        <%= makeOption(hd.branchId, hd.branchId, hd.branchId + " - " + hd.name)%>
                         <%--<option value='<%=get("hd.branchId")%>' ><%=get("hd.name")%></option>--%>
                     <% } /* end for Branch Id */ %>
                 </select> 
