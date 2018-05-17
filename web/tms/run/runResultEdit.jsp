@@ -51,11 +51,11 @@
                 color: black;
                 cursor: pointer;
             }
-            
+
             .hover:hover {
-               cursor: pointer; 
+                cursor: pointer; 
             }
-            
+
             .center {
                 text-align: center;
             }
@@ -244,14 +244,30 @@
                         arrOfRow[i] = document.getElementById('table').rows[rowIdx].cells[i].innerHTML;
                     }
                     document.getElementById("table").deleteRow(rowIdx);
+                    //remove break row: case 1
                     var nextVehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
-                    var prevArrive = document.getElementById('table').rows[rowIdx-1].cells[3].innerHTML;
+                    var prevArrive = document.getElementById('table').rows[rowIdx - 1].cells[3].innerHTML;
                     try {
-                        var nextDepart = document.getElementById('table').rows[rowIdx+1].cells[4].innerHTML;
-                        if(nextVehicleCode.length == 0 && prevArrive.length == 0 && nextDepart.length == 0) {
+                        var nextDepart = document.getElementById('table').rows[rowIdx + 1].cells[4].innerHTML;
+                        if (nextVehicleCode.length == 0 && prevArrive.length == 0 && nextDepart.length == 0) {
                             document.getElementById("table").deleteRow(rowIdx);
                         }
-                    } catch(err) {
+                    } catch (err) {
+                        klikStatus = 2;
+                        orderNo();
+                    }
+
+                    //remove break row: case 2
+                    var prevVehicleCode = document.getElementById('table').rows[rowIdx - 1].cells[1].innerHTML;
+                    console.log(prevVehicleCode);
+                    var prevPrevArrive = document.getElementById('table').rows[rowIdx - 2].cells[3].innerHTML;
+                    console.log(prevPrevArrive);
+                    try {
+                        var currentDepart = document.getElementById('table').rows[rowIdx].cells[4].innerHTML;
+                        if (prevVehicleCode.length == 0 && prevPrevArrive.length == 0 && currentDepart.length == 0) {
+                            document.getElementById("table").deleteRow(rowIdx - 1);
+                        }
+                    } catch (err) {
                         klikStatus = 2;
                         orderNo();
                     }
@@ -500,9 +516,9 @@
         <label class="fzLabel">Branch:</label> 
         <label class="fzLabel" id="branch"><%=get("branch")%></label>
 
-<!--        <br>
-        <label class="fzLabel">Shift:</label> 
-        <label class="fzLabel" id="shift"><%=get("shift")%></label>-->
+        <!--        <br>
+                <label class="fzLabel">Shift:</label> 
+                <label class="fzLabel" id="shift"><%=get("shift")%></label>-->
 
         <br>
         <label class="fzLabel">Channel:</label> 
@@ -554,7 +570,7 @@
                     style="background-color: lightyellow"
                     <%} else if (j.arrive.length() == 0 && j.storeName.length() == 0) {%>
                     style="background-color: #e6ffe6"
-                    <%} else if (j.isOkay == false ) {%>
+                    <%} else if (j.isOkay == false) {%>
                     style="background-color: #ffe6e6"
                     <%}%> >
                     <td class="fzCell index center">
@@ -569,28 +585,28 @@
                     <td class="fzCell center"><%=j.doNum%></td>
                     <td class="fzCell center">
                         <%if (!j.vehicleCode.equals("NA")) {
-                            if (!j.serviceTime.equals("0")) {%>
-                                <%=j.serviceTime%>
-                            <%} else {
-                                out.print("");
-                            }
-                        } else {
-                            out.print("0");
-                        }%>  
+                                if (!j.serviceTime.equals("0")) {%>
+                        <%=j.serviceTime%>
+                        <%} else {
+                                    out.print("");
+                                }
+                            } else {
+                                    out.print("0");
+                                }%>  
                     </td>
                     <td class="fzCell center">
                         <%if (j.arrive.length() > 0) {%>
-                            <a href="<%=j.getMapLink()%>" target="_blank"><%=j.storeName%></a>
+                        <a href="<%=j.getMapLink()%>" target="_blank"><%=j.storeName%></a>
                         <%} else {%>
-                            <%=j.storeName%>
+                        <%=j.storeName%>
                         <%}%>
                     </td>
                     <td class="fzCell center">
                         <%if (!j.priority.equals("0")) {%>
-                            <%=j.priority%>
+                        <%=j.priority%>
                         <%} else {
-                            out.print("");
-                        }%>
+                                out.print("");
+                            }%>
                     </td>
                     <td class="fzCell center"><%=j.distChannel%></td>
                     <td class="fzCell center"><%=j.street%></td>
@@ -598,24 +614,24 @@
                     <td class="fzCell center"><%=j.volume%></td>
                     <td class="fzCell center">
                         <%if (j.rdd != null) {%>
-                            <%=j.rdd%>
+                        <%=j.rdd%>
                         <%} else {%>
-                            <p></p>
+                        <p></p>
                         <%}%>
                     </td>
                     <td class="fzCell center">
                         <%if (!j.custId.equals("")) {%>
-                            <%=j.transportCost%>
+                        <%=j.transportCost%>
                         <%} else {
-                            out.print("");
-                        }%>
+                                out.print("");
+                            }%>
                     </td>
                     <td class="fzCell center">
                         <%if (!j.custId.equals("")) {%>
-                            <%=j.dist%>
+                        <%=j.dist%>
                         <%} else {
-                            out.print("");
-                        }%>
+                                out.print("");
+                            }%>
                     </td>
                     <td class="editCust hover center" onclick="klik(<%=j.custId%>)" style="color: blue;">
                         <%if (j.doNum.length() > 0) {%>
