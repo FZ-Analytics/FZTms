@@ -4,6 +4,10 @@
     Author     : dwi.oktaviandi
 --%>
 
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="com.fz.generic.Db"%>
+<%@page import="java.sql.Connection"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@include file="../appGlobal/pageTop.jsp"%>
 <!DOCTYPE html>
@@ -25,7 +29,31 @@
 
             <br>
             <label class="fzLabel">Branch</label>
-            <label class="fzLabel">: <%=WorkplaceID%></label>
+            <%
+                String str = "";
+                try (Connection con = (new Db()).getConnection("jdbc/DB10")){            
+                    try (Statement stm = con.createStatement()){
+
+                        // create sql
+                        String br = WorkplaceID;
+                        br = br.length() == 0 ? "999" : br;
+                        br = "where SalOffCode = '" + br + "'";
+                        String sql ;
+                        sql = "SELECT distinct SalOffCode, SalOffName FROM IBACONSOL.dbo.SALES_OFFICE "+br+" order by SalOffCode asc;";
+
+                        // query
+                        try (ResultSet rs = stm.executeQuery(sql)){
+                            if (rs.next()){   
+                                str = rs.getString("SalOffCode") + " - " + rs.getString("SalOffName");
+                            }
+                        }
+                    }
+                }
+                catch (Exception e){
+                    throw new Exception(e.getMessage());
+                }
+            %>
+            <label class="fzLabel">: <%=str%></label>
         </form>
         <%@include file="../appGlobal/bodyBottom.jsp"%>
     </body>
