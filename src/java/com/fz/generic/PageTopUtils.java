@@ -218,10 +218,15 @@ public class PageTopUtils {
         String EmpyID = FZUtil.getHttpParam(request, "EmpyID");
         String UserName = FZUtil.getHttpParam(request, "UserName");
         String WorkplaceID = FZUtil.getHttpParam(request, "WorkplaceID");
-        String Key = FZUtil.getHttpParam(request, "Key");
+        String Key = FZUtil.getHttpParam(request, "Key");        
         
-        //bypass HO 999%20
-        WorkplaceID = WorkplaceID.substring(0,3).equalsIgnoreCase("999")? "" : WorkplaceID;
+        if(WorkplaceID.length() > 0){
+            //bypass HO 999%20
+            WorkplaceID = WorkplaceID.substring(0,3).equalsIgnoreCase("999")? "" : WorkplaceID;
+        }else{
+            //bypass admin
+            WorkplaceID = "";
+        }
         
         if(UserID.length() > 0 && EmpyID.length() > 0 
                 && UserName.length() > 0 && Key.length() > 0 ){
