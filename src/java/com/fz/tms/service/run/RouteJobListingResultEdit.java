@@ -8,8 +8,10 @@ package com.fz.tms.service.run;
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
 import com.fz.tms.params.model.Delivery;
+import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.PreRouteJobLog;
 import com.fz.tms.params.model.PreRouteVehicleLog;
+import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.RouteJobLog;
 import com.fz.util.FZUtil;
 import java.sql.Connection;
@@ -25,6 +27,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +51,8 @@ public class RouteJobListingResultEdit implements BusinessLogic {
     String oriRunId, runId, branch, shift, dateDeliv;
 
     boolean hasBreak = false;
+    
+    List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response, PageContext pc) throws Exception {
@@ -59,8 +65,12 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         String vehicles = FZUtil.getHttpParam(request, "vehicles");
         String tableArr = FZUtil.getHttpParam(request, "tableArr");
 
+        GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+        List<OptionModel> jss = new ArrayList<OptionModel>();
+        mapColor = map.runs(runId, jss);
+        System.out.println("SIZEEE " + mapColor);
         ArrayList<Delivery> alTableData = getTableData(oriRunId);
-
+        
         insertToRouteJob(getListRouteJob(oriRunId, runId), runId);
         insertToPreRouteJob(getListPreRouteJob(oriRunId, runId), runId);
         insertPreRouteVehicle(getListPreRouteVehicle(oriRunId, runId), runId);
@@ -238,6 +248,19 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;
                         }
+                        
+                        if(!ld.vehicleCode.equalsIgnoreCase("NA")) {
+                            System.out.println("IN " + mapColor.size());
+                            for(int i = 0; i < mapColor.size(); i++) {
+                                System.out.println("MAP SIZE: " + mapColor.get(i).size());
+                                for(int os = 0; os < mapColor.get(i).size(); os++){
+                                    if(mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)){
+                                        ld.color = "#"+mapColor.get(i).get(os).get("color").toUpperCase();
+                                        System.out.println(ld.color);
+                                    }
+                                }                            
+                            }
+                        }
                     }
                 }
             }
@@ -360,19 +383,16 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             if (rs.getString("sp") == null) {
                                 errorStatus = "sp";
                                 isOkay = false;
-                                System.out.println(doNumSplit[i] + " " + isOkay);
                                 break;
                             }
                             if (rs.getString("ss") != null) {
                                 errorStatus = "ss";
                                 isOkay = false;
-                                System.out.println(doNumSplit[i] + " " + isOkay);
                                 break;
                             }
                             if (rs.getString("rs") != null) {
                                 errorStatus = "rs";
                                 isOkay = false;
-                                System.out.println(doNumSplit[i] + " " + isOkay);
                                 break;
                             }
                         }

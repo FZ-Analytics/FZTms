@@ -43,6 +43,7 @@ public class Delivery {
     public String feasibleCustomer ="";
     public String isFix = "";
     public boolean isOkay = true;
+    public String color = "";
     
     public String getMapLink() {
         String s = "https://www.google.com/maps/dir/"

@@ -11,6 +11,7 @@ import com.fz.tms.params.model.Delivery;
 import com.fz.tms.params.model.RouteJobLog;
 import com.fz.util.FZUtil;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.ParseException;
@@ -269,23 +270,15 @@ public class LoadDelivery implements BusinessLogic {
         return doSplit.length;
     }
 
-    public int getVehicleNum(String runId) throws Exception {
-        int count = -1;
-        try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
-            try (Statement stm = con.createStatement()) {
-                String sql = "";
-                sql = "SELECT distinct vehicle_code\n"
-                        + "  FROM [BOSNET1].[dbo].[TMS_RouteJob]\n"
-                        + "  where runID = '" + runId + "'\n"
-                        + "  group by vehicle_code";
-                try (ResultSet rs = stm.executeQuery(sql)) {
-                    while (rs.next()) {
-                        count++;
-                    }
+    public String getVehicleNum(String runId) throws Exception {
+        String count = "";
+        String sql = "select count(distinct vehicle_code) as cnt from BOSNET1.dbo.TMS_RouteJob where RunId = '"+runId+"' and vehicle_code <> 'NA'";
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");PreparedStatement ps = con.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    count = rs.getString("cnt");
                 }
-            }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            }    
         }
         return count;
     }
