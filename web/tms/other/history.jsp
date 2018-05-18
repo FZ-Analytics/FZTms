@@ -37,7 +37,7 @@
                         <td class="fzCell" ><a target="iframe1" href="<%=j.Value%>" ><%=j.Display%></a></td>
                         <td class="fzCell" ><%=j.Dates%></td>
                         <%--<td class="fzCell" ><span class="fa fa-star-o" aria-hidden="true" onclick="location.reload();"></span></td>--%>
-                        <td class="fzCell" ><span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="location.reload();"></span></td>
+                        <td class="fzCell" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span></td><%--onclick="klik('<%=EmpyID%>','<%=j.Value%>')"--%>
                     </tr>
                     <%} // for ProgressRecord %>
                 </tbody>
@@ -61,6 +61,20 @@
                     length_sel.addClass('form-control input-sm');
                 });
             });
+            function klik(nik,kode) {                
+                var $apiAddress = '../../api/HistoryAPI/submit';
+                var jsonForServer = '{\"Display\": \"' + nik + '\",\"Value\":\"' + kode + '\"}';
+
+                var data = [];
+                $.post($apiAddress, {json: jsonForServer}).done(function (data) {
+                    if(data == 'OK'){
+                        alert( 'sukses' );
+                        location.reload();
+                    }else{
+                        alert( 'submit error' ); 
+                    }
+                });                
+            }
         </script>
         <%@include file="../appGlobal/bodyBottom.jsp"%>
     </body>

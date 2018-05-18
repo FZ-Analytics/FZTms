@@ -48,7 +48,7 @@
                 <td class="fzCell"><%=j.DO_Number%></td>
                 <td class="fzCell"><%=j.Product_Description%></td>
                 <td class="fzCell"><%=j.Total_KG_Item%></td>
-                <td class="fzCell"><%=j.DOQty%> <%=j.DOQtyUOM%></td>
+                <td class="fzCell"><%=j.DOQty%> <%=j.DOQtyUOM%>(<%=j.result%>)</td><%--<%=j.DOQty%> <%=j.DOQtyUOM%>--%>
                 <th width="100px" class="fzCol"><%=j.sap%></th>
                 <%--<td class="fzCell"><%=j.pck%></td>--%>
             </tr>
