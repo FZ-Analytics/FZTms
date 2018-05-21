@@ -51,7 +51,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
     String oriRunId, runId, branch, shift, dateDeliv;
 
     boolean hasBreak = false;
-    
+
     List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
 
     @Override
@@ -67,10 +67,9 @@ public class RouteJobListingResultEdit implements BusinessLogic {
 
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
-        mapColor = map.runs(runId, jss);
-        System.out.println("SIZEEE " + mapColor);
+        mapColor = map.runs(oriRunId, jss);
         ArrayList<Delivery> alTableData = getTableData(oriRunId);
-        
+
         insertToRouteJob(getListRouteJob(oriRunId, runId), runId);
         insertToPreRouteJob(getListPreRouteJob(oriRunId, runId), runId);
         insertPreRouteVehicle(getListPreRouteVehicle(oriRunId, runId), runId);
@@ -85,7 +84,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         request.setAttribute("oriRunId", oriRunId);
         request.setAttribute("tableArr", tableArr);
     }
-
+    
     public ArrayList<Delivery> getTableData(String runId) throws Exception {
         ArrayList<Delivery> alDelivery = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
@@ -129,7 +128,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         + "                      WHERE\n"
                         + "                         Is_Edit = 'edit'\n"
                         + "                      AND Customer_ID = prj.Customer_ID\n"
-                        + "                         AND RunId = '"+runId+"'\n"
+                        + "                         AND RunId = '" + runId + "'\n"
                         + "                      GROUP BY\n"
                         + "                         DO_Number FOR xml PATH('')\n"
                         + "			),\n"
@@ -152,7 +151,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         + "         FROM \n"
                         + "             [BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
                         + "         WHERE \n"
-                        + "             Is_Edit = 'edit' AND RunId = '"+runId+"'\n"
+                        + "             Is_Edit = 'edit' AND RunId = '" + runId + "'\n"
                         + "         ) a\n"
                         + "     WHERE\n"
                         + "         rn = 1"
@@ -248,17 +247,17 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;
                         }
-                        
-                        if(!ld.vehicleCode.equalsIgnoreCase("NA")) {
+
+                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
                             System.out.println("IN " + mapColor.size());
-                            for(int i = 0; i < mapColor.size(); i++) {
+                            for (int i = 0; i < mapColor.size(); i++) {
                                 System.out.println("MAP SIZE: " + mapColor.get(i).size());
-                                for(int os = 0; os < mapColor.get(i).size(); os++){
-                                    if(mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)){
-                                        ld.color = "#"+mapColor.get(i).get(os).get("color").toUpperCase();
+                                for (int os = 0; os < mapColor.get(i).size(); os++) {
+                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
+                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
                                         System.out.println(ld.color);
                                     }
-                                }                            
+                                }
                             }
                         }
                     }
@@ -353,7 +352,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             + "		FROM \n"
                             + "			[BOSNET1].[dbo].[TMS_Status_Shipment] ss\n"
                             + "		WHERE\n"
-                            + "			ss.Delivery_Number = '"+doNumSplit[i]+"'\n"
+                            + "			ss.Delivery_Number = '" + doNumSplit[i] + "'\n"
                             + "	) ss ON ss.Delivery_Number = sp.DO_Number\n"
                             + "	LEFT JOIN(\n"
                             + "		SELECT\n"
@@ -361,10 +360,10 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             + "		FROM \n"
                             + "			[BOSNET1].[dbo].[TMS_Result_Shipment] rs\n"
                             + "		WHERE\n"
-                            + "			rs.Delivery_Number = '"+doNumSplit[i]+"'\n"
+                            + "			rs.Delivery_Number = '" + doNumSplit[i] + "'\n"
                             + "	) rs ON rs.Delivery_Number = sp.DO_Number\n"
                             + "	WHERE\n"
-                            + "		sp.DO_Number = '"+doNumSplit[i]+"'\n"
+                            + "		sp.DO_Number = '" + doNumSplit[i] + "'\n"
                             + "		AND (sp.Already_Shipment <> 'Y'\n"
                             + "		AND sp.Batch <> 'NULL'\n"
                             + "		AND sp.NotUsed_Flag is NULL\n"
@@ -375,8 +374,8 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             + "		AND sp.create_date >= DATEADD (DAY, - 7, GETDATE()))\n"
                             + ") table1 ON table1.sp = prj.DO_Number\n"
                             + "WHERE \n"
-                            + "	prj.DO_Number = '"+doNumSplit[i]+"'\n"
-                            + "	AND prj.runID = '"+runId+"'\n"
+                            + "	prj.DO_Number = '" + doNumSplit[i] + "'\n"
+                            + "	AND prj.runID = '" + runId + "'\n"
                             + "	AND prj.Is_Edit = 'edit'";
                     try (ResultSet rs = stm.executeQuery(sql)) {
                         while (rs.next()) {
@@ -435,7 +434,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
 
         return timeStampDate;
     }
-    
+
     public ArrayList<PreRouteJobLog> getListPreRouteJob(String oriRunId, String runId) throws Exception {
         ArrayList<PreRouteJobLog> arlistPrj = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
@@ -532,7 +531,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         }
         return arlistPrv;
     }
-    
+
     public ArrayList<RouteJobLog> getListRouteJob(String oriRunId, String runId) throws Exception {
         ArrayList<RouteJobLog> arlistRj = new ArrayList<>();
         Timestamp createTime = getTimeStamp();
@@ -635,15 +634,15 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         int rowNum = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
-                String sql = "SELECT COUNT(*) total FROM bosnet1.dbo.TMS_RouteJob WHERE runID = '" + runId + "';";
-                try (ResultSet rs = stm.executeQuery(sql)) {
-                    while (rs.next()) {
-                        rowNum = rs.getInt("total");
-                    }
-                }
+                String sql = "DELETE "
+                        + "FROM "
+                        + "   bosnet1.dbo.TMS_RouteJob "
+                        + "WHERE "
+                        + "   RunID = '" + runId + "'";
+                stm.executeQuery(sql);
             }
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+
         }
         if (rowNum == 0) {
             String sql = "INSERT INTO bosnet1.dbo.TMS_RouteJob "

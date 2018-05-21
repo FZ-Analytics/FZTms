@@ -120,6 +120,7 @@
                     colorBottom = document.getElementById('table').rows[rowIdx + 1].cells[0].style.backgroundColor;
                     custIdTop = document.getElementById('table').rows[rowIdx - 1].cells[3].innerHTML;
                     custIdBottom = document.getElementById('table').rows[rowIdx + 1].cells[3].innerHTML;
+                    arriveBottom = document.getElementById('table').rows[rowIdx + 1].cells[4].innerHTML;
 
                     var menu = $(".menu");
 
@@ -263,16 +264,20 @@
                     }
 
                     //remove break row: case 2
-                    var prevVehicleCode = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
-                    var prevPrevArrive = document.getElementById('table').rows[rowIdx - 2].cells[4].innerHTML;
                     try {
-                        var currentDepart = document.getElementById('table').rows[rowIdx].cells[5].innerHTML;
-                        if (prevVehicleCode.length == 0 && prevPrevArrive.length == 0 && currentDepart.length == 0) {
-                            document.getElementById("table").deleteRow(rowIdx - 1);
+                        var prevVehicleCode = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
+                        var prevPrevArrive = document.getElementById('table').rows[rowIdx - 2].cells[4].innerHTML;
+                        try {
+                            var currentDepart = document.getElementById('table').rows[rowIdx].cells[5].innerHTML;
+                            if (prevVehicleCode.length == 0 && prevPrevArrive.length == 0 && currentDepart.length == 0) {
+                                document.getElementById("table").deleteRow(rowIdx - 1);
+                            }
+                        } catch (err) {
+                            klikStatus = 2;
+                            orderNo();
                         }
                     } catch (err) {
-                        klikStatus = 2;
-                        orderNo();
+                        
                     }
                 }
                 klikStatus = 2;
@@ -300,7 +305,7 @@
                                     cell.style.width = "30px";
                                     cell.style.backgroundColor = colorTop;
                                 } else {
-                                    if(vNoBottom.length > 0 && custIdBottom.length === 0) {
+                                    if(vNoBottom.length > 0 && arriveBottom.length === 0) {
                                         var cell = row.insertCell(i);
                                         cell.style.width = "30px";
                                         cell.style.backgroundColor = colorTop;
@@ -318,8 +323,6 @@
                         }
                         //vehicle code row
                         else if (i == 2) {
-                            console.log(colorBottom);
-                            console.log(colorTop);
                             var cell = row.insertCell(i);
                             //vehicle no row not empty
                             if (arrOfRow[i] !== "") {
