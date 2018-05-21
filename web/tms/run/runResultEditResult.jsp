@@ -145,9 +145,9 @@
             <label class="fzLabel">Branch:</label> 
             <label class="fzLabel" id="branch"><%=get("branchId")%></label>
 
-            <br>
+<!--            <br>
             <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel"><%=get("shift")%></label>
+            <label class="fzLabel"><%=get("shift")%></label>-->
 
             <br>
             <label class="fzLabel">Channel:</label> 
@@ -206,9 +206,7 @@
                                 <%=j.no%>
                             <%}%>
                         </td>
-                        <td class="vCodeClick hover center" style="color: blue;">
-                            <%=j.vehicleCode%>
-                        </td>
+                        <td class="vCodeClick hover center" id="vehicleCode" style="color: blue;"><%=j.vehicleCode%></td>
                         <td class="custIDClick hover center" id="custId" style="color: blue;"><%=j.custId%></td>
                         <td class="fzCell center"><%=j.arrive%></td>
                         <td class="fzCell center"><%=j.depart%></td>                    

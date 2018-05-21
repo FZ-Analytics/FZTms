@@ -18,4 +18,21 @@ public class DODetil {
     public String DOQtyUOM;
     public String pck;
     public String sap;
+    public String Base_Units_of_Measurement;
+    public int Numeration1;
+    public int Conversion1;
+    public String UoM1;
+    public int Numeration2;
+    public int Conversion2;
+    public String UoM2;
+    public int Numeration3;
+    public int Conversion3;
+    public String UoM3;
+    public int Numeration4;
+    public int Conversion4;
+    public String UoM4;
+    public int Numeration5;
+    public int Conversion5;
+    public String UoM5;
+    public String result;
 }

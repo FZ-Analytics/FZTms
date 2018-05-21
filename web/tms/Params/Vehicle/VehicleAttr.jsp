@@ -40,7 +40,7 @@
             <select id="branchId" name="branchId">
                 <%for (Branch hd : (List<Branch>) getList("ListBranch")) { %>
                 <%--<%= makeOption(hd.branchId, hd.branchId, hd.name)%>--%>
-                    <option value='<%=hd.branchId%>' <%if (hd.branchId.equals(WorkplaceID)) {%> selected="true" <%}%>><%=hd.name%></option>
+                    <option value='<%=hd.branchId%>' <%if (hd.branchId.equals(WorkplaceID)) {%> selected="true" <%}%>><%=hd.branchId%> - <%=hd.name%></option>
                 <% } /* end for Branch Id */ %>
             </select> 
             <br>

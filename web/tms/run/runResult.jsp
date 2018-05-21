@@ -8,13 +8,16 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Jobs</title>
     </head>
-    <body>
+    <body style="height: 760px">
         <style>
-            tr { border-bottom: 2px solid lightgray;
+            tr { 
+                border-bottom: 2px solid lightgray;
             }
+            
             .hover:hover {
                cursor: pointer; 
             }
+            
             .center {
                 text-align: center;
             }
@@ -38,7 +41,8 @@
         <script src="../appGlobal/eFreezeTable.js"></script>
         <script>
             $(document).ready(function () {                
-                $('#table').eFreezeTableHead();
+                //$('#table').eFreezeTableHead();
+                runMapAll();
                 $('.custIDClick').click(function () {
                     //Some code
                     //alert( $(this).text() ); 
@@ -92,7 +96,7 @@
                 var table = document.getElementById("table");
 
                 var tableArr = [];
-                for (var i = 1; i < table.rows.length; i++) {
+                /*for (var i = 1; i < table.rows.length; i++) {
                     var no = table.rows[i].cells[0].innerHTML; //no
                     var truck = table.rows[i].cells[1].innerHTML; //truck
                     var custId = "";
@@ -106,10 +110,10 @@
                             truck,
                             custId
                             );
-                }
+                }*/
 
-                var win = window.location.replace('runResultEdit.jsp?&OriRunID=' + $('#RunIdClick').text() + '&runId=' + $('#nextRunId').text() + '&channel=' + $('#channel').text() +
-                        '&branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&vehicles=' + $('#vehicles').text() + '&dateDeliv=' + $('#dateDeliv').text());
+                var win = window.open('runResultEdit.jsp?&OriRunID=' + $('#RunIdClick').text() + '&runId=' + $('#nextRunId').text() + '&channel=' + $('#channel').text() +
+                        '&branch=' + $('#branch').text() + '&shift=' + $('#shift').text() + '&vehicles=' + $('#vehicles').text() + '&dateDeliv=' + $('#dateDeliv').text(),"Route Editor",'height=600,width=800');
                  //+ '&tableArr=' + tableArr);
                 if (win) {
                     //Browser has allowed it to be opened
@@ -226,6 +230,184 @@
                     }
                 });
             }
+            function setSize() {
+                var height = $(window).height();
+                height = height + (height/2);
+                alert(height);
+                console.log($(window).height()+''+height);
+                document.getElementById('cover').style.height= height;
+                
+                //document.getElementById('body').style.height= height;
+            }
+            
+            function runMapAll() {
+                console.log("detikawal" + new Date().getTime());
+                var map = null;
+                var infowindow = new google.maps.InfoWindow();
+                var bounds = new google.maps.LatLngBounds();
+
+                //label dibuat beda
+                var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                var labelx = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                var labelIndex = 0;
+                var labelxIndex = 0;
+                var tr = null;
+
+                //The list of points to be connected
+                var txt = document.getElementById("txt").value;
+                //var markers = eval(txt);
+                //alert(txt);
+                var mark = null;
+                var markers = JSON.parse(txt);
+
+                var service = new google.maps.DirectionsService();
+                var directionsTaskTimer;
+
+                //    var map;
+                function initialize() {
+                    mark = markers[0];
+                    var mapOptions = {
+                        center: new google.maps.LatLng(
+                                parseFloat(mark[0].lat),
+                                parseFloat(mark[0].lng)),
+                        zoom: 30,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    };
+
+                    var infoWindow = new google.maps.InfoWindow();
+                    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                    var lat_lng = new Array();
+
+                    
+                    for (var a = 0; a < markers.length; a++) {
+                        mark = null;
+                        mark = markers[a];
+                        labelIndex = 0;
+                        //t = labelx[labelxIndex++ % labelx.length];
+                        //sleep(a);
+                        var nt = 1;
+                        for (var i = 0; i < mark.length; i++) {
+                            if ((i + 1) < mark.length && mark[i].jobNb != "0") {
+                                var clr = mark[i].color;
+
+                                tr = labels[labelIndex++ % labels.length];
+                                var src = new google.maps.LatLng(parseFloat(mark[i].lat),
+                                        parseFloat(mark[i].lng));
+                                var descriptionSrc = mark[i].description;
+                                createMarker(src, descriptionSrc, nt++, clr, mark[i].channel);
+
+                                tr = null;
+                                var des = new google.maps.LatLng(parseFloat(mark[i + 1].lat),
+                                        parseFloat(mark[i + 1].lng));
+                                var descriptionDes = mark[i + 1].description;
+                                //createMarker(des, descriptionDes, tr, mark[i].color);
+                                //  poly.setPath(path);     
+
+                                //directionsTaskTimer = setInterval(function () {                              
+                                recursive(src, des, a, i, clr);
+                            }else if(mark[i].jobNb == "0"){
+                                console.log(mark[i].jobNb);
+                                var clr = mark[i].color;
+
+                                //tr = labels[labelIndex++ % labels.length];
+                                var src = new google.maps.LatLng(parseFloat(mark[i].lat),
+                                        parseFloat(mark[i].lng));
+                                var descriptionSrc = mark[i].description;
+                                createMarker(src, descriptionSrc, 0, clr, mark[i].channel);
+                            }
+                        }
+
+                        //sleep();
+                    }
+                    //console.log("final?" + new Date().getTime());
+                    //service = new google.maps.DirectionsService();
+                }
+
+                function recursive(src, des, a, b, clr)
+                {
+                    //window.clearInterval(directionsTaskTimer);
+                    //console.log("clearInterval " + directionsTaskTimer);
+                    var d = new Date();
+                    //console.log("route awal " + a + " ; " + b + " status: awal" + "detik " + d.getSeconds());                    
+                    //sleep(a);
+                    //console.log("send src " + src + " des " + des + " " + a + " " + b);
+                    setTimeout(function () {
+                        service.route({
+                            origin: src,
+                            destination: des,
+                            travelMode: google.maps.DirectionsTravelMode.DRIVING
+                        }, function (result, status) {
+                            if (status === google.maps.DirectionsStatus.OK) {
+                                //console.log("recieve src " + src + " des " + des + " " + a + " " + b);
+                                var path = new google.maps.MVCArray();
+                                var poly = new google.maps.Polyline({
+                                    map: map,
+                                    strokeColor: '#'+clr//,
+                                            //strokeWidth : 1,
+                                            //width : 1
+                                });
+                                for (var i = 0, len = result.routes[0].overview_path.length; i < len; i++) {
+                                    path.push(result.routes[0].overview_path[i]);
+                                }
+                                poly.setPath(path);
+                                map.fitBounds(bounds);
+
+                                //console.log("line" + a +" ; " + b);
+                            } else if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                                //console.log("resend src " + src + " des " + des + " Status" + status);
+                                //sleep(src, des);
+                                recursive(src, des, a, b, clr);
+                            }
+                        });
+                    }, 3000);
+                }
+
+                function createMarker(latLng, str, lbl, clr, channel) {
+                    //alert(clr);
+                    if(lbl > 0){
+                        if(lbl == 1){
+                            str = 'DEPO'; 
+                            var pinImage = new google.maps.MarkerImage('http://chart.apis.google.com/chart?chst=d_map_xpin_icon&chld=pin|civic-building|ffffff|000000',
+                                new google.maps.Size(21, 34),
+                                new google.maps.Point(0, 0),
+                                new google.maps.Point(10, 34));
+                        }else if(lbl > 1){
+                            var url = 'http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|';
+                            var pinImage = new google.maps.MarkerImage(url+clr+'|8|b|'+(lbl-1),
+                                new google.maps.Size(21, 34),
+                                new google.maps.Point(0, 0),
+                                new google.maps.Point(10, 34));
+                        }
+                        
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            map: map,
+                            draggable: false,
+                            icon: pinImage
+                        });
+                    }else if(lbl == 0){
+                        //untuk NA
+                        var marker = new google.maps.Marker({position:latLng});
+                        marker.setMap(map);
+                    }                   
+                    
+                    bounds.extend(marker.getPosition());
+                    google.maps.event.addListener(marker, "click", function (evt) {
+                        infowindow.setContent(str);
+                        infowindow.open(map, this);
+                    });
+                }
+                //console.log("detikakhira" + new Date().getTime());
+                google.maps.event.addDomListener(window, 'load', initialize());
+                //console.log("detikakhirb" + new Date().getTime());
+            }
+            
+            window.onload = function(){
+                var a = document.getElementById('iframe1'); //or grab it by tagname etc
+                a.src = "../Params/Detail/runResultDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
+                console.log(a.src);
+                //alert(a.src);
+            };
         </script>
         <h4>Routing Result 
             <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
@@ -238,100 +420,121 @@
         <input class="fzInput" id="OriRunID" 
                name="OriRunID" value="<%=get("OriRunID")%>" hidden="true"/>
 
-        <br>
-        <label class="fzLabel">Branch:</label> 
-        <label class="fzLabel" id="branch"><%=get("branch")%></label>
+        <div style="float: left; width: 50%">
+            
+            <br>
+            <label class="fzLabel">RunID:</label> 
+            <label class="fzLabel hover" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
+            
+            <br>
 
-        <br>
-        <label class="fzLabel">Shift:</label> 
-        <label class="fzLabel" id="shift"><%=get("shift")%></label>
+            <br>
+            <%--<label class="fzLabel" id="mapAll" style="color: blue;">Map</label>--%> 
+            <label class="fzLabel hover" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
+            <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
+            <%--<label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>--%>
 
-        <br>
-        <label class="fzLabel">Channel:</label> 
-        <label class="fzLabel" id="channel"><%=get("channel")%></label> 
-
-        <br>
-        <label class="fzLabel">Vehicles:</label> 
-        <label class="fzLabel" id="vehicles"><%=get("vehicleCount")%></label>
-
-        <br>
-        <label class="fzLabel">RunID:</label> 
-        <label class="fzLabel hover" id="RunIdClick" style="color: blue;"><%=get("runID")%></label> 
-
-        <br>
-        <label class="fzLabel hover" id="mapAll" style="color: blue;">Map</label> 
-        <label class="fzLabel hover" id="Vehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
-        <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
-        <label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
-
-        <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />
+            <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />            
+        </div>
         
-        <br><br>
-        <table id="table" border1="1" style="border-color: lightgray;">
-            <thead>
-                <tr style="background-color:orange;">
-                    <th width="100px" class="fzCol center">No.</th>
-                    <th width="100px" class="fzCol center">Truck</th>
-                    <th width="100px" class="fzCol center">Cust. ID</th>
-                    <th width="100px" class="fzCol center">Arrv</th>
-                    <th width="100px" class="fzCol center">Depart</th>
-                    <th width="100px" class="fzCol center">DO Count</th>
-                    <th width="100px" class="fzCol center">Serv. Time</th>
-                    <th width="100px" class="fzCol center">Name</th>
-                    <th width="100px" class="fzCol center">Prty</th>
-                    <th width="100px" class="fzCol center">Dist. Chl</th>
-                    <th width="100px" class="fzCol center">Street</th>
-                    <th width="100px" class="fzCol center">Weight (KG)</th>
-                    <th width="100px" class="fzCol center">Volume (M3)</th>
-                    <th width="100px" class="fzCol center">RDD</th>
-                    <th width="100px" class="fzCol center">Cost</th>
-                    <th width="100px" class="fzCol center">Dist</th>
-<!--                    <th width="100px" class="fzCol">Send SAP</th>-->
-                    <th width="100px" class="fzCol center">Edit</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
-                <tr 
-                    <%if (j.vehicleCode.equals("NA")) {%>
-                    style="color: red"
-                    <%} else if (j.arrive.length() == 0 && j.depart.length() > 0) {%>
-                    style="background-color: lightyellow"
-                    <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
-                    style="background-color: #e6ffe6"
-                    <%} else if (j.bat == "1" ) {%>
-                    style="background-color: #ffe6e6"
-                    <%}%> >
-                    <td class="fzCell center"><%=j.no%></td>
-                    <td class="vCodeClick hover center" style="color: blue;"><%=j.vehicleCode%></td>
-                    <td class="custIDClick hover center" style="color: blue;"><%=j.custID%></td>
-                    <td class="fzCell center"><%=j.arrive%></td>
-                    <td class="fzCell center"><%=j.depart%></td>                    
-                    <td class="fzCell center"><%=j.DONum%></td>
-                    <td class="fzCell center"><%=j.getServiceTime()%></td>
-                    <td class="fzCell center">
-                        <%if (j.arrive.length() > 0) {%>
-                        <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
-                        <%} else {%><%=j.name1%><%}%>
-                    <td class="fzCell center"><%=j.custPriority%></td>
-                    <td class="fzCell center"><%=j.distrChn%></td>
-                    <td class="fzCell center"><%=j.street%></td>
-                    <td class="fzCell center"><%=j.weight%></td>
-                    <td class="fzCell center"><%=j.volume%></td>
-                    <td class="fzCell center"><%=j.rdd%></td>
-                    <td class="fzCell center"><%=j.transportCost%></td>
-                    <td class="fzCell center"><%=j.dist%></td>
-<!--                    <td class="fzCell" 
-                        <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
-                        onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
-                        <%}%> ><%=j.send%></td>-->
-                    <td class="editCust hover center" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
-                </tr>
+        <div style="float: left; width: 50%">
+            <br>
+            <label class="fzLabel">Channel:</label> 
+            <label class="fzLabel" id="channel"><%=get("channel")%></label>     
+            
+            <%--<br>
+            <label class="fzLabel">Shift:</label> 
+            <label class="fzLabel" id="shift"><%=get("shift")%></label>--%>
+            
+            <br>
+            <label class="fzLabel">Branch:</label> 
+            <label class="fzLabel" id="branch"><%=get("branch")%></label>      
+            
+            <br>
+            <label class="fzLabel">Vehicles:</label> 
+            <label class="fzLabel" id="vehicles"><%=get("vehicleCount")%></label>
+        </div>
+        
+        <br><br><br><br><br><br>
+        <div id="cover" style="width: 100%">
+            <div id="thediv" style="float: left;width: 65%;"><%--overflow-y: scroll;--%>
+                <div style="width: 100%; text-align: center"><h4>Result Detail</h4></div>
+                <div style="height: 500px; width: 100%;border-style: double"><iframe name="iframe1" id="iframe1" src="" frameborder="0" height="100%" width="100%"></iframe></div>
+                <%--<table id="table" border1="1" style="border-color: lightgray;">
+                    <thead>
+                        <tr style="background-color:orange;">
+                            <th width="100px" class="fzCol center">color</th>
+                            <th width="100px" class="fzCol center">No.</th>
+                            <th width="100px" class="fzCol center">Truck</th>
+                            <th width="100px" class="fzCol center">CustID</th>
+                            <th width="100px" class="fzCol center">Arrv</th>
+                            <th width="100px" class="fzCol center">Depart</th>
+                            <th width="100px" class="fzCol center">DO</th>
+                            <th width="100px" class="fzCol center">Srvc Time</th>
+                            <th width="100px" class="fzCol center">Name</th>
+                            <th width="100px" class="fzCol center">Priority</th>
+                            <th width="100px" class="fzCol center">Dist Chl</th>
+                            <th width="100px" class="fzCol center">Street</th>
+                            <th width="100px" class="fzCol center">Weight (KG)</th>
+                            <th width="100px" class="fzCol center">Volume (M3)</th>
+                            <th width="100px" class="fzCol center">RDD</th>
+                            <th width="100px" class="fzCol center">Transport Cost</th>
+                            <th width="100px" class="fzCol center">Dist</th>
+        <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
+                            <th width="100px" class="fzCol center">Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
+                        <tr 
+                            <%if (j.vehicleCode.equals("NA")) {%>
+                            style="color: red"
+                            <%} else if (j.arrive.length() == 0 && j.depart.length() > 0) {%>
+                            style="background-color: lightyellow"
+                            <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
+                            style="background-color: #e6ffe6"
+                            <%}%> >
+                            <td class="fzCell" style="background-color: <%=j.color%>"></td>
+                            <td class="fzCell center"><%=j.no%></td>
+                            <td class="vCodeClick center  hover" style="color: blue;"><%=j.vehicleCode%></td>
+                            <td class="custIDClick center  hover" style="color: blue;"><%=j.custID%></td>
+                            <td class="fzCell center"><%=j.arrive%></td>
+                            <td class="fzCell center"><%=j.depart%></td>                    
+                            <td class="fzCell center" <%if (j.bat == "1" ) {%> 
+                                style="background-color: #ffe6e6" <%}%> ><%=j.DONum%></td>
+                            <td class="fzCell center"><%=j.getServiceTime()%></td>
+                            <td class="fzCell center">
+                                <%if (j.arrive.length() > 0) {%>
+                                <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
+                                <%} else {%><%=j.name1%><%}%>
+                            <td class="fzCell center"><%=j.custPriority%></td>
+                            <td class="fzCell center"><%=j.distrChn%></td>
+                            <td class="fzCell center"><%=j.street%></td>
+                            <td class="fzCell center"><%=j.weight%></td>
+                            <td class="fzCell center"><%=j.volume%></td>
+                            <td class="fzCell center"><%=j.rdd%></td>
+                            <td class="fzCell center"><%=j.transportCost%></td>
+                            <td class="fzCell center"><%=j.dist%></td>
+        <!--                    <td class="fzCell" 
+                                <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
+                                onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
+                                <%}%> ><%=j.send%></td>-->
+                            <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
+                        </tr>
 
-                <%} // for ProgressRecord %>
-            </tbody>
-        </table>
-
+                        <%} // for ProgressRecord %>
+                    </tbody>
+                </table>--%>
+            </div>
+            <div style="float: left;width: 35%;">
+                <div style="width: 100%; text-align: center"><h4>MAP</h4></div>
+                <script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
+                <input type="text" id="txt" value='<%=request.getAttribute("test")%>' hidden="true"/>
+                <div id="map" style="width: 100%;height: 500px;border-style: double"></div>
+            </div>
+        </div>
+        
+        <%--
         <br><br>
         <iframe id="txtArea1" style="display:none"></iframe>
         <table id="t_table" border1="1" style="border-color: lightgray;" hidden="true">
@@ -396,7 +599,7 @@
                     </table>                    
                 </td>
             </tr>
-        </table>
+        </table>--%>
         <%@include file="../appGlobal/bodyBottom.jsp"%>
     </body>
 </html>

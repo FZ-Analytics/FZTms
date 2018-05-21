@@ -293,7 +293,7 @@ public class VehicleAttrDB {
         Branch c = new Branch();
         List<Branch> ar = new ArrayList<Branch>();
         
-        try (Connection con = (new Db()).getConnection("jdbc/fztms")){            
+        try (Connection con = (new Db()).getConnection("jdbc/DB10")){            
             try (Statement stm = con.createStatement()){
             
                 // create sql
@@ -302,7 +302,7 @@ public class VehicleAttrDB {
                     str = "where SalOffCode = '" + br + "'";
                 }
                 String sql ;
-                sql = "SELECT SalOffCode, SalOffName FROM BOSNET1.dbo.TMS_SALESOFFICE "+str+" order by SalOffCode asc;";
+                sql = "SELECT SalOffCode, SalOffName FROM IBACONSOL.dbo.SALES_OFFICE "+str+" order by SalOffCode asc;";
                 
                 // query
                 try (ResultSet rs = stm.executeQuery(sql)){

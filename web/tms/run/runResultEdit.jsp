@@ -51,11 +51,11 @@
                 color: black;
                 cursor: pointer;
             }
-            
+
             .hover:hover {
-               cursor: pointer; 
+                cursor: pointer; 
             }
-            
+
             .center {
                 text-align: center;
             }
@@ -69,6 +69,8 @@
         <script src="../appGlobal/eFreezeTable.js"></script>
         <script>
             var rowIdx = 0;
+            var colorTop = "";
+            var colorBottom = "";
             var vNoTop = "";
             var vNoBottom = "";
             var custIdTop = "";
@@ -94,13 +96,6 @@
                         return true;
                     }
                 });
-                /*$('#RunIdClick').click(function () {
-                 if ($(this).text().length > 0) {
-                 window.open("../Params/PopUp/popupDetilRunId.jsp?runID=" + $("#RunIdClick").text() + "&oriRunID=" + $("#OriRunID").val(), null,
-                 "scrollbars=1,resizable=1,height=500,width=850");
-                 return true;
-                 }
-                 });*/
                 $('#mapAll').click(function () {
                     if ($(this).text().length > 0) {
                         window.open("../Params/map/GoogleDirMapAllVehi.jsp?runID=" + $("#RunIdClick").text() + '&channel=' + $('#channel').text(), null,
@@ -119,10 +114,12 @@
                     e.preventDefault();
 
                     rowIdx = this.rowIndex;
-                    vNoTop = document.getElementById('table').rows[rowIdx - 1].cells[1].innerHTML;
-                    vNoBottom = document.getElementById('table').rows[rowIdx + 1].cells[1].innerHTML;
-                    custIdTop = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
-                    custIdBottom = document.getElementById('table').rows[rowIdx + 1].cells[2].innerHTML;
+                    vNoTop = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
+                    vNoBottom = document.getElementById('table').rows[rowIdx + 1].cells[2].innerHTML;
+                    colorTop = document.getElementById('table').rows[rowIdx - 1].cells[0].style.backgroundColor;
+                    colorBottom = document.getElementById('table').rows[rowIdx + 1].cells[0].style.backgroundColor;
+                    custIdTop = document.getElementById('table').rows[rowIdx - 1].cells[3].innerHTML;
+                    custIdBottom = document.getElementById('table').rows[rowIdx + 1].cells[3].innerHTML;
 
                     var menu = $(".menu");
 
@@ -185,17 +182,25 @@
                     $(".menu").hide();
                 });
             }
+            
+            function rgb2hex(rgb) {
+                rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                function hex(x) {
+                    return ("0" + parseInt(x).toString(16)).slice(-2);
+                }
+                return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+            }
 
             function switchTruck() {
                 if (klikStatus === 1) {
-                    vehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
+                    vehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
 
                     var tableLength = document.getElementById('table').rows.length - 1;
                     for (var i = 0; i <= tableLength; i++) {
-                        var currentVehicleCode = document.getElementById('table').rows[i].cells[1].innerHTML;
+                        var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
                         if (currentVehicleCode === vehicleCode) {
-                            document.getElementById('table').rows[i].cells[1].style.color = 'orange';
-                            $(document.getElementById('table').rows[i].cells[1]).fadeIn("fast").fadeOut("fast").fadeIn("fast").fadeOut("fast").fadeIn("fast").fadeOut("fast").fadeIn("fast");
+                            document.getElementById('table').rows[i].cells[2].style.color = 'orange';
+                            $(document.getElementById('table').rows[i].cells[2]).fadeIn("fast").fadeOut("fast").fadeIn("fast").fadeOut("fast").fadeIn("fast").fadeOut("fast").fadeIn("fast");
                             arrSignedIndex.push(i);
                         }
                     }
@@ -212,20 +217,20 @@
             }
 
             function switchWithThisTruck() {
-                var vCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
+                var vCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
                 for (var i = arrSignedIndex[0]; i < arrSignedIndex[arrSignedIndex.length - 1] + 1; i++) {
-                    var currentVehicleCode = document.getElementById('table').rows[i].cells[1].innerHTML;
+                    var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
                     if (currentVehicleCode !== "") {
-                        document.getElementById('table').rows[i].cells[1].style.color = 'blue';
-                        document.getElementById('table').rows[i].cells[1].innerHTML = vCode;
+                        document.getElementById('table').rows[i].cells[2].style.color = 'blue';
+                        document.getElementById('table').rows[i].cells[2].innerHTML = vCode;
                     }
                 }
 
                 var tableLength = document.getElementById('table').rows.length - 1;
                 for (var i = 0; i <= tableLength; i++) {
-                    var currentVehicleCode = document.getElementById('table').rows[i].cells[1].innerHTML;
+                    var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
                     if (currentVehicleCode !== "" && currentVehicleCode === vCode && arrSignedIndex.indexOf(i) === -1) {
-                        document.getElementById('table').rows[i].cells[1].innerHTML = vehicleCode;
+                        document.getElementById('table').rows[i].cells[2].innerHTML = vehicleCode;
                     }
                 }
             }
@@ -237,13 +242,38 @@
             }
 
             function deleteRow() {
-                vehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
+                vehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
                 if (klikStatus === 1) {
                     //put data row to array
-                    for (i = 0; i <= 16; i++) {
+                    for (i = 0; i <= 17; i++) {
                         arrOfRow[i] = document.getElementById('table').rows[rowIdx].cells[i].innerHTML;
                     }
                     document.getElementById("table").deleteRow(rowIdx);
+                    //remove break row: case 1
+                    var nextVehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
+                    var prevArrive = document.getElementById('table').rows[rowIdx - 1].cells[4].innerHTML;
+                    try {
+                        var nextDepart = document.getElementById('table').rows[rowIdx + 1].cells[5].innerHTML;
+                        if (nextVehicleCode.length == 0 && prevArrive.length == 0 && nextDepart.length == 0) {
+                            document.getElementById("table").deleteRow(rowIdx);
+                        }
+                    } catch (err) {
+                        klikStatus = 2;
+                        orderNo();
+                    }
+
+                    //remove break row: case 2
+                    var prevVehicleCode = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
+                    var prevPrevArrive = document.getElementById('table').rows[rowIdx - 2].cells[4].innerHTML;
+                    try {
+                        var currentDepart = document.getElementById('table').rows[rowIdx].cells[5].innerHTML;
+                        if (prevVehicleCode.length == 0 && prevPrevArrive.length == 0 && currentDepart.length == 0) {
+                            document.getElementById("table").deleteRow(rowIdx - 1);
+                        }
+                    } catch (err) {
+                        klikStatus = 2;
+                        orderNo();
+                    }
                 }
                 klikStatus = 2;
                 orderNo();
@@ -257,9 +287,39 @@
                     } else {
                         var row = table.insertRow(rowIdx + 1);
                     }
-                    for (i = 0; i <= 16; i++) {
+                    for (i = 0; i <= 17; i++) {
+                        //color row
+                        if(i == 0) {
+                            if (colorBottom === colorTop) {
+                                var cell = row.insertCell(i);
+                                cell.style.width = "30px";
+                                cell.style.backgroundColor = colorBottom;
+                            } else if(vNoBottom !== vNoTop) {
+                                if(s === "top") {
+                                    var cell = row.insertCell(i);
+                                    cell.style.width = "30px";
+                                    cell.style.backgroundColor = colorTop;
+                                } else {
+                                    if(vNoBottom.length > 0 && custIdBottom.length === 0) {
+                                        var cell = row.insertCell(i);
+                                        cell.style.width = "30px";
+                                        cell.style.backgroundColor = colorTop;
+                                    } else if(vNoBottom.length > 0) {
+                                        var cell = row.insertCell(i);
+                                        cell.style.width = "30px";
+                                        cell.style.backgroundColor = colorBottom;
+                                    } else {
+                                        var cell = row.insertCell(i);
+                                        cell.style.width = "30px";
+                                        cell.style.backgroundColor = colorTop;
+                                    }
+                                }
+                            }
+                        }
                         //vehicle code row
-                        if (i == 1) {
+                        else if (i == 2) {
+                            console.log(colorBottom);
+                            console.log(colorTop);
                             var cell = row.insertCell(i);
                             //vehicle no row not empty
                             if (arrOfRow[i] !== "") {
@@ -291,7 +351,7 @@
                                             cell.innerHTML = vNoTop;
                                             vehicleCode = vNoTop;
                                         } else {
-                                            if (document.getElementById('table').rows[rowIdx].cells[1].innerHTML === "NA") {
+                                            if (document.getElementById('table').rows[rowIdx].cells[2].innerHTML === "NA") {
                                                 cell.innerHTML = "NA";
                                                 vehicleCode = "NA";
                                             } else {
@@ -305,8 +365,8 @@
                                             cell.innerHTML = vNoTop;
                                             vehicleCode = vNoTop;
                                             if (vNoTop === "") {
-                                                cell.innerHTML = document.getElementById('table').rows[rowIdx + 1].cells[1].innerHTML;
-                                                vehicleCode = document.getElementById('table').rows[rowIdx + 1].cells[1].innerHTML;
+                                                cell.innerHTML = document.getElementById('table').rows[rowIdx + 1].cells[2].innerHTML;
+                                                vehicleCode = document.getElementById('table').rows[rowIdx + 1].cells[2].innerHTML;
                                             }
                                         }
                                         //row move between two different vehicle no and put at bottom
@@ -314,8 +374,8 @@
                                             cell.innerHTML = vNoBottom;
                                             vehicleCode = vNoBottom;
                                             if (vNoBottom === "") {
-                                                cell.innerHTML = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
-                                                vehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
+                                                cell.innerHTML = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
+                                                vehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
                                             }
                                         }
                                     } else if (vNoTop === "Truck" && vNoBottom !== "NA") {
@@ -323,8 +383,8 @@
                                             cell.innerHTML = "NA";
                                             vehicleCode = "NA";
                                         } else {
-                                            cell.innerHTML = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
-                                            vehicleCode = document.getElementById('table').rows[rowIdx].cells[1].innerHTML;
+                                            cell.innerHTML = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
+                                            vehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
                                         }
                                     } else {
                                         cell.innerHTML = vNoBottom;
@@ -339,23 +399,28 @@
                             } else {
                                 row.style.backgroundColor = "#e6ffe6";
                             }
+                            cell.style.textAlign = 'center';
                         }
                         //customer id row
-                        else if (i == 2) {
+                        else if (i == 3) {
                             var cell = row.insertCell(i);
                             cell.innerHTML = arrOfRow[i];
                             cell.style.color = "blue";
                             cell.className = "custIdClick";
                             cell.id = "custId";
+                            cell.style.textAlign = 'center';
                         }
                         //edit row
-                        else if (i == 16) {
+                        else if (i == 17) {
                             var cell = row.insertCell(i);
                             cell.innerHTML = arrOfRow[i];
                             cell.style.color = "blue";
                             cell.className = "editCust";
+                            cell.style.textAlign = 'center';
                         } else {
-                            row.insertCell(i).innerHTML = arrOfRow[i];
+                            var cell = row.insertCell(i);
+                            cell.innerHTML = arrOfRow[i];
+                            cell.style.textAlign = 'center';
                         }
                     }
                     row.setAttribute('id', 'tableRow');
@@ -370,15 +435,15 @@
                 var tableLength = document.getElementById('table').rows.length;
                 var idx = 1;
                 for (i = 0; i <= tableLength; i++) {
-                    var currentVehicleCode = document.getElementById('table').rows[i].cells[1].innerHTML;
+                    var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
                     if (currentVehicleCode !== "NA") {
-                        var custId = document.getElementById('table').rows[i].cells[2].innerHTML;
+                        var custId = document.getElementById('table').rows[i].cells[3].innerHTML;
                         if (currentVehicleCode === vehicleCode && custId !== "") {
-                            document.getElementById('table').rows[i].cells[0].innerHTML = idx;
+                            document.getElementById('table').rows[i].cells[1].innerHTML = idx;
                             idx++;
                         }
                     } else {
-                        document.getElementById('table').rows[i].cells[0].innerHTML = "";
+                        document.getElementById('table').rows[i].cells[1].innerHTML = "";
                     }
                 }
             }
@@ -388,54 +453,47 @@
 
                 var tableArr2 = [];
                 for (var i = 1; i < table.rows.length; i++) {
-                    var no = table.rows[i].cells[0].innerHTML; //no
-                    var truck = table.rows[i].cells[1].innerHTML; //truck
+                    //var no = table.rows[i].cells[0].innerHTML; //no
+                    var truck = table.rows[i].cells[2].innerHTML; //truck
                     var custId = "";
                     //if ((table.rows[i].cells[1].innerHTML !== "") && (table.rows[i].cells[2].innerHTML === "") && (table.rows[i].cells[4].innerHTML !== "")) {
                     //custId = "start" + "split";
 
-                    var curArrv = table.rows[i].cells[3].innerHTML;
-                    var curDepart = table.rows[i].cells[4].innerHTML;
+                    var curArrv = table.rows[i].cells[4].innerHTML;
+                    var curDepart = table.rows[i].cells[5].innerHTML;
                     var nextArrv = "";
                     var nextDepart = "";
                     var prevArrv = "";
                     var prevDepart = "";
                     if (i !== table.rows.length - 1) {
-                        nextArrv = table.rows[i + 1].cells[3].innerHTML;
-                        nextDepart = table.rows[i + 1].cells[4].innerHTML;
+                        nextArrv = table.rows[i + 1].cells[4].innerHTML;
+                        nextDepart = table.rows[i + 1].cells[5].innerHTML;
                     }
                     if (i !== 1) {
-                        prevArrv = table.rows[i - 1].cells[3].innerHTML;
-                        prevDepart = table.rows[i - 1].cells[4].innerHTML;
+                        prevArrv = table.rows[i - 1].cells[4].innerHTML;
+                        prevDepart = table.rows[i - 1].cells[5].innerHTML;
                     }
                     if (curArrv === "" && curDepart !== "" && nextArrv !== "" && nextDepart === "") {
-                        console.log(truck + " is not included");
                     } else if (curArrv !== "" && curDepart === "" && prevArrv === "" && prevDepart !== "") {
-                        console.log(truck + " is not included");
                     } else {
                         //custId = table.rows[i].cells[2].innerHTML + "split"; //custId
-                        if ((table.rows[i].cells[1].innerHTML !== "") && (table.rows[i].cells[2].innerHTML === "") && (table.rows[i].cells[4].innerHTML !== "")) {
+                        if ((table.rows[i].cells[2].innerHTML !== "") && (table.rows[i].cells[3].innerHTML === "") && (table.rows[i].cells[5].innerHTML !== "")) {
                             custId = "start" + "split";
                         } else {
-                            custId = table.rows[i].cells[2].innerHTML + "split"; //custId
+                            custId = table.rows[i].cells[3].innerHTML + "split"; //custId
                         }
                         tableArr2.push(
-                                no,
+                                //no,
                                 truck,
                                 custId
                                 );
 
                     }
-//                        tableArr2.push(
-//                                no,
-//                                truck,
-//                                custId
-//                                );
                 }
                 document.getElementById("submit").disabled = true;
                 $("#submit").val('Loading...');
                 var $apiAddress = '../../api/submitEditRouteJob/submitEditRouteJob';
-                var jsonForServer = '{\"table\": \"' + tableArr2 + '\", \"runId\":\"' + $("#RunIdClick").text() + '\", \"oriRunId\":\"' + $("#OriRunID").val() + '\", \"branch\":\"' + $("#branch").text() + '\", \"shift\":\"' + $("#shift").text() + '\"}';
+                var jsonForServer = '{\"table\": \"' + tableArr2 + '\", \"runId\":\"' + $("#RunIdClick").text() + '\"}';
                 $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                     if (data == 'OK') {
                         console.log("OK");
@@ -476,7 +534,7 @@
                 });
             }
         </script>
-        <h4>Routing Result Editor
+        <h4>Route Editor
             <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
             <span class="glyphicon glyphicon-list-alt hover" aria-hidden="true" onclick="saveHistory()"></span>
         </h4>
@@ -489,10 +547,6 @@
         <label class="fzLabel" id="branch"><%=get("branch")%></label>
 
         <br>
-        <label class="fzLabel">Shift:</label> 
-        <label class="fzLabel" id="shift"><%=get("shift")%></label>
-
-        <br>
         <label class="fzLabel">Channel:</label> 
         <label class="fzLabel" id="channel"><%=get("channel")%></label> 
 
@@ -502,7 +556,6 @@
 
         <br>
         <label class="fzLabel">RunID:</label> 
-        <!--<label class="fzLabel" id="RunIdClick" style="color: blue;"><%=get("runId")%></label> -->
         <label id="RunIdClick" class="fzLabel"><%=get("runId")%></label>
 
         <br>
@@ -513,6 +566,7 @@
         <table id="table" border1="1" style="border-color: lightgray;">
             <thead>
                 <tr style="background-color:orange">
+                    <th width="100px" class="fzCol center">Color</th>
                     <th width="100px" class="fzCol center">No.</th>
                     <th width="100px" class="fzCol center">Truck</th>
                     <th width="100px" class="fzCol center">Cust. ID</th>
@@ -542,9 +596,10 @@
                     style="background-color: lightyellow"
                     <%} else if (j.arrive.length() == 0 && j.storeName.length() == 0) {%>
                     style="background-color: #e6ffe6"
-                    <%} else if (j.isOkay == false ) {%>
+                    <%} else if (j.isOkay == false) {%>
                     style="background-color: #ffe6e6"
                     <%}%> >
+                    <td class="color" style="width: 30px; background-color: <%=j.color%>"></td>
                     <td class="fzCell index center">
                         <%if (!j.no.equals("0")) {%>
                         <%=j.no%>
@@ -575,7 +630,7 @@
                     </td>
                     <td class="fzCell center">
                         <%if (!j.priority.equals("0")) {%>
-                            <%=j.priority%>
+                        <%=j.priority%>
                         <%} else {
                             out.print("");
                         }%>
@@ -607,13 +662,11 @@
                     </td>
                     <td class="editCust hover center" onclick="klik(<%=j.custId%>)" style="color: blue;">
                         <%if (j.doNum.length() > 0) {%>
-                        edit
+                            edit
                         <%}%>
                     </td>
-
                 </tr>
-
-                <%} // for ProgressRecord %>
+                <%}%>
             </tbody>
         </table>
 
@@ -627,7 +680,6 @@
                 <li id="switchHelper" onclick="switchHelper()">Switch with this truck</li>
                 <li id="pasteAtTop" onclick="paste('top')">Paste at top of this row</li>
                 <li id="pasteAtBottom" onclick="paste('bottom')">Paste at bottom of this row</li>
-
             </ul>
         </div>
 

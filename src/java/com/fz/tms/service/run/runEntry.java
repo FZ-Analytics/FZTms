@@ -26,7 +26,7 @@ public class runEntry implements BusinessLogic {
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
             , PageContext pc) throws Exception {
-        String br = (String) pc.getSession().getAttribute("WorkplaceID");
+        String br = (String) pc.getSession().getAttribute("WorkplaceID");        
         List<Branch> lBr = getBranch(br);
         request.setAttribute("ListBranch", lBr);
     }
@@ -43,14 +43,25 @@ public class runEntry implements BusinessLogic {
             try (Statement stm = con.createStatement()){
             
                 // create sql
-                String sql ;
-                sql = "select distinct plant from BOSNET1.dbo.TMS_ShipmentPlan where plant like 'D%' "+str+" order by plant asc";
+                String sql = "SELECT\n" +
+                        "	DISTINCT plant,\n" +
+                        "	SalOffName\n" +
+                        "FROM\n" +
+                        "	BOSNET1.dbo.TMS_ShipmentPlan aq\n" +
+                        "INNER JOIN BOSNET1.dbo.TMS_SalesOffice aw ON\n" +
+                        "	aq.plant = aw.SalOffCode\n" +
+                        "WHERE\n" +
+                        "	plant LIKE 'D%'\n" +
+                        "	"+str+"\n" +
+                        "ORDER BY\n" +
+                        "	plant ASC";
                 
                 // query
                 try (ResultSet rs = stm.executeQuery(sql)){
                     while (rs.next()){   
                         c = new Branch();
                         c.branchId = rs.getString("plant");
+                        c.name = rs.getString("SalOffName");
                         ar.add(c);
                     }
                 }

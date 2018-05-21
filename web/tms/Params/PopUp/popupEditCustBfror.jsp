@@ -1,212 +1,175 @@
-<%-- 
-    Document   : popupEditCustBfror
-    Created on : Nov 13, 2017, 12:22:11 PM
-    Author     : Administrator
---%>
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.fz.tms.params.PopUp;
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@include file="../../appGlobal/pageTop.jsp"%>
-<%@page import="com.fz.tms.params.model.Customer"%>
-<%run(new com.fz.tms.params.PopUp.popupEditCustBfror());%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <style>
-            .hover:hover {
-               cursor: pointer; 
+import com.fz.generic.BusinessLogic;
+import com.fz.generic.Db;
+import com.fz.tms.params.model.Customer;
+import com.fz.tms.params.service.Other;
+import com.fz.tms.params.service.VehicleAttrDB;
+import com.fz.tms.service.run.RouteJob;
+import com.fz.util.FZUtil;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
+
+/**
+ *
+ * @author Administrator
+ */
+public class popupEditCustBfror implements BusinessLogic {
+
+    @Override
+    public void run(HttpServletRequest request, HttpServletResponse response,
+            PageContext pc
+    ) throws Exception {
+        String branchCode = FZUtil.getHttpParam(request, "branchCode");
+        String dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
+        String shift = FZUtil.getHttpParam(request, "shift");
+        String reRun = FZUtil.getHttpParam(request, "reRun");
+        String runId = FZUtil.getHttpParam(request, "runId");
+        String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
+        String err = FZUtil.getHttpParam(request, "errMsg");
+        String channel = FZUtil.getHttpParam(request, "channel");
+        request.setAttribute("errMsg", err.length() > 0 ? err : "");
+        //request.getSession().setAttribute("errMsg", err);        
+        
+        String cds = "ERROR insertPreRouteJob";
+
+        String sql = "SELECT\n" +
+                "	distinct\n" +
+                "	pr.customer_id,\n" +
+                "	pr.do_number,\n" +
+                "	pr.long,\n" +
+                "	pr.lat,\n" +
+                "	pr.Customer_Priority,\n" +
+                "	pr.Distribution_Channel,\n" +
+                "	pr.Request_Delivery_Date,\n" +
+                "	pr.service_time,\n" +
+                "	pr.deliv_start,\n" +
+                "	pr.deliv_end,\n" +
+                "	pr.vehicle_type_list,\n" +
+                "	pr.Is_Exclude\n" +
+                "FROM\n" +
+                "	bosnet1.dbo.TMS_PreRouteJob pr\n" +
+                "LEFT OUTER JOIN(\n" +
+                "		SELECT\n" +
+                "			a.*\n" +
+                "		FROM\n" +
+                "			(\n" +
+                "				SELECT\n" +
+                "					ROW_NUMBER() OVER(\n" +
+                "						PARTITION BY Customer_ID\n" +
+                "					ORDER BY\n" +
+                "						Customer_ID\n" +
+                "					) AS noId,\n" +
+                "					*\n" +
+                "				FROM\n" +
+                "					bosnet1.dbo.customer\n" +
+                "			) a\n" +
+                "		WHERE\n" +
+                "			a.noid = 1\n" +
+                "	) cs ON\n" +
+                "	pr.customer_id = cs.customer_id\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_CustAtr ca ON\n" +
+                "	pr.Customer_ID = ca.customer_id\n" +
+                "WHERE\n" +
+                "	pr.isactive = 1\n" +
+                "	AND pr.is_edit = 'edit'\n" +
+                "	AND pr.runid = '"+runId+"'";
+
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            List<Customer> js = new ArrayList<Customer>();
+            Customer c = new Customer();
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next()) {
+                    c = new Customer();
+                    int i = 1;
+                    c.customer_id = FZUtil.getRsString(rs, i++, "");
+                    c.do_number = FZUtil.getRsString(rs, i++, "");
+                    c.lng = FZUtil.getRsString(rs, i++, "");
+                    c.lat = FZUtil.getRsString(rs, i++, "");
+                    c.customer_priority = FZUtil.getRsString(rs, i++, "");
+                    c.channel = FZUtil.getRsString(rs, i++, "");
+                    c.rdd = FZUtil.getRsString(rs, i++, "");
+                    c.service_time = Integer.parseInt(FZUtil.getRsString(rs, i++, ""));//Integer.parseInt(FZUtil.getRsString(rs, i++, getParams("DefaultCustServiceTime")));
+                    c.deliv_start = FZUtil.getRsString(rs, i++, "");//FZUtil.getRsString(rs, i++, getParams("DefaultCustStartTime"));
+                    c.deliv_end = FZUtil.getRsString(rs, i++, "");//FZUtil.getRsString(rs, i++, getParams("DefaultCustEndTime"));
+                    c.vehicle_type_list = FZUtil.getRsString(rs, i++, "");//FZUtil.getRsString(rs, i++, getParams("DefaultCustVehicleTypes"));
+                    c.isInc = FZUtil.getRsString(rs, i++, "");//FZUtil.getRsString(rs, i++, "");
+                    js.add(c);
+                }
+                
+                request.setAttribute("CustList", js);
+                request.setAttribute("branchCode", branchCode);
+                request.setAttribute("dateDeliv", dateDeliv);
+                request.setAttribute("shift", shift);
+                request.setAttribute("reRun", reRun);
+                request.setAttribute("runId", runId);
+                request.setAttribute("oriRunID", oriRunID);
+                request.setAttribute("channel", channel);
             }
-        </style>
-    </head>
-    <body>
-        <div style="width: 100%; height: 700px;">
-            <%@include file="../appGlobal/bodyTop.jsp"%>
-            <%
-                url = request.getRequestURL().toString();
-                String str =  url + "?" + request.getQueryString();
-                str = str.replace("http://","");
-                str = str.replace(":","9ETR9");
-                str = str.replace(".","9DOT9");
-                str = str.replace("/","9AK9");
-                str = str.replace("?","9ASK9");
-                str = str.replace("&","9END9");
-                str = str.replace("=","9EQU9");
-                str = str.replace("-","9MIN9");
-                String urls =  url + "?" + request.getQueryString();
-            %>
-            <div class="fzErrMsg" id="errMsg">
-                <%=get("errMsg")%>
-            </div>
-            <h4>Customer Editor 
-                <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
-                <span class="glyphicon glyphicon-list-alt hover" aria-hidden="true" onclick="saveHistory()"></span>
-            </h4>
+        }catch(Exception e){
+            HashMap<String, String> pl = new HashMap<String, String>();
+            pl.put("ID", runId);
+            pl.put("fileNmethod", "popupEditCustBfror&run Exc");
+            pl.put("datas", "");
+            pl.put("msg", e.getMessage());
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            Date date = new Date();
+            pl.put("dates", dateFormat.format(date).toString());
+            Other.insertLog(pl);
+        }
+    }
+    
+    public String getParams(String param) throws Exception{
+        String str = "";
+        
+        String sql = "SELECT\n" +
+                "	value\n" +
+                "FROM\n" +
+                "	bosnet1.dbo.TMS_Params\n" +
+                "WHERE\n" +
+                "	param = '"+param+"'\n" ;
 
-            <input type="hidden" value="<%=str%>" id="urls"/>
-            <br>
-            <label class="fzLabel">Branch:</label> 
-            <label class="fzLabel" id="branch"><%=get("branchCode")%></label>
-
-            <br>
-            <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel"><%=get("shift")%></label>
-
-            <br>
-            <label class="fzLabel">Date Deliv:</label> 
-            <label class="fzLabel" id="dateDeliv"><%=get("dateDeliv")%></label>
-
-            <br>
-            <label class="fzLabel">RunID:</label> 
-            <label class="fzLabel" id="runId"><%=get("runId")%></label> 
-
-            <br>
-            <label class="fzLabel">Ori RunID:</label> 
-            <label class="fzLabel" id="oriRunID"><%=get("oriRunID")%></label> 
-
-            <br>
-            <label class="fzLabel">Prev RunID:</label> 
-            <label class="fzLabel" id="reRun"><%=get("reRun")%></label> 
-
-            <br>
-            <label class="fzLabel">Channel:</label> 
-            <label class="fzLabel" id="channel"><%=get("channel")%></label> 
-
-            <br>
-            <label class="fzLabel hover" id="re_Run" style="color: blue;">Routing</label>
-            <label class="fzLabel hover" id="Vvehicle" style="color: blue;" onclick="Vklik();">Vehicle</label>
-            <%--<input id="clickMe" class="btn fzButton" type="button" value="Manual Route" onclick="openManualRoutePage();" />--%>
-
-            <br><br>
-            <table cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered">
-                <thead>
-                    <tr style="background-color:orange">
-                        <th width="100px" class="fzCol">customer id</th>
-                        <th width="100px" class="fzCol">do number</th>
-                        <th width="100px" class="fzCol">long</th>
-                        <th width="100px" class="fzCol">lat</th>
-                        <th width="100px" class="fzCol">customer priority</th>
-                        <th width="100px" class="fzCol">Channel</th>
-                        <th width="100px" class="fzCol">RDD</th>
-                        <th width="100px" class="fzCol">service time</th>
-                        <th width="100px" class="fzCol">deliv start</th>
-                        <th width="100px" class="fzCol">deliv end</th>
-                        <th width="100px" class="fzCol">vehicle type list</th>
-                        <th width="100px" class="fzCol">inc</th>
-                        <th width="100px" class="fzCol">Edit</th>
-                        <th width="100px" class="fzCol">remove</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%for (Customer j : (List<Customer>) getList("CustList")) {%> 
-                    <tr >
-                        <td class="fzCell" ><%=j.customer_id%></td>
-                        <td class="fzCell" ><%=j.do_number%></td>
-                        <td class="fzCell" ><%=j.lng%></td>
-                        <td class="fzCell" ><%=j.lat%></td>
-                        <td class="fzCell" ><%=j.customer_priority%></td>
-                        <td class="fzCell" ><%=j.channel%></td>
-                        <td class="fzCell" ><%=j.rdd%></td>
-                        <td class="fzCell" ><%=j.service_time%></td>
-                        <td class="fzCell" ><%=j.deliv_start%></td>
-                        <td class="fzCell" ><%=j.deliv_end%></td>
-                        <td class="fzCell" ><%=j.vehicle_type_list%></td>
-                        <td class="fzCell" ><%=j.isInc%></td>
-                        <td class="fzCell hover" onclick="klik('<%=j.customer_id%>')" >
-                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                        </td>
-                        <td class="fzCell hover" onclick="exclude('<%=j.customer_id%>','<%=j.do_number%>')">
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        </td>
-                    </tr>
-
-                    <%} // for ProgressRecord %>
-                </tbody>
-                <tfoot></tfoot>
-            </table>
-
-            <script src="../appGlobal/jquery.dataTables.min.js"></script>
-            <script src="../appGlobal/datatables.js"></script>
-            <script >
-                $(document).ready(function () {
-                    $('.datatable').dataTable({
-                        "sPaginationType": "bs_normal"
-                    });
-                    $('.datatable').each(function () {
-                        var datatable = $(this);
-                        // SEARCH - Add the placeholder for Search and Turn this into in-line form control
-                        var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
-                        search_input.attr('placeholder', 'Search');
-                        search_input.addClass('form-control input-sm');
-                        // LENGTH - Inline-Form control
-                        var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
-                        length_sel.addClass('form-control input-sm');
-                    });
-                    $('#re_Run').click(function () {
-                        //setTimeout(function () {
-                            //alert($("#urls").text());
-                            //var dateNow = $.datepicker.formatDate('yy-mm-dd', new Date());//currentDate.getFullYear()+"-"+(currentDate.getMonth()+1)+"-"+currentDate.getDate();
-                            //alert($('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text() + '&channel=' + $("#channel").text());
-                            //var win = window.open('../../run/runProcess.jsp?tripCalc=M&shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text(), null);
-                            var win = window.location.replace('../../run/runProcess.jsp?shift=1&dateDeliv=' + $('#dateDeliv').text() + '&branch=' + $('#branch').text() + '&runId=' + $("#runId").text() + '&oriRunID=' + $("#oriRunID").text()  + '&reRun=' + $("#reRun").text() + '&channel=' + $("#channel").text() + '&url=' + $("#urls").val());
-                            if (win) {
-                                //Browser has allowed it to be opened
-                                win.focus();
-                            }
-                        //}, 3000);
-                    });
-                });
-
-                function klik(kode) {
-                    window.open('popupEditCust.jsp?runId=' + $('#runId').text() + '&custId=' + kode, null,
-                            'scrollbars=1,resizable=1,height=500,width=750');
-
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            List<Customer> js = new ArrayList<Customer>();
+            Customer c = new Customer();
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    c = new Customer();
+                    int i = 1;
+                    str = FZUtil.getRsString(rs, i++, "");
                 }
-
-                function Vklik() {
-                    window.open('ShowPreRouteVehicle.jsp?runId=' + $('#runId').text(), null,
-                            'scrollbars=1,resizable=1,height=500,width=950');
-
-                }
-
-                function openManualRoutePage() {
-                    var win = window.open('../../run/runManualRoute.jsp?branch='+$('#branch').text()+'&shift='+$('#shift').text()+'&oriRunId='+$('#runId').text()+'&channel='+$('#channel').val());
-                    if (win) {
-                        //Browser has allowed it to be opened
-                        win.focus();
-                    }
-                }
-
-                function exclude(custId, kode) {
-                    var $apiAddress = '../../../api/popupEditCustBfror/excludeDO';
-                    var jsonForServer = '{\"RunId\": \"' + $("#runId").text() + '\",\"Customer_ID\":\"' + 
-                            custId + '\",\"DO_Number\":\"' + kode  + '\",\"ExcInc\":\"exc\"}';
-                    var data = [];
-
-                    $.post($apiAddress, {json: jsonForServer}).done(function (data) {
-                        if(data == 'OK'){
-                            alert( 'sukses' );
-                            //location.reload();
-                        }else{
-                            alert( 'submit error' ); 
-                        }
-                    });
-
-                }
-                function saveHistory() {
-                    var $apiAddress = '../../../api/popupEditCustBfror/savehistory';
-                    var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
-                    var data = [];
-
-                    $.post($apiAddress, {json: jsonForServer}).done(function (data) {
-                        if(data == 'OK'){
-                            alert( 'sukses' );
-                            //location.reload();
-                        }else{
-                            alert( 'submit error' ); 
-                        }
-                    });
-                }
-            </script>
-        </div>
-        <%@include file="../appGlobal/bodyBottom.jsp"%>
-    </body>
-</html>
+            }
+        }
+        
+        return str;
+    }
+    
+    public String cekError(ResultSet rs, int i, String prm){
+        String str = "";
+        
+        
+        return str;
+        
+    }
+    
+}

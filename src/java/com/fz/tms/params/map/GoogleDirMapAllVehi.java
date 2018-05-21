@@ -39,7 +39,14 @@ import javax.servlet.jsp.PageContext;
  */
 public class GoogleDirMapAllVehi implements BusinessLogic {
     String key = Constava.googleKey;
-    List<String> vehi = new ArrayList<String>();
+    List<String> vehi = new ArrayList<String>();  
+    
+    public String[] myList = {"0019DC","A20CE8","FF0000","E8720C","FFD30D","00ABFB","632152","00546B","B69451",
+                    "D2691E","FF7F50","6495ED","FFF8DC","DC143C","00FFFF","00008B","008B8B","B8860B","A9A9A9","006400","BDB76B",
+                    "8B008B","8B0000","556B2F","FF8C00","9932CC","E9967A","8FBC8F","483D8B","00CED1","9400D3","00CED1","9400D3",
+                    "FF1493","B22222","00BFFF","228B22","FF00FF","1E90FF","FFD700","008000","FF69B4","CD5C5C","DAA520","ADFF2F",
+                    "4B0082","F0E68C","FFF0F5","7CFC00","ADD8E6","F08080","90EE90","FFB6C1","FFA07A","20B2AA","00FF00","B0C4DE",
+                    "87CEFA","FF00FF","66CDAA","BA55D3","9370DB","3CB371"};
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -49,7 +56,42 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
         String runID = FZUtil.getHttpParam(request, "runID");
         String vCode = FZUtil.getHttpParam(request, "vCode");
         String channel = FZUtil.getHttpParam(request, "channel");
+        
+        List<OptionModel> js = new ArrayList<OptionModel>();
+        List<List<HashMap<String, String>>> all = runs(runID, js);
+        
+        //String str = asd.toString();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jsonOutput = gson.toJson(all);
+        //jsonOutput = "{\"myObj\":" + jsonOutput + "}";
+        System.out.println(jsonOutput.toString());                
+        //request.setAttribute("branch", br);
+        
+        request.setAttribute("key", key);
+        request.setAttribute("test", jsonOutput.toString());
+        request.setAttribute("JobOptionModel", js);
+    }
+    
+    
+    
+    public static String clr() {
 
+        // create random object - reuse this as often as possible
+        Random random = new Random();
+
+        // create a big random number - maximum is ffffff (hex) = 16777215 (dez)
+        int nextInt = random.nextInt(256*256*256);
+
+        // format it as hexadecimal string (with hashtag and leading zeros)
+        String colorCode = String.format("#%06x", nextInt);
+
+        // print it
+        System.out.println(colorCode);
+        return colorCode.toUpperCase();
+    }
+    
+    public List<List<HashMap<String, String>>> runs(String runID, List<OptionModel> js) throws Exception{
+        List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
         String sql = "SELECT\n" +
                 "	aq.jobNb,\n" +
                 "	CASE\n" +
@@ -122,7 +164,7 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                 "	aq.customer_id = aw.Customer_ID and aq.RunId = aw.RunId\n" +
                 "WHERE\n" +
                 "	aq.runID = '"+runID+"'\n" +
-                "	AND aq.vehicle_code <> 'NA'\n" +
+                //"	AND aq.vehicle_code <> 'NA'\n" +
                 "ORDER BY\n" +
                 "	aq.vehicle_code,\n" +
                 //"	aq.jobNb";
@@ -136,29 +178,21 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
-            try (ResultSet rs = ps.executeQuery()) {
-                List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
+            try (ResultSet rs = ps.executeQuery()) {                
                 List<HashMap<String, String>> asd = new ArrayList<HashMap<String, String>>();
                 //ArrayList<HashMap<String, String>> ar = new ArrayList<HashMap<String, String>>();
                 HashMap<String, String> pl = new HashMap<String, String>();
                 //https://www.w3schools.com/colors/colors_names.asp
                 /*String[] myList = {"ff5050", "ffff52", "52ff52", "52ffff", "5252ff", "ff52ff", "ff7d52", "d4ff52", "52ff7d", 
                     "52d4ff", "7d52ff", "ff52d4", "ffa852", "a8ff52", "52ffa8", "52a8ff", "a852ff", "ff52a8", "ffd452", 
-                    "7dff52", "52ffd4", "527dff", "d452ff", "ff527d"};*/
-                String[] myList = {"FAEBD7","00FFFF","7FFFD4","0000FF","8A2BE2","A52A2A","DEB887","5F9EA0","7FFF00",
-                    "D2691E","FF7F50","6495ED","FFF8DC","DC143C","00FFFF","00008B","008B8B","B8860B","A9A9A9","006400","BDB76B",
-                    "8B008B","8B0000","556B2F","FF8C00","9932CC","E9967A","8FBC8F","483D8B","00CED1","9400D3","00CED1","9400D3",
-                    "FF1493","B22222","00BFFF","228B22","FF00FF","1E90FF","FFD700","008000","FF69B4","CD5C5C","DAA520","ADFF2F",
-                    "4B0082","F0E68C","FFF0F5","7CFC00","ADD8E6","F08080","90EE90","FFB6C1","FFA07A","20B2AA","00FF00","B0C4DE",
-                    "87CEFA","FF00FF","66CDAA","BA55D3","9370DB","3CB371"};
+                    "7dff52", "52ffd4", "527dff", "d452ff", "ff527d"};*/                
                 int p = 0;
 
                 String vehi = "";
                 String NB = "";
                 String clr = "";
                 
-                //vehi();
-                List<OptionModel> js = new ArrayList<OptionModel>();
+                //vehi();                
                 OptionModel om = new OptionModel();
                 while (rs.next()) {
                     pl = new HashMap<String, String>();
@@ -177,6 +211,9 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                     String Customer_priority = FZUtil.getRsString(rs, i++, "");
                     String DO_number = FZUtil.getRsString(rs, i++, "");
                     String vehicle_code = FZUtil.getRsString(rs, i++, "");
+                    if(pl.get("jobNb").equalsIgnoreCase("0")){
+                        System.out.println("com.fz.tms.params.map.GoogleDirMapAllVehi.runs()");
+                    }
                     
                     String str = "<h2>" + pl.get("title") + "</h2><p>Channel : "+ Distribution_Channel + "(" + DeliveryDeadline + ")" 
                             + "</p><p>Priority : " + Customer_priority + " (" + vehicle_code + ")" + "</p> " + "</p><p>Street : " + street + "</p><p>Arrive : " 
@@ -197,9 +234,10 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                     }
                     
                     
-                    if (!pl.get("title").equalsIgnoreCase(vehi)
+                    if ((!pl.get("title").equalsIgnoreCase(vehi)
                             && street == ""
-                            && !pl.get("jobNb").equalsIgnoreCase("1")) {
+                            && !pl.get("jobNb").equalsIgnoreCase("1"))
+                            || pl.get("jobNb").equalsIgnoreCase("0")) {
                         //clr = clr();
                         p = p + 1;
                         //remove & replace pertama dengan akhir 
@@ -211,18 +249,6 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                         asd = new ArrayList<HashMap<String, String>>();
                     }
                 }
-
-                //String str = asd.toString();
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String jsonOutput = gson.toJson(all);
-                //jsonOutput = "{\"myObj\":" + jsonOutput + "}";
-                System.out.println(jsonOutput.toString());
-                request.setAttribute("key", channel);
-                request.setAttribute("key", key);
-                request.setAttribute("test", jsonOutput.toString());
-                request.setAttribute("JobOptionModel", js);
-                //request.setAttribute("branch", br);
-
             }
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
@@ -235,22 +261,7 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
             pl.put("dates", dateFormat.format(date).toString());
             Other.insertLog(pl);
         }
-    }
-    
-    public static String clr() {
-
-        // create random object - reuse this as often as possible
-        Random random = new Random();
-
-        // create a big random number - maximum is ffffff (hex) = 16777215 (dez)
-        int nextInt = random.nextInt(256*256*256);
-
-        // format it as hexadecimal string (with hashtag and leading zeros)
-        String colorCode = String.format("#%06x", nextInt);
-
-        // print it
-        System.out.println(colorCode);
-        return colorCode.toUpperCase();
+        return all;
     }
     
     public String cek(String ttl){

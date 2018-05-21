@@ -16,5 +16,5 @@ public class Constava {
     //final static String googleKey = "AIzaSyARbEBUNSIVYgKaVXJcD3-s7Un2YYY0JTk";
     
     //dari mas subhan 11032017
-    final static String googleKey = "AIzaSyBOsad8CCGx7acE9H_c-27JVH-qqKzei20";
+    public static String googleKey = "AIzaSyBOsad8CCGx7acE9H_c-27JVH-qqKzei20";
 }
