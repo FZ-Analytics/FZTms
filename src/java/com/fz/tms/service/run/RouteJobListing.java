@@ -483,12 +483,25 @@ public class RouteJobListing implements BusinessLogic {
     public void insertNextProgress() throws Exception {
         Timestamp createTime = getTimeStamp();
         int rowNum = 0;
+        String originalRunId = "";
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
                 String sql = "SELECT COUNT(*) total FROM bosnet1.dbo.TMS_Progress WHERE runID = '" + getNextRunId(runID) + "';";
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
                         rowNum = rs.getInt("total");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+        try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
+            try (Statement stm = con.createStatement()) {
+                String sql = "SELECT OriRunId FROM bosnet1.dbo.TMS_Progress WHERE runID = '" + runID + "';";
+                try (ResultSet rs = stm.executeQuery(sql)) {
+                    while (rs.next()) {
+                        originalRunId = rs.getString("OriRunId");
                     }
                 }
             }
@@ -514,7 +527,7 @@ public class RouteJobListing implements BusinessLogic {
                 psHdr.setString(11, null);
                 psHdr.setString(12, dateDeliv);
                 psHdr.setString(13, "-");
-                psHdr.setString(14, runID);
+                psHdr.setString(14, originalRunId);
                 psHdr.setString(15, channel);
 
                 psHdr.executeUpdate();
