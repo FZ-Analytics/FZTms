@@ -178,6 +178,50 @@
             <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
                                 <th width="100px" class="fzCol center" style="min-width: 35px">Edit</th>
                             </tr>
+                            <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
+                                <tr 
+                                    <%if (j.vehicleCode.equals("NA")) {%>
+                                    style="height: 73px;color: red"
+                                    <%} else if (j.arrive.length() == 0 && j.depart.length() > 0) {%>
+                                    style="height: 73px;background-color: lightyellow"
+                                    <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
+                                    style="height: 73px;background-color: #e6ffe6"
+                                    <%} else {%>
+                                    style="height: 73px;"
+                                    <%}%> >
+                                    <td class="fzCell center" style="min-width: 30px"><%=j.no%></td>
+                                    <td class="vCodeClick center  hover" style="color: blue;min-width: 180px"><%=j.vehicleCode%></td>
+                                    <td class="custIDClick center  hover" style="color: blue;min-width: 85px"><%=j.custID%></td>
+                                    <td class="fzCell center" style="min-width: 45px"><%=j.arrive%></td>
+                                    <td class="fzCell center" style="min-width: 55px"><%=j.depart%></td>                    
+                                    <td class="fzCell center" style="<%if (j.bat == "1" ) {%> 
+                                        background-color: #ffe6e6 <%}%>;min-width: 95px;" ><%=j.DONum%></td>
+                                    <td class="fzCell center" style="min-width: 35px"><%=j.getServiceTime()%></td>
+                                    <td class="fzCell center" style="min-width: 115px">
+                                        <%if (j.arrive.length() > 0) {%>
+                                        <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
+                                        <%} else {%><%=j.name1%><%}%>
+                                    <td class="fzCell center" style="min-width: 65px"><%=j.custPriority%></td>
+                                    <td class="fzCell center" style="min-width: 35px"><%=j.distrChn%></td>
+                                    <td class="fzCell center" style="min-width: 110px"><%=j.street%></td>
+                                    <td class="fzCell center" style="min-width: 55px"><%=j.weight%></td>
+                                    <td class="fzCell center" style="min-width: 55px"><%=j.volume%></td>
+                                    <td class="fzCell center" style="min-width: 40px"><%=j.rdd%></td>
+                                    <td class="fzCell center" style="min-width: 75px"><%=j.transportCost%></td>
+                                    <td class="fzCell center" style="min-width: 35px"><%=j.dist%></td>
+                                    <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;min-width: 35px"><%=j.edit%></td>
+                                </tr>
+                            <%} // for ProgressRecord %>
+                            <%--
+                                List<RouteJob> jx = (List<RouteJob>) request.getAttribute("JobList");
+                                for(RouteJob category : jx) {
+                                    //System.out.println(category.color);
+                                    out.println("<tr style=\"height: 73px;\">"
+                                            + "<td class=\"fzCells\" style=\"min-width: 50px; background-color: "+category.color+"\"></td>"
+                                            + "<td class=\"fzCells\" style=\"min-width: 95px;\">"+category.DONum+"</td>"
+                                            + "</tr>");
+                                }
+                            --%>
                         </thead>
                     </table>
                 </div>
@@ -243,8 +287,7 @@
                                         <%}%> ><%=j.send%></td>-->
                                     <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;min-width: 35px"><%=j.edit%></td>
                                 </tr>
-
-                                <%} // for ProgressRecord %>
+                            <%} // for ProgressRecord %>
                         </tbody>
                     </table>
                 </div>
