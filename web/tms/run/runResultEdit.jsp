@@ -12,10 +12,14 @@
     </head>
     <body>
         <style>
-            tr { 
-                border-bottom: 2px solid lightgray;
+            td {
+                border: 1px solid lightgray;
             }
 
+            th {
+                border: 1px solid black;
+            }
+            
             #oriRunId {
                 display:none;
                 visibility:hidden;
@@ -566,27 +570,27 @@
 
         <br><br>
 
-        <table id="table" border1="1" style="border-color: lightgray;">
+        <table id="table">
             <thead>
                 <tr style="background-color:orange">
-                    <th width="100px" class="fzCol center">Color</th>
-                    <th width="100px" class="fzCol center">No.</th>
-                    <th width="100px" class="fzCol center">Truck</th>
-                    <th width="100px" class="fzCol center">Cust. ID</th>
-                    <th width="100px" class="fzCol center">Arrv</th>
-                    <th width="100px" class="fzCol center">Depart</th>
-                    <th width="100px" class="fzCol center">DO Count</th>
-                    <th width="100px" class="fzCol center">Serv. Time</th>
-                    <th width="100px" class="fzCol center">Name</th>
-                    <th width="100px" class="fzCol center">Prty</th>
-                    <th width="100px" class="fzCol center">Dist. Chl</th>
-                    <th width="100px" class="fzCol center">Street</th>
-                    <th width="100px" class="fzCol center">Weight (KG)</th>
-                    <th width="100px" class="fzCol center">Volume (M3)</th>
-                    <th width="100px" class="fzCol center">RDD</th>
-                    <th width="100px" class="fzCol center">Cost</th>
-                    <th width="100px" class="fzCol center">Dist</th>
-                    <th width="100px" class="fzCol center">Edit</th>
+                    <th width="100px" class="center">Color</th>
+                    <th width="100px" class="center">No.</th>
+                    <th width="100px" class="center">Truck</th>
+                    <th width="100px" class="center">Cust. ID</th>
+                    <th width="100px" class="center">Arrv</th>
+                    <th width="100px" class="center">Depart</th>
+                    <th width="100px" class="center">DO Count</th>
+                    <th width="100px" class="center">Serv. Time</th>
+                    <th width="100px" class="center">Name</th>
+                    <th width="100px" class="center">Prty</th>
+                    <th width="100px" class="center">Dist. Chl</th>
+                    <th width="100px" class="center">Street</th>
+                    <th width="100px" class="center">Weight (KG)</th>
+                    <th width="100px" class="center">Volume (M3)</th>
+                    <th width="100px" class="center">RDD</th>
+                    <th width="100px" class="center">Cost</th>
+                    <th width="100px" class="center">Dist</th>
+                    <th width="100px" class="center">Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -603,17 +607,17 @@
                     style="background-color: #ffe6e6"
                     <%}%> >
                     <td class="color" style="width: 30px; background-color: <%=j.color%>"></td>
-                    <td class="fzCell index center">
+                    <td class="index center">
                         <%if (!j.no.equals("0")) {%>
                         <%=j.no%>
                         <%}%>
                     </td>
-                    <td class="vCodeClick hover center" id="vehicleCode" style="color: blue;"><%=j.vehicleCode%></td>
+                    <td class="vCodeClick hover center" id="vehicleCode" style="color: blue; padding: 5px;"><%=j.vehicleCode%></td>
                     <td class="custIDClick hover center" id="custId" style="color: blue;"><%=j.custId%></td>
-                    <td class="fzCell center"><%=j.arrive%></td>
-                    <td class="fzCell center"><%=j.depart%></td>                    
-                    <td class="fzCell center"><%=j.doNum%></td>
-                    <td class="fzCell center">
+                    <td class="center"><%=j.arrive%></td>
+                    <td class="center"><%=j.depart%></td>                    
+                    <td class="center"><%=j.doNum%></td>
+                    <td class="center">
                         <%if (!j.vehicleCode.equals("NA")) {
                             if (!j.serviceTime.equals("0")) {%>
                                 <%=j.serviceTime%>
@@ -624,39 +628,39 @@
                             out.print("0");
                         }%>  
                     </td>
-                    <td class="fzCell center">
+                    <td class="center">
                         <%if (j.arrive.length() > 0) {%>
                             <a href="<%=j.getMapLink()%>" target="_blank"><%=j.storeName%></a>
                         <%} else {%>
                             <%=j.storeName%>
                         <%}%>
                     </td>
-                    <td class="fzCell center">
+                    <td class="center">
                         <%if (!j.priority.equals("0")) {%>
                         <%=j.priority%>
                         <%} else {
                             out.print("");
                         }%>
                     </td>
-                    <td class="fzCell center"><%=j.distChannel%></td>
-                    <td class="fzCell center"><%=j.street%></td>
-                    <td class="fzCell center"><%=j.weight%></td>
-                    <td class="fzCell center"><%=j.volume%></td>
-                    <td class="fzCell center">
+                    <td class="center"><%=j.distChannel%></td>
+                    <td class="center"><%=j.street%></td>
+                    <td class="center"><%=j.weight%></td>
+                    <td class="center"><%=j.volume%></td>
+                    <td class="center">
                         <%if (j.rdd != null) {%>
                             <%=j.rdd%>
                         <%} else {%>
                             <p></p>
                         <%}%>
                     </td>
-                    <td class="fzCell center">
+                    <td class="center">
                         <%if (!j.custId.equals("")) {%>
                             <%=j.transportCost%>
                         <%} else {
                             out.print("");
                         }%>
                     </td>
-                    <td class="fzCell center">
+                    <td class="center">
                         <%if (!j.custId.equals("")) {%>
                             <%=j.dist%>
                         <%} else {

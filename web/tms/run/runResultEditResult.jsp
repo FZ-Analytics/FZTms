@@ -22,17 +22,16 @@
             .center {
                 text-align: center;
             }
+            td { 
+                border: 1px solid lightgray;
+                padding: 3px;
+            }
+            th {
+                border: 1px solid black;
+            }
         </style>
     </head>
     <body>
-        <style>
-            tr { 
-                border-bottom: 2px solid lightgray;
-                padding-top: 3px;
-                padding-bottom: 3px;
-            }
-
-        </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
         <%
             url = request.getRequestURL().toString();
@@ -145,10 +144,6 @@
             <label class="fzLabel">Branch:</label> 
             <label class="fzLabel" id="branch"><%=get("branchId")%></label>
 
-<!--            <br>
-            <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel"><%=get("shift")%></label>-->
-
             <br>
             <label class="fzLabel">Channel:</label> 
             <label class="fzLabel" id="channel"><%=get("channel")%></label> 
@@ -206,7 +201,7 @@
                                 <%=j.no%>
                             <%}%>
                         </td>
-                        <td class="vCodeClick hover center" id="vehicleCode" style="color: blue;"><%=j.vehicleCode%></td>
+                        <td class="vCodeClick hover center" id="vehicleCode" style="color: blue; padding: 5px;"><%=j.vehicleCode%></td>
                         <td class="custIDClick hover center" id="custId" style="color: blue;"><%=j.custId%></td>
                         <td class="fzCell center"><%=j.arrive%></td>
                         <td class="fzCell center"><%=j.depart%></td>                    
