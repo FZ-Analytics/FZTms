@@ -64,6 +64,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         String channel = FZUtil.getHttpParam(request, "channel");
         String vehicles = FZUtil.getHttpParam(request, "vehicles");
         String tableArr = FZUtil.getHttpParam(request, "tableArr");
+        breakTime = getBreakTime(getDayByDate(dateDeliv));
 
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
@@ -244,7 +245,6 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             ldBreak.dist = "0";
 
                             hasBreak = true;
-                            breakTime = getBreakTime(getDayByDate(dateDeliv));
                             alDelivery.add(ldBreak);
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;

@@ -7,7 +7,9 @@ package com.fz.tms.service.run;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.Delivery;
+import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.RouteJobLog;
 import com.fz.util.FZUtil;
 import java.sql.Connection;
@@ -20,6 +22,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +41,8 @@ public class LoadDelivery implements BusinessLogic {
     int breakTime = 0;
     boolean hasBreak = false;
 
+    List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
+
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response, PageContext pc) throws Exception {
         runId = FZUtil.getHttpParam(request, "runId");
@@ -46,6 +52,11 @@ public class LoadDelivery implements BusinessLogic {
         String channel = FZUtil.getHttpParam(request, "channel");
         String vehicle = "" + getVehicleNum(runId);
         oriRunId = FZUtil.getHttpParam(request, "oriRunId");
+        breakTime = getBreakTime(getDayByDate(dateDeliv));
+
+        GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+        List<OptionModel> jss = new ArrayList<OptionModel>();
+        mapColor = map.runs(oriRunId, jss);
 
         ArrayList<Delivery> alTableData = getTableData(runId);
         request.setAttribute("branchId", branch);
@@ -104,7 +115,7 @@ public class LoadDelivery implements BusinessLogic {
                         + "                      WHERE\n"
                         + "                         Is_Edit = 'edit'\n"
                         + "                      AND Customer_ID = prj.Customer_ID\n"
-                        + "                         AND RunId = '"+runId+"'\n"
+                        + "                         AND RunId = '" + runId + "'\n"
                         + "                      GROUP BY\n"
                         + "                         DO_Number FOR xml PATH('')\n"
                         + "			),\n"
@@ -199,7 +210,12 @@ public class LoadDelivery implements BusinessLogic {
                         }
                         ld.rdd = rs.getString("Request_Delivery_Date");
                         ld.transportCost = rs.getInt("TransportCost");
-                        ld.dist = "" + Math.round((rs.getDouble("Dist") / 1000) * 10) / 10.0;
+                        try {
+                            ld.dist = "" + Math.round((rs.getDouble("Dist") / 1000) * 10) / 10.0;
+                        } catch (Exception e) {
+                            ld.dist = "";
+                        }
+                        System.out.println(ld.custId + " " + ld.dist);
                         if (ld.custId.length() > 0 && !ld.vehicleCode.equals("NA")) {
                             ld.feasibleTruck = isTimeinRange(ld.arrive, rs.getString("startTime"), rs.getString("endTime"));
                             String vehicleType = rs.getString("vehicle_type");
@@ -223,8 +239,6 @@ public class LoadDelivery implements BusinessLogic {
                             }
                         }
 
-                        alDelivery.add(ld);
-
                         if (ld.no.equals("0") && !ld.vehicleCode.equals("NA")) {
                             prevLong = rs.getString("startLon");
                             prevLat = rs.getString("startLat");
@@ -246,16 +260,27 @@ public class LoadDelivery implements BusinessLogic {
                             ldBreak.street = "";
                             ldBreak.weight = "";
                             ldBreak.volume = "";
-                            ldBreak.rdd = "null";
+                            ldBreak.rdd = null;
                             ldBreak.transportCost = 0;
                             ldBreak.dist = "null";
 
                             hasBreak = true;
-                            breakTime = getBreakTime(getDayByDate(dateDeliv));
                             alDelivery.add(ldBreak);
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;
                         }
+
+                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
+                            for (int i = 0; i < mapColor.size(); i++) {
+                                for (int os = 0; os < mapColor.get(i).size(); os++) {
+                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
+                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
+                                    }
+                                }
+                            }
+                        }
+
+                        alDelivery.add(ld);
                     }
                 }
             }
@@ -272,13 +297,13 @@ public class LoadDelivery implements BusinessLogic {
 
     public String getVehicleNum(String runId) throws Exception {
         String count = "";
-        String sql = "select count(distinct vehicle_code) as cnt from BOSNET1.dbo.TMS_RouteJob where RunId = '"+runId+"' and vehicle_code <> 'NA'";
-        try (Connection con = (new Db()).getConnection("jdbc/fztms");PreparedStatement ps = con.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()){
+        String sql = "select count(distinct vehicle_code) as cnt from BOSNET1.dbo.TMS_RouteJob where RunId = '" + runId + "' and vehicle_code <> 'NA'";
+        try (Connection con = (new Db()).getConnection("jdbc/fztms"); PreparedStatement ps = con.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getString("cnt");
                 }
-            }    
+            }
         }
         return count;
     }
