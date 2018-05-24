@@ -104,7 +104,7 @@
                     <th width="100px" class="fzCol">Channel</th>
                     <th width="100px" class="fzCol">inc</th>
                     <th width="100px" class="fzCol">Edit</th>
-                    <th width="100px" class="fzCol">Add</th>
+                    <%--<th width="100px" class="fzCol">Add</th>--%>
                 </tr>
             </thead>
             <tbody>
@@ -134,13 +134,13 @@
                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                     </td>
                     <%}%>
-                    <%if (j.source1.equalsIgnoreCase("EXT") && j.addNew.equalsIgnoreCase("1")) {%>
+                    <%--<%if (j.source1.equalsIgnoreCase("EXT") && j.addNew.equalsIgnoreCase("1")) {%>
                     <td class="fzCell"onclick="addNew('<%=j.vehicle_code%>')" >
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </td>
                     <%} else {%>
                     <td class="fzCell"></td>
-                    <%}%>
+                    <%}%>--%>
                 </tr>
 
                 <%} // for ProgressRecord %>

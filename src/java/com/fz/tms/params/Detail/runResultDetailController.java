@@ -9,6 +9,7 @@ import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
 import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.OptionModel;
+import com.fz.tms.params.model.RunResult;
 import com.fz.tms.params.service.Other;
 import com.fz.tms.params.service.VehicleAttrDB;
 import com.fz.tms.service.run.RouteJob;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -494,4 +496,32 @@ public class runResultDetailController implements BusinessLogic {
         
         return px;
     }
+    
+    public String exclude(RunResult he) throws Exception{
+        String str = "ERROR";
+        
+        String sql = "UPDATE\n" +
+                "	bosnet1.dbo.TMS_PreRouteJob\n" +
+                "SET\n" +
+                "	Is_Exclude = 'exc'\n" +
+                "WHERE\n" +
+                "	RunId = '"+he.runId+"'\n" +
+                "	AND Customer_ID = '"+he.custId+"'\n" +
+                "	AND Is_Edit = 'edit'";
+        try (
+            Connection con = (new Db()).getConnection("jdbc/fztms");
+            PreparedStatement psHdr = con.prepareStatement(sql
+                    , Statement.RETURN_GENERATED_KEYS);
+            )  {
+            con.setAutoCommit(false);
+
+            psHdr.executeUpdate();
+            
+            con.setAutoCommit(true);
+            str = "OK";
+        }
+        
+        return str;
+    }
 }
+

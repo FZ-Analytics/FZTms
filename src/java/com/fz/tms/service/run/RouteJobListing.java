@@ -7,8 +7,9 @@ package com.fz.tms.service.run;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.tms.params.Detail.runResultMapDetailController;
 import com.fz.tms.params.map.Constava;
-import com.fz.tms.params.map.GoogleDirMapAllVehi;
+//import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.DODetil;
 import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.SummaryVehicle;
@@ -67,21 +68,21 @@ public class RouteJobListing implements BusinessLogic {
         dateDeliv = FZUtil.getHttpParam(request, "dateDeliv");
         branch = FZUtil.getHttpParam(request, "branch");
 
-        GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+        runResultMapDetailController map = new runResultMapDetailController();
         List<OptionModel> jss = new ArrayList<OptionModel>();
 
-        all = map.runs(runID, jss);
+        //all = map.runs(runID, jss);
 
         //TMS_Progress for what if
         insertNextProgress();
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        /*Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonOutput = gson.toJson(all);
         System.out.println(jsonOutput);
 
         request.setAttribute("key", key);
         request.setAttribute("test", jsonOutput.toString());
-        request.setAttribute("JobOptionModel", jss);
+        request.setAttribute("JobOptionModel", jss);*/
 
         request.setAttribute("channel", channel);
         //List<RouteJob> js = getAll(runID, OriRunID);
@@ -274,7 +275,7 @@ public class RouteJobListing implements BusinessLogic {
                 VehicleAttrDB ar = new VehicleAttrDB();
                 int a = 1;
 
-                GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+                runResultMapDetailController map = new runResultMapDetailController();
                 int p = 0;
                 String vehicleCode = "";
 

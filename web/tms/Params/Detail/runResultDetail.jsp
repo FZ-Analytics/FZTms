@@ -140,6 +140,20 @@
                 window.open("../PopUp/popupEditCust.jsp?runId=" + $("#runID").val() + "&custId=" + kode, null,
                         "scrollbars=1,resizable=1,height=500,width=750");
             }
+            
+            function exc(kode) {
+                var $apiAddress = '../../../api/RunResultDetail/submit';
+                var jsonForServer = '{\"runId\": \"' + $("#runID").val() + '\",\"custId\":\"' + kode + '\"}';
+                var data = [];
+                $.post($apiAddress, {json: jsonForServer}).done(function (data) {
+                    if (data == 'OK') {
+                        alert('sukses');
+                        //location.reload();
+                    } else {
+                        alert('submit error');
+                    }
+                });
+            }
         </script>
         <input class="fzInput" id="runID" 
                name="runID" value="<%=get("runID")%>" hidden="true"/>
@@ -176,7 +190,8 @@
                                 <th style="min-width: 75px" class="fzCol text-center">Transport Cost</th>
                                 <th style="min-width: 35px" class="fzCol text-center">Dist</th>
             <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
-                                <th width="100px" class="fzCol center" style="min-width: 35px">Edit</th>
+                                <th class="fzCol text-center" style="min-width: 35px">Edit</th>
+                                <th class="fzCol text-center" style="min-width: 35px">Exc</th>
                             </tr>
                             <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
                                 <tr 
@@ -210,6 +225,7 @@
                                     <td class="fzCell center" style="min-width: 75px"><%=j.transportCost%></td>
                                     <td class="fzCell center" style="min-width: 35px"><%=j.dist%></td>
                                     <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;min-width: 35px"><%=j.edit%></td>
+                                    <th class="fzCol center" style="min-width: 35px">exc</th>
                                 </tr>
                             <%} // for ProgressRecord %>
                             <%--
@@ -286,6 +302,11 @@
                                         onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
                                         <%}%> ><%=j.send%></td>-->
                                     <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;min-width: 35px"><%=j.edit%></td>
+                                    <%if (j.vehicleCode.length() > 2 && j.custID.length() > 0) {%>
+                                        <th class="fzCol text-center hover" style="color: blue;min-width: 35px" onclick="exc(<%=j.custID%>)">exc</th>
+                                    <%}else{%>
+                                        <th></th>
+                                    <%}%>
                                 </tr>
                             <%} // for ProgressRecord %>
                         </tbody>
