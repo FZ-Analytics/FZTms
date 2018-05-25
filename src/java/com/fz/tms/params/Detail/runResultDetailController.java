@@ -7,7 +7,6 @@ package com.fz.tms.params.Detail;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
-import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.RunResult;
 import com.fz.tms.params.service.Other;
@@ -48,7 +47,7 @@ public class runResultDetailController implements BusinessLogic {
         String runID = FZUtil.getHttpParam(request, "runID");
         String OriRunID = FZUtil.getHttpParam(request, "OriRunID");
         
-        GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+        runResultMapDetailController map = new runResultMapDetailController();
         List<OptionModel> jss = new ArrayList<OptionModel>();
 
         List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
@@ -208,7 +207,6 @@ public class runResultDetailController implements BusinessLogic {
                 VehicleAttrDB ar = new VehicleAttrDB();
                 int a = 1;
                     
-                GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
                 int p = 0;
                 String vehicleCode = "";
                 
