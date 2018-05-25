@@ -215,6 +215,16 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         if(ld.doNum.length() > 0) {
                             ld.isOkay = isOkay(ld.doNum, runId);
                         }
+                        
+                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
+                            for (int i = 0; i < mapColor.size(); i++) {
+                                for (int os = 0; os < mapColor.get(i).size(); os++) {
+                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
+                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
+                                    }
+                                }
+                            }
+                        }
 
                         alDelivery.add(ld);
 
@@ -248,16 +258,6 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             alDelivery.add(ldBreak);
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;
-                        }
-
-                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
-                            for (int i = 0; i < mapColor.size(); i++) {
-                                for (int os = 0; os < mapColor.get(i).size(); os++) {
-                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
-                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
-                                    }
-                                }
-                            }
                         }
                     }
                 }

@@ -215,7 +215,6 @@ public class LoadDelivery implements BusinessLogic {
                         } catch (Exception e) {
                             ld.dist = "";
                         }
-                        System.out.println(ld.custId + " " + ld.dist);
                         if (ld.custId.length() > 0 && !ld.vehicleCode.equals("NA")) {
                             ld.feasibleTruck = isTimeinRange(ld.arrive, rs.getString("startTime"), rs.getString("endTime"));
                             String vehicleType = rs.getString("vehicle_type");
@@ -246,9 +245,23 @@ public class LoadDelivery implements BusinessLogic {
                             prevLong = ld.lon2;
                             prevLat = ld.lat2;
                         }
+                        
+                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
+                            for (int i = 0; i < mapColor.size(); i++) {
+                                for (int os = 0; os < mapColor.get(i).size(); os++) {
+                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
+                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
+                                    }
+                                }
+                            }
+                        }
 
+                        alDelivery.add(ld);
+
+                        System.out.println(ld.custId + " " + ld.depart);
                         //break if depart + 60 minutes is more than 11:30
                         if (hasBreak == false && !ld.depart.equals("") && timeMoreThan(addTime(addTime(ld.arrive, Integer.parseInt(ld.serviceTime)), 60), "11:30")) {
+                            System.out.println("BREAK " + ld.custId + " " + ld.depart);
                             ldBreak.no = "";
                             ldBreak.vehicleCode = "";
                             ldBreak.custId = "";
@@ -269,18 +282,6 @@ public class LoadDelivery implements BusinessLogic {
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;
                         }
-
-                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
-                            for (int i = 0; i < mapColor.size(); i++) {
-                                for (int os = 0; os < mapColor.get(i).size(); os++) {
-                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
-                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
-                                    }
-                                }
-                            }
-                        }
-
-                        alDelivery.add(ld);
                     }
                 }
             }
