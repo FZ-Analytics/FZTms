@@ -143,23 +143,9 @@ public class runResultDetailController implements BusinessLogic {
                 "			1\n" +
                 "		)\n" +
                 "	) AS Dist,\n" +
-                "	Request_Delivery_Date,\n" +
-                "	rt.batch\n" +
+                "	Request_Delivery_Date\n" +
                 "FROM\n" +
-                "	(\n" +
-                "		SELECT\n" +
-                "			*,\n" +
-                "			concat(\n" +
-                "				REPLACE(\n" +
-                "					runID,\n" +
-                "					'_',\n" +
-                "					''\n" +
-                "				),\n" +
-                "				(select concat(substring(vehicle_code,charindex('_',vehicle_code)+1,2), RIGHT(vehicle_code, 1)) as vehicle_code)\n" +
-                "			) AS Shipment_Number_Dummy\n" +
-                "		FROM\n" +
-                "			bosnet1.dbo.tms_RouteJob\n" +
-                "	) j\n" +
+                "	bosnet1.dbo.tms_RouteJob j\n" +
                 "LEFT OUTER JOIN(\n" +
                 "		SELECT\n" +
                 "			RunId,\n" +
@@ -199,22 +185,6 @@ public class runResultDetailController implements BusinessLogic {
                 "	) d ON\n" +
                 "	j.runID = d.RunId\n" +
                 "	AND j.customer_id = d.Customer_ID\n" +
-                "LEFT OUTER JOIN(\n" +
-                "		SELECT\n" +
-                "			COUNT( CASE WHEN batch IS NULL THEN 1 ELSE 0 END ) AS batch,\n" +
-                "			Customer_ID,\n" +
-                "			runID\n" +
-                "		FROM\n" +
-                "			bosnet1.dbo.TMS_PreRouteJob\n" +
-                "		WHERE\n" +
-                "			Is_Edit = 'ori'\n" +
-                "			AND batch IS NULL\n" +
-                "		GROUP BY\n" +
-                "			Customer_ID,\n" +
-                "			runID\n" +
-                "	) rt ON\n" +
-                "	j.runID = rt.runID\n" +
-                "	AND j.customer_id = rt.Customer_ID\n" +
                 "WHERE\n" +
                 "	j.runID = '"+runID+"'\n" +
                 "ORDER BY\n" +
