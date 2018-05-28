@@ -69,8 +69,7 @@
             url = request.getRequestURL().toString();
             String urls = url + "?" + request.getQueryString();
         %>
-        <link href="../appGlobal/eFreezeTable.css" rel="stylesheet">
-        <script src="../appGlobal/eFreezeTable.js"></script>
+
         <script>
             var rowIdx = 0;
             var colorTop = "";
@@ -85,7 +84,6 @@
             var arrSignedIndex = [];
 
             $(document).ready(function () {
-                $('#table').eFreezeTableHead();
                 $('.custIDClick').click(function () {
                     if ($(this).text().length > 0) {
                         window.open("../Params/PopUp/popupDetilDOCust.jsp?custId=" + $(this).text() + "&runId=" + $("#OriRunID").val(), null,
