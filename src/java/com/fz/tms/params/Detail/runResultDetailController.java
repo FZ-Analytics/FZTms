@@ -7,6 +7,7 @@ package com.fz.tms.params.Detail;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.RunResult;
 import com.fz.tms.params.service.Other;
@@ -51,7 +52,7 @@ public class runResultDetailController implements BusinessLogic {
         List<OptionModel> jss = new ArrayList<OptionModel>();
 
         List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
-        all = map.runs(runID, jss);
+        //all = map.runs(runID, jss);
         
         List<RouteJob> js = getAll(runID, OriRunID, all);
         
@@ -62,7 +63,7 @@ public class runResultDetailController implements BusinessLogic {
     public List<RouteJob> getAll(String runID, String OriRunID, List<List<HashMap<String, String>>> all) throws Exception{
         List<RouteJob> js = new ArrayList<RouteJob>();
         
-        String sql = "SELECT\n" +
+        /*String sql = "SELECT\n" +
                 "	j.customer_ID,\n" +
                 "	(\n" +
                 "		SELECT\n" +
@@ -189,15 +190,18 @@ public class runResultDetailController implements BusinessLogic {
                 "ORDER BY\n" +
                 "	j.routeNb,\n" +
                 "	j.jobNb,\n" +
-                "	j.arrive";
+                "	j.arrive";*/
         
+        /*try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                PreparedStatement ps = con.prepareStatement(sql)){*/
+        String sql = "{call bosnet1.dbo.TMS_RunResultShow(?)}";
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
-                PreparedStatement ps = con.prepareStatement(sql)){
-
-            //ps.setString(1, runID);
-            
+                java.sql.CallableStatement stmt =
+                con.prepareCall(sql)) {
+            stmt.setString(1, runID);
+            try(ResultSet rs = stmt.executeQuery()){
             // get list
-            try (ResultSet rs = ps.executeQuery()){
+            //try (ResultSet rs = ps.executeQuery()){
                 BigDecimal bcW = new BigDecimal(0);
                 BigDecimal bcV = new BigDecimal(0);
                 // populate list
@@ -259,7 +263,7 @@ public class runResultDetailController implements BusinessLogic {
                     //color row
                     if(!j.vehicleCode.equalsIgnoreCase("NA")){                        
                         
-                        for(int op = 0;op<all.size();op++){
+                        /*for(int op = 0;op<all.size();op++){
                             for(int os = 0;os<all.get(op).size();os++){
                                 if(all.get(op).get(os).get("description").contains(j.vehicleCode)){
                                     j.color = "#"+all.get(op).get(os).get("color").toUpperCase();
@@ -267,7 +271,12 @@ public class runResultDetailController implements BusinessLogic {
                                 }
                                 //System.out.println(all.get(op).get(os));
                             }                            
-                        }
+                        }*/
+                        
+                        //set color
+                        GoogleDirMapAllVehi gv = new GoogleDirMapAllVehi();
+                        String clr = gv.myList[Integer.valueOf(FZUtil.getRsString(rs, i++, ""))-1].toUpperCase();
+                        j.color = "#" + clr;
                         
                         if(!j.vehicleCode.equalsIgnoreCase(vehicleCode)
                                 && j.getServiceTime().equalsIgnoreCase("0")){
@@ -275,7 +284,14 @@ public class runResultDetailController implements BusinessLogic {
                             
                             p++;
                         }
+                    }else{
+                        i++;
                     }
+                    
+                    //mark red
+                    String mark = FZUtil.getRsString(rs, i++, "");
+                    System.out.println(j.custID+"()"+mark);
+                    j.bat = mark.equalsIgnoreCase("1") ? "1" : "";
                     
                     //System.out.println(j.toString());
                     //add break row
@@ -332,7 +348,7 @@ public class runResultDetailController implements BusinessLogic {
                     // for next round
                     prevJ = j;
                 }
-                List<HashMap<String, String>> px = cekData(runID, "");
+                /*List<HashMap<String, String>> px = cekData(runID, "");
                 int x = 0;
                 while(x < js.size()){
                     int y = 0;
@@ -365,7 +381,9 @@ public class runResultDetailController implements BusinessLogic {
                         //System.out.println(js.get(x).DONum + "()" + js.get(x).bat);
                     }                    
                     x++;
-                }
+                }*/
+                
+                
             }            
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
