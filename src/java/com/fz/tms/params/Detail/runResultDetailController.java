@@ -9,6 +9,7 @@ import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
 import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.OptionModel;
+import com.fz.tms.params.model.RunResult;
 import com.fz.tms.params.service.Other;
 import com.fz.tms.params.service.VehicleAttrDB;
 import com.fz.tms.service.run.RouteJob;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,11 +48,11 @@ public class runResultDetailController implements BusinessLogic {
         String runID = FZUtil.getHttpParam(request, "runID");
         String OriRunID = FZUtil.getHttpParam(request, "OriRunID");
         
-        GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
+        runResultMapDetailController map = new runResultMapDetailController();
         List<OptionModel> jss = new ArrayList<OptionModel>();
 
         List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
-        all = map.runs(runID, jss);
+        //all = map.runs(runID, jss);
         
         List<RouteJob> js = getAll(runID, OriRunID, all);
         
@@ -61,7 +63,7 @@ public class runResultDetailController implements BusinessLogic {
     public List<RouteJob> getAll(String runID, String OriRunID, List<List<HashMap<String, String>>> all) throws Exception{
         List<RouteJob> js = new ArrayList<RouteJob>();
         
-        String sql = "SELECT\n" +
+        /*String sql = "SELECT\n" +
                 "	j.customer_ID,\n" +
                 "	(\n" +
                 "		SELECT\n" +
@@ -141,23 +143,9 @@ public class runResultDetailController implements BusinessLogic {
                 "			1\n" +
                 "		)\n" +
                 "	) AS Dist,\n" +
-                "	Request_Delivery_Date,\n" +
-                "	rt.batch\n" +
+                "	Request_Delivery_Date\n" +
                 "FROM\n" +
-                "	(\n" +
-                "		SELECT\n" +
-                "			*,\n" +
-                "			concat(\n" +
-                "				REPLACE(\n" +
-                "					runID,\n" +
-                "					'_',\n" +
-                "					''\n" +
-                "				),\n" +
-                "				(select concat(substring(vehicle_code,charindex('_',vehicle_code)+1,2), RIGHT(vehicle_code, 1)) as vehicle_code)\n" +
-                "			) AS Shipment_Number_Dummy\n" +
-                "		FROM\n" +
-                "			bosnet1.dbo.tms_RouteJob\n" +
-                "	) j\n" +
+                "	bosnet1.dbo.tms_RouteJob j\n" +
                 "LEFT OUTER JOIN(\n" +
                 "		SELECT\n" +
                 "			RunId,\n" +
@@ -197,36 +185,23 @@ public class runResultDetailController implements BusinessLogic {
                 "	) d ON\n" +
                 "	j.runID = d.RunId\n" +
                 "	AND j.customer_id = d.Customer_ID\n" +
-                "LEFT OUTER JOIN(\n" +
-                "		SELECT\n" +
-                "			COUNT( CASE WHEN batch IS NULL THEN 1 ELSE 0 END ) AS batch,\n" +
-                "			Customer_ID,\n" +
-                "			runID\n" +
-                "		FROM\n" +
-                "			bosnet1.dbo.TMS_PreRouteJob\n" +
-                "		WHERE\n" +
-                "			Is_Edit = 'ori'\n" +
-                "			AND batch IS NULL\n" +
-                "		GROUP BY\n" +
-                "			Customer_ID,\n" +
-                "			runID\n" +
-                "	) rt ON\n" +
-                "	j.runID = rt.runID\n" +
-                "	AND j.customer_id = rt.Customer_ID\n" +
                 "WHERE\n" +
                 "	j.runID = '"+runID+"'\n" +
                 "ORDER BY\n" +
                 "	j.routeNb,\n" +
                 "	j.jobNb,\n" +
-                "	j.arrive";
+                "	j.arrive";*/
         
+        /*try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                PreparedStatement ps = con.prepareStatement(sql)){*/
+        String sql = "{call bosnet1.dbo.TMS_RunResultShow(?)}";
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
-                PreparedStatement ps = con.prepareStatement(sql)){
-
-            //ps.setString(1, runID);
-            
+                java.sql.CallableStatement stmt =
+                con.prepareCall(sql)) {
+            stmt.setString(1, runID);
+            try(ResultSet rs = stmt.executeQuery()){
             // get list
-            try (ResultSet rs = ps.executeQuery()){
+            //try (ResultSet rs = ps.executeQuery()){
                 BigDecimal bcW = new BigDecimal(0);
                 BigDecimal bcV = new BigDecimal(0);
                 // populate list
@@ -236,7 +211,6 @@ public class runResultDetailController implements BusinessLogic {
                 VehicleAttrDB ar = new VehicleAttrDB();
                 int a = 1;
                     
-                GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
                 int p = 0;
                 String vehicleCode = "";
                 
@@ -289,7 +263,7 @@ public class runResultDetailController implements BusinessLogic {
                     //color row
                     if(!j.vehicleCode.equalsIgnoreCase("NA")){                        
                         
-                        for(int op = 0;op<all.size();op++){
+                        /*for(int op = 0;op<all.size();op++){
                             for(int os = 0;os<all.get(op).size();os++){
                                 if(all.get(op).get(os).get("description").contains(j.vehicleCode)){
                                     j.color = "#"+all.get(op).get(os).get("color").toUpperCase();
@@ -297,7 +271,12 @@ public class runResultDetailController implements BusinessLogic {
                                 }
                                 //System.out.println(all.get(op).get(os));
                             }                            
-                        }
+                        }*/
+                        
+                        //set color
+                        GoogleDirMapAllVehi gv = new GoogleDirMapAllVehi();
+                        String clr = gv.myList[Integer.valueOf(FZUtil.getRsString(rs, i++, ""))-1].toUpperCase();
+                        j.color = "#" + clr;
                         
                         if(!j.vehicleCode.equalsIgnoreCase(vehicleCode)
                                 && j.getServiceTime().equalsIgnoreCase("0")){
@@ -305,7 +284,14 @@ public class runResultDetailController implements BusinessLogic {
                             
                             p++;
                         }
+                    }else{
+                        i++;
                     }
+                    
+                    //mark red
+                    String mark = FZUtil.getRsString(rs, i++, "");
+                    System.out.println(j.custID+"()"+mark);
+                    j.bat = mark.equalsIgnoreCase("1") ? "1" : "";
                     
                     //System.out.println(j.toString());
                     //add break row
@@ -362,7 +348,7 @@ public class runResultDetailController implements BusinessLogic {
                     // for next round
                     prevJ = j;
                 }
-                List<HashMap<String, String>> px = cekData(runID, "");
+                /*List<HashMap<String, String>> px = cekData(runID, "");
                 int x = 0;
                 while(x < js.size()){
                     int y = 0;
@@ -395,7 +381,9 @@ public class runResultDetailController implements BusinessLogic {
                         //System.out.println(js.get(x).DONum + "()" + js.get(x).bat);
                     }                    
                     x++;
-                }
+                }*/
+                
+                
             }            
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
@@ -494,4 +482,32 @@ public class runResultDetailController implements BusinessLogic {
         
         return px;
     }
+    
+    public String exclude(RunResult he) throws Exception{
+        String str = "ERROR";
+        
+        String sql = "UPDATE\n" +
+                "	bosnet1.dbo.TMS_PreRouteJob\n" +
+                "SET\n" +
+                "	Is_Exclude = 'exc'\n" +
+                "WHERE\n" +
+                "	RunId = '"+he.runId+"'\n" +
+                "	AND Customer_ID = '"+he.custId+"'\n" +
+                "	AND Is_Edit = 'edit'";
+        try (
+            Connection con = (new Db()).getConnection("jdbc/fztms");
+            PreparedStatement psHdr = con.prepareStatement(sql
+                    , Statement.RETURN_GENERATED_KEYS);
+            )  {
+            con.setAutoCommit(false);
+
+            psHdr.executeUpdate();
+            
+            con.setAutoCommit(true);
+            str = "OK";
+        }
+        
+        return str;
+    }
 }
+
