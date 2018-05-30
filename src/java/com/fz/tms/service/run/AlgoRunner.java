@@ -44,6 +44,7 @@ public class AlgoRunner implements BusinessLogic {
         String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
         String urls = FZUtil.getHttpParam(request, "url");
+        String DefaultDistance = FZUtil.getHttpParam(request, "DefaultDistance");
         
         if(urls != null || urls.length() > 0){
             urls = urls.replace("9ETR9",":");
@@ -193,6 +194,11 @@ public class AlgoRunner implements BusinessLogic {
                     resp = prepareCustTable(branchCode);
                     
                     if (resp.equalsIgnoreCase("OK")){
+                        errMsg = "Insert Param";
+                        resp = InsertParam(runID, DefaultDistance);
+                    }
+                    
+                    if (resp.equalsIgnoreCase("OK")){
                         errMsg = "Insert PreRouteVehicle Error";
                         resp = insertPreRouteVehicle(runID, branchCode, dateDeliv, chn);
                     }
@@ -239,6 +245,37 @@ public class AlgoRunner implements BusinessLogic {
             response.sendRedirect("../Params/PopUp/popupEditCustBfror.jsp?oriRunID=" + oriRunID + "&dateDeliv="
                     + dateDeliv + "&shift=" + shift + "&reRun=A" + "&branchCode=" + branchCode + "&runId=" + runId + "&channel=" + channel  + "&error=Y" + "&errMsg=" + errMsg);
         }
+    }
+    
+    public String InsertParam(String runId, String DefaultDistance) throws Exception{
+        String str = "ERROR";
+        
+        String sql = "";
+        
+        List<HashMap<String, String>> asd = new ArrayList<HashMap<String, String>>();
+        HashMap<String, String> pl = new HashMap<String, String>();
+        
+        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams select '"+runId+"', param, value from BOSNET1.dbo.TMS_Params where param not in('DefaultDistance');");
+        asd.add(pl);
+        
+        pl = new HashMap<String, String>();
+        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams values('"+runId+"', 'DefaultDistance', '"+DefaultDistance+"');");
+        asd.add(pl);
+        
+        try (Connection con = (new Db()).getConnection("jdbc/fztms")){            
+            for(int a=0;a<asd.size();a++){
+                
+                sql = asd.get(a).get("sql");
+                //System.out.println(sql);
+                try (PreparedStatement ps = con.prepareStatement(sql) ){
+                    ps.executeUpdate();
+                    str = "OK";
+                }catch(Exception e){
+                    str = "ERROR " + e.getMessage();
+                }
+            } 
+        }
+        return str;
     }
 
     private static String getStackTrace(Exception ex) {
@@ -535,14 +572,20 @@ public class AlgoRunner implements BusinessLogic {
                 "			v.vehicle_code = vh.vehicle_code\n" +
                 "		LEFT OUTER JOIN bosnet1.dbo.TMS_vehicleAtr va ON\n" +
                 "			v.vehicle_code = va.vehicle_code\n" +
-                "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params pr ON\n" +
+                "		LEFT OUTER JOIN BOSNET1.dbo.TMS_Progress ru ON\n" +
+                "			ru.runID = '"+runID+"'\n" +
+                "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams pr ON\n" +
                 "			pr.param = 'HargaSolar'\n" +
-                "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params bm ON\n" +
+                "			and pr.RunId = ru.OriRunId\n" +
+                "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams bm ON\n" +
                 "			bm.param = 'DefaultKonsumsiBBm'\n" +
-                "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params rt ON\n" +
+                "			and bm.RunId = ru.OriRunId\n" +
+                "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams rt ON\n" +
                 "			rt.param = 'Defaultagentpriority'\n" +
-                "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params ry ON\n" +
+                "			and rt.RunId = ru.OriRunId\n" +
+                "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams ry ON\n" +
                 "			ry.param = 'DefaultMaxCust'\n" +
+                "			and ry.RunId = ru.OriRunId\n" +                
                 "		WHERE\n" +
                 "			va.included = 1\n" +
                 "			and va.Channel in (" + shn + ");";
@@ -826,30 +869,44 @@ public class AlgoRunner implements BusinessLogic {
                 "	sp.DO_Number = sn.Delivery_Number\n" +
                 "LEFT OUTER JOIN bosnet1.dbo.TMS_CustAtr ca ON\n" +
                 "	sp.customer_id = ca.customer_id\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dd ON\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_Progress dm ON\n" +
+                "	dm.runID = '"+runId+"'\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dd ON\n" +
                 "	dd.param = 'DeliveryDeadLine'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params ds ON\n" +
+                "	and dd.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams ds ON\n" +
                 "	ds.param = 'DayWinStart'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params de ON\n" +
+                "	and ds.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams de ON\n" +
                 "	de.param = 'DayWinEnd'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params df ON\n" +
+                "	and de.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams df ON\n" +
                 "	df.param = 'DefaultCustPriority'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dr ON\n" +
+                "	and df.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dr ON\n" +
                 "	dr.param = 'DefaultCustServiceTime'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dg ON\n" +
+                "	and dr.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dg ON\n" +
                 "	dg.param = 'DefaultCustStartTime'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dt ON\n" +
+                "	and dg.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dt ON\n" +
                 "	dt.param = 'DefaultCustEndTime'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dh ON\n" +
+                "	and dt.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dh ON\n" +
                 "	dh.param = 'DefaultCustVehicleTypes'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dy ON\n" +
+                "	and dh.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dy ON\n" +
                 "	dy.param = 'MTDefault'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dn ON\n" +
+                "	and dy.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dn ON\n" +
                 "	dn.param = 'BufferEndDefault'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params dj ON\n" +
+                "	and dn.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dj ON\n" +
                 "	dj.param = 'SatDelivDefault'\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params du ON\n" +
+                "	and dj.RunId = dm.OriRunId\n" +
+                "LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams du ON\n" +
                 "	du.param = 'ChannelNullDefault'\n" +
+                "	and du.RunId = dm.OriRunId\n" +                
                 "WHERE\n" +
                 "	sp.plant = '"+branchCode+"'\n" +
                 "	AND sp.already_shipment = 'N'\n" +

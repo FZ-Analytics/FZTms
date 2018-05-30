@@ -416,9 +416,9 @@ public class RouteJobListingResultEdit implements BusinessLogic {
             try (Statement stm = con.createStatement()) {
                 String sql = "";
                 if (day.equals("Friday")) {
-                    sql = "SELECT value FROM BOSNET1.dbo.TMS_Params WHERE param = 'fridayBreak'";
+                    sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE param = 'fridayBreak' and RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"')";
                 } else {
-                    sql = "SELECT value FROM BOSNET1.dbo.TMS_Params WHERE param = 'defaultBreak'";
+                    sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE param = 'defaultBreak' and RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"')";
                 }
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {

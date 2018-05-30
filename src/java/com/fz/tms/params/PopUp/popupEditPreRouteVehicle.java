@@ -58,7 +58,21 @@ public class popupEditPreRouteVehicle  implements BusinessLogic {
                 "	re.max_cust\n" +
                 "FROM\n" +
                 "	BOSNET1.dbo.TMS_PreRouteVehicle re\n" +
-                "LEFT OUTER JOIN bosnet1.dbo.TMS_Params pr ON\n" +
+                "LEFT OUTER JOIN(\n" +
+                "		SELECT\n" +
+                "			DISTINCT *\n" +
+                "		FROM\n" +
+                "			bosnet1.dbo.TMS_PreRouteParams\n" +
+                "		WHERE\n" +
+                "			RunId =(\n" +
+                "				SELECT\n" +
+                "					OriRunId\n" +
+                "				FROM\n" +
+                "					BOSNET1.dbo.TMS_Progress\n" +
+                "				WHERE\n" +
+                "					runID = '"+runId+"'\n" +
+                "			)\n" +
+                "	) pr ON\n" +
                 "	pr.param = 'HargaSolar'\n" +
                 "INNER JOIN bosnet1.dbo.TMS_vehicleAtr va ON\n" +
                 "	re.vehicle_code = va.vehicle_code\n" +
