@@ -22,17 +22,16 @@
             .center {
                 text-align: center;
             }
+            td { 
+                border: 1px solid lightgray;
+                padding: 3px;
+            }
+            th {
+                border: 1px solid black;
+            }
         </style>
     </head>
     <body>
-        <style>
-            tr { 
-                border-bottom: 2px solid lightgray;
-                padding-top: 3px;
-                padding-bottom: 3px;
-            }
-
-        </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
         <%
             url = request.getRequestURL().toString();
@@ -134,8 +133,7 @@
 
         </script>
         <div id="body">
-            <h4>Routing Result 
-                <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
+            <h4>Routing Result
                 <span class="glyphicon glyphicon-list-alt hover" aria-hidden="true" onclick="saveHistory()"></span>
             </h4>
 
@@ -144,10 +142,6 @@
             <br>
             <label class="fzLabel">Branch:</label> 
             <label class="fzLabel" id="branch"><%=get("branchId")%></label>
-
-<!--            <br>
-            <label class="fzLabel">Shift:</label> 
-            <label class="fzLabel"><%=get("shift")%></label>-->
 
             <br>
             <label class="fzLabel">Channel:</label> 
@@ -169,6 +163,7 @@
             <table id="table" border1="1" style="border-color: lightgray;">
                 <thead>
                     <tr style="background-color:orange">
+                        <th width="100px" class="fzCol center">Color</th>
                         <th width="100px" class="fzCol center">No.</th>
                         <th width="100px" class="fzCol center">Truck</th>
                         <th width="100px" class="fzCol center">Cust. ID</th>
@@ -179,7 +174,7 @@
                         <th width="100px" class="fzCol center">Name</th>
                         <th width="100px" class="fzCol center">Prty</th>
                         <th width="100px" class="fzCol center">Dist. Chl</th>
-                        <th width="100px" class="fzCol center">Street</th>
+                        <th width="80px" class="fzCol center">Street</th>
                         <th width="100px" class="fzCol center">Weight</th>
                         <th width="100px" class="fzCol center">Volume</th>
                         <th width="100px" class="fzCol center">RDD</th>
@@ -188,7 +183,7 @@
                         <th width="100px" class="fzCol center">Access Feas.</th>
                         <th width="100px" class="fzCol center">Cust. Feas.</th>
                         <th width="100px" class="fzCol center">Truck Feas.</th>
-                        <th width="100px" class="fzCol center">Edit</th>
+<!--                        <th width="100px" class="fzCol center">Edit</th>-->
                     </tr>
                 </thead>
                 <tbody>
@@ -201,12 +196,13 @@
                         <%} else if (j.arrive.length() == 0 && j.storeName.length() == 0) {%>
                         style="background-color: #e6ffe6"
                         <%}%> >
+                        <td class="fzCell index center" style="background-color: <%=j.color%>"></td>
                         <td class="fzCell index center">
                             <%if (!j.no.equals("0")) {%>
                                 <%=j.no%>
                             <%}%>
                         </td>
-                        <td class="vCodeClick hover center" id="vehicleCode" style="color: blue;"><%=j.vehicleCode%></td>
+                        <td class="vCodeClick hover center" id="vehicleCode" style="color: blue; padding: 5px;"><%=j.vehicleCode%></td>
                         <td class="custIDClick hover center" id="custId" style="color: blue;"><%=j.custId%></td>
                         <td class="fzCell center"><%=j.arrive%></td>
                         <td class="fzCell center"><%=j.depart%></td>                    
@@ -276,11 +272,11 @@
                         <td class="fzCell center"><%=j.feasibleCustomer%></td>
                         <td class="fzCell center"><%=j.feasibleTruck%></td>
                         <%if (j.doNum.length() > 0 && !j.vehicleCode.equals("NA")) {%>
-                        <td class="editCust hover center" onclick="klik(<%=j.custId%>)" style="color: blue;">
+<!--                       //  <td class="editCust hover center" onclick="klik(<%=j.custId%>)" style="color: blue;">
                             edit
-                        </td>
+                        </td>-->
                         <%} else {%>
-                        <td class="editCust" onclick="" style="color: blue;"></td>
+                        <!--<td class="editCust" onclick="" style="color: blue;"></td>-->
                         <%}%>
                     </tr>
 

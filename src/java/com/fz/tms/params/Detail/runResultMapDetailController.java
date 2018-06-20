@@ -3,26 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.fz.tms.params.map;
+package com.fz.tms.params.Detail;
 
-import com.fz.tms.params.map.*;
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
-import com.fz.tms.params.map.key.GooAPICaller;
-import com.fz.tms.params.model.DODetil;
+import com.fz.tms.params.map.Constava;
 import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.service.Other;
 import com.fz.util.FZUtil;
-import com.fz.util.UrlResponseGetter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,9 +29,9 @@ import javax.servlet.jsp.PageContext;
 
 /**
  *
- * @author dwi.rangga
+ * @author dwi.oktaviandi
  */
-public class GoogleDirMapAllVehi implements BusinessLogic {
+public class runResultMapDetailController implements BusinessLogic {
     String key = Constava.googleKey;
     List<String> vehi = new ArrayList<String>();  
     
@@ -93,7 +87,10 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
     public List<List<HashMap<String, String>>> runs(String runID, List<OptionModel> js) throws Exception{
         List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
         String sql = "SELECT\n" +
-                "	aq.jobNb,\n" +
+                "	CASE\n" +
+                "		WHEN aw.Is_Exclude = 'exc' THEN '-1'\n" +
+                "		ELSE aq.jobNb\n" +
+                "	END jobNb,\n" +
                 "	CASE\n" +
                 "		WHEN aw.Name1 IS NULL THEN aq.vehicle_code\n" +
                 "		ELSE aw.Name1\n" +
@@ -149,19 +146,59 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                 "	BOSNET1.dbo.TMS_RouteJob aq\n" +
                 "LEFT OUTER JOIN(\n" +
                 "		SELECT\n" +
-                "			distinct RunId, Customer_ID, Name1, Street, Distribution_Channel, deliv, DeliveryDeadline, openDay, min(Customer_priority) Customer_priority\n" +
+                "			DISTINCT RunId,\n" +
+                "			Customer_ID,\n" +
+                "			Name1,\n" +
+                "			Street,\n" +
+                "			Distribution_Channel,\n" +
+                "			deliv,\n" +
+                "			DeliveryDeadline,\n" +
+                "			openDay,\n" +
+                "			MIN( Customer_priority ) Customer_priority,\n" +
+                "			Is_Exclude\n" +
                 "		FROM\n" +
                 "			(\n" +
-                "				SELECT RunId, Customer_ID, Name1, Street, Distribution_Channel, concat(deliv_start, ' - ', deliv_end) as deliv,\n" +
-                "				DeliveryDeadline, concat((DayWinStart -1), '-', (DayWinEnd - 1)) openDay,  Customer_priority\n" +
+                "				SELECT\n" +
+                "					RunId,\n" +
+                "					Customer_ID,\n" +
+                "					Name1,\n" +
+                "					Street,\n" +
+                "					Distribution_Channel,\n" +
+                "					concat(\n" +
+                "						deliv_start,\n" +
+                "						' - ',\n" +
+                "						deliv_end\n" +
+                "					) AS deliv,\n" +
+                "					DeliveryDeadline,\n" +
+                "					concat(\n" +
+                "						(\n" +
+                "							DayWinStart - 1\n" +
+                "						),\n" +
+                "						'-',\n" +
+                "						(\n" +
+                "							DayWinEnd - 1\n" +
+                "						)\n" +
+                "					) openDay,\n" +
+                "					Customer_priority,\n" +
+                "					Is_Exclude\n" +
                 "				FROM\n" +
                 "					BOSNET1.dbo.TMS_PreRouteJob\n" +
-                "					\n" +
+                "				WHERE\n" +
+                "					Is_Edit = 'edit'\n" +
                 "			) a\n" +
-                "\n" +
-                "			group by RunId, Customer_ID, Name1, Street, Distribution_Channel, deliv, DeliveryDeadline, openDay\n" +
+                "		GROUP BY\n" +
+                "			RunId,\n" +
+                "			Customer_ID,\n" +
+                "			Name1,\n" +
+                "			Street,\n" +
+                "			Distribution_Channel,\n" +
+                "			deliv,\n" +
+                "			DeliveryDeadline,\n" +
+                "			openDay,\n" +
+                "			Is_Exclude\n" +
                 "	) aw ON\n" +
-                "	aq.customer_id = aw.Customer_ID and aq.RunId = aw.RunId\n" +
+                "	aq.customer_id = aw.Customer_ID\n" +
+                "	AND aq.RunId = aw.RunId\n" +
                 "WHERE\n" +
                 "	aq.runID = '"+runID+"'\n" +
                 //"	AND aq.vehicle_code <> 'NA'\n" +

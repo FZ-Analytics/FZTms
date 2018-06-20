@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Jobs</title>
     </head>
-    <body style="height: 760px">
+    <body style="height: 700px">
         <style>
             tr { 
                 border-bottom: 2px solid lightgray;
@@ -42,7 +42,7 @@
         <script>
             $(document).ready(function () {                
                 //$('#table').eFreezeTableHead();
-                runMapAll();
+                //runMapAll();
                 $('.custIDClick').click(function () {
                     //Some code
                     //alert( $(this).text() ); 
@@ -289,21 +289,32 @@
                         for (var i = 0; i < mark.length; i++) {
                             if ((i + 1) < mark.length && mark[i].jobNb != "0") {
                                 var clr = mark[i].color;
-
-                                tr = labels[labelIndex++ % labels.length];
+                                var descriptionSrc = mark[i].description;
                                 var src = new google.maps.LatLng(parseFloat(mark[i].lat),
                                         parseFloat(mark[i].lng));
-                                var descriptionSrc = mark[i].description;
-                                createMarker(src, descriptionSrc, nt++, clr, mark[i].channel);
-
-                                tr = null;
                                 var des = new google.maps.LatLng(parseFloat(mark[i + 1].lat),
-                                        parseFloat(mark[i + 1].lng));
-                                var descriptionDes = mark[i + 1].description;
-                                //createMarker(des, descriptionDes, tr, mark[i].color);
-                                //  poly.setPath(path);     
+                                            parseFloat(mark[i + 1].lng));
+                                if(mark[i].jobNb == "-1"){
+                                    tr = labels[labelIndex++ % labels.length];
+                                    nt++;
+                                    createMarker(src, descriptionSrc, -1, clr, mark[i].channel);
 
-                                //directionsTaskTimer = setInterval(function () {                              
+                                    tr = null;
+                                    
+                                    var descriptionDes = mark[i + 1].description;
+                                }else{
+                                    tr = labels[labelIndex++ % labels.length];
+                                    
+                                    createMarker(src, descriptionSrc, nt++, clr, mark[i].channel);
+
+                                    tr = null;
+                                    
+                                    var descriptionDes = mark[i + 1].description;
+                                    //createMarker(des, descriptionDes, tr, mark[i].color);
+                                    //  poly.setPath(path);     
+
+                                    //directionsTaskTimer = setInterval(function () {    
+                                }            
                                 recursive(src, des, a, i, clr);
                             }else if(mark[i].jobNb == "0"){
                                 console.log(mark[i].jobNb);
@@ -385,11 +396,11 @@
                             draggable: false,
                             icon: pinImage
                         });
-                    }else if(lbl == 0){
+                    }else if(lbl <= 0){
                         //untuk NA
                         var marker = new google.maps.Marker({position:latLng});
                         marker.setMap(map);
-                    }                   
+                    }
                     
                     bounds.extend(marker.getPosition());
                     google.maps.event.addListener(marker, "click", function (evt) {
@@ -403,11 +414,20 @@
             }
             
             window.onload = function(){
-                var a = document.getElementById('iframe1'); //or grab it by tagname etc
-                a.src = "../Params/Detail/runResultDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
-                console.log(a.src);
+                opensDetail();opensMap();
+                //console.log(a.src);
                 //alert(a.src);
             };
+            
+            function opensDetail() {
+                var link = "../Params/Detail/runResultDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
+                $('#iframe1').attr('src', link);
+            }
+            
+            function opensMap() {
+                var link2 = "../Params/Detail/runResultMapDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
+                $('#iframe2').attr('src', link2);
+            }
         </script>
         <h4>Routing Result 
             <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
@@ -458,148 +478,21 @@
         <br><br><br><br><br><br>
         <div id="cover" style="width: 100%">
             <div id="thediv" style="float: left;width: 65%;"><%--overflow-y: scroll;--%>
-                <div style="width: 100%; text-align: center"><h4>Result Detail</h4></div>
-                <div style="height: 500px; width: 100%;border-style: double"><iframe name="iframe1" id="iframe1" src="" frameborder="0" height="100%" width="100%"></iframe></div>
-                <%--<table id="table" border1="1" style="border-color: lightgray;">
-                    <thead>
-                        <tr style="background-color:orange;">
-                            <th width="100px" class="fzCol center">color</th>
-                            <th width="100px" class="fzCol center">No.</th>
-                            <th width="100px" class="fzCol center">Truck</th>
-                            <th width="100px" class="fzCol center">CustID</th>
-                            <th width="100px" class="fzCol center">Arrv</th>
-                            <th width="100px" class="fzCol center">Depart</th>
-                            <th width="100px" class="fzCol center">DO</th>
-                            <th width="100px" class="fzCol center">Srvc Time</th>
-                            <th width="100px" class="fzCol center">Name</th>
-                            <th width="100px" class="fzCol center">Priority</th>
-                            <th width="100px" class="fzCol center">Dist Chl</th>
-                            <th width="100px" class="fzCol center">Street</th>
-                            <th width="100px" class="fzCol center">Weight (KG)</th>
-                            <th width="100px" class="fzCol center">Volume (M3)</th>
-                            <th width="100px" class="fzCol center">RDD</th>
-                            <th width="100px" class="fzCol center">Transport Cost</th>
-                            <th width="100px" class="fzCol center">Dist</th>
-        <!--                    <th width="100px" class="fzCol">Send SAP</th>-->
-                            <th width="100px" class="fzCol center">Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <%for (RouteJob j : (List<RouteJob>) getList("JobList")) { %> 
-                        <tr 
-                            <%if (j.vehicleCode.equals("NA")) {%>
-                            style="color: red"
-                            <%} else if (j.arrive.length() == 0 && j.depart.length() > 0) {%>
-                            style="background-color: lightyellow"
-                            <%} else if (j.arrive.length() == 0 && j.name1.length() == 0) {%>
-                            style="background-color: #e6ffe6"
-                            <%}%> >
-                            <td class="fzCell" style="background-color: <%=j.color%>"></td>
-                            <td class="fzCell center"><%=j.no%></td>
-                            <td class="vCodeClick center  hover" style="color: blue;"><%=j.vehicleCode%></td>
-                            <td class="custIDClick center  hover" style="color: blue;"><%=j.custID%></td>
-                            <td class="fzCell center"><%=j.arrive%></td>
-                            <td class="fzCell center"><%=j.depart%></td>                    
-                            <td class="fzCell center" <%if (j.bat == "1" ) {%> 
-                                style="background-color: #ffe6e6" <%}%> ><%=j.DONum%></td>
-                            <td class="fzCell center"><%=j.getServiceTime()%></td>
-                            <td class="fzCell center">
-                                <%if (j.arrive.length() > 0) {%>
-                                <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
-                                <%} else {%><%=j.name1%><%}%>
-                            <td class="fzCell center"><%=j.custPriority%></td>
-                            <td class="fzCell center"><%=j.distrChn%></td>
-                            <td class="fzCell center"><%=j.street%></td>
-                            <td class="fzCell center"><%=j.weight%></td>
-                            <td class="fzCell center"><%=j.volume%></td>
-                            <td class="fzCell center"><%=j.rdd%></td>
-                            <td class="fzCell center"><%=j.transportCost%></td>
-                            <td class="fzCell center"><%=j.dist%></td>
-        <!--                    <td class="fzCell" 
-                                <%if (j.send != null && (j.send.equalsIgnoreCase("OK") || j.send.equalsIgnoreCase("DELL"))) {%>
-                                onclick="sendSAP('<%=j.vehicleCode%>','<%=j.send%>')" style="color: green;"
-                                <%}%> ><%=j.send%></td>-->
-                            <td class="editCust center hover" onclick="klik(<%=j.custID%>)" style="color: blue;"><%=j.edit%></td>
-                        </tr>
-
-                        <%} // for ProgressRecord %>
-                    </tbody>
-                </table>--%>
+                <div style="width: 100%; text-align: center"><a onClick="opensDetail()" class="hover" target="iframe1"><h4>Result Detail</h4></a></div>
+                <div style="height: 500px; width: 100%;border-style: double">
+                    <iframe name="iframe1" id="iframe1" src="" frameborder="0" height="100%" width="100%"></iframe>
+                </div>
             </div>
             <div style="float: left;width: 35%;">
-                <div style="width: 100%; text-align: center"><h4>MAP</h4></div>
-                <script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
+                <div style="width: 100%; text-align: center"><a onClick="opensMap()" class="hover" target="iframe2"><h4>MAP</h4></a></div>
+                <%--<script src='https://maps.googleapis.com/maps/api/js?key=<%=get("key")%>'></script>
                 <input type="text" id="txt" value='<%=request.getAttribute("test")%>' hidden="true"/>
-                <div id="map" style="width: 100%;height: 500px;border-style: double"></div>
+                <div id="map" style="width: 100%;height: 500px;border-style: double"></div>--%>
+                <div style="width: 100%;height: 500px;border-style: double;">
+                    <iframe name="iframe2" id="iframe2" src="" allowfullscreen frameborder="0" height="100%" width="100%" scrolling="no"></iframe>
+                </div>
             </div>
         </div>
-        
-        <%--
-        <br><br>
-        <iframe id="txtArea1" style="display:none"></iframe>
-        <table id="t_table" border1="1" style="border-color: lightgray;" hidden="true">
-            <tr>
-                <td>Branch : <%=get("branch")%></td>
-            </tr>
-            <tr>
-                <td>Channel : <%=get("channel")%></td>
-            </tr>
-            <tr>
-                <td>Truck : <%=get("vehicleCount")%></td>
-            </tr>
-            <tr>
-                <td>Run Id : <%=get("runID")%></td>
-            </tr>
-            <tr>
-                <td>
-                    <table id="d_table" border1="1" style="border-color: lightgray;">
-                        <thead>
-                            <tr style="background-color:orange">
-                                <th width="100px" class="fzCol">No.</th>
-                                <th width="100px" class="fzCol">Truck</th>
-                                <th width="100px" class="fzCol">CustID</th>
-                                <th width="100px" class="fzCol">Arrv</th>
-                                <th width="100px" class="fzCol">Depart</th>
-                                <th width="100px" class="fzCol">DO Count</th>
-                                <th width="100px" class="fzCol">Srvc Time</th>
-                                <th width="100px" class="fzCol">Name</th>
-                                <th width="100px" class="fzCol">Priority</th>
-                                <th width="100px" class="fzCol">Dist Chl</th>
-                                <th width="100px" class="fzCol">Street</th>
-                                <th width="100px" class="fzCol">Weight</th>
-                                <th width="100px" class="fzCol">Volume</th>
-                                <th width="100px" class="fzCol">RDD</th>
-                                <th width="100px" class="fzCol">Transport Cost</th>
-                                <th width="100px" class="fzCol">Dist</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <%for (RouteJob j : (List<RouteJob>) getList("JobList")) {%> 
-                            <tr>
-                                <td class="fzCell"><%=j.no%></td>
-                                <td class="vCodeClick" style="color: blue;"><%=j.vehicleCode%></td>
-                                <td class="custIDClick" style="color: blue;"><%=j.custID%></td>
-                                <td class="fzCell"><%=j.arrive%></td>
-                                <td class="fzCell"><%=j.depart%></td>                    
-                                <td class="fzCell"><%=j.DONum%></td>
-                                <td class="fzCell"><%=j.getServiceTime()%></td>
-                                <td class="fzCell"><%=j.name1%></td>
-                                <td class="fzCell"><%=j.custPriority%></td>
-                                <td class="fzCell"><%=j.distrChn%></td>
-                                <td class="fzCell"><%=j.street%></td>
-                                <td class="fzCell"><%=j.weight%></td>
-                                <td class="fzCell"><%=j.volume%></td>
-                                <td class="fzCell"><%=j.rdd%></td>
-                                <td class="fzCell"><%=j.transportCost%></td>
-                                <td class="fzCell"><%=j.dist%></td>
-                            </tr>
-
-                            <%} // for ProgressRecord %>
-                        </tbody>
-                    </table>                    
-                </td>
-            </tr>
-        </table>--%>
         <%@include file="../appGlobal/bodyBottom.jsp"%>
     </body>
 </html>

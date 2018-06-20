@@ -64,6 +64,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         String channel = FZUtil.getHttpParam(request, "channel");
         String vehicles = FZUtil.getHttpParam(request, "vehicles");
         String tableArr = FZUtil.getHttpParam(request, "tableArr");
+        breakTime = getBreakTime(getDayByDate(dateDeliv));
 
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
@@ -84,7 +85,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         request.setAttribute("oriRunId", oriRunId);
         request.setAttribute("tableArr", tableArr);
     }
-    
+
     public ArrayList<Delivery> getTableData(String runId) throws Exception {
         ArrayList<Delivery> alDelivery = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
@@ -211,7 +212,19 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         ld.rdd = rs.getString("Request_Delivery_Date");
                         ld.transportCost = rs.getInt("TransportCost");
                         ld.dist = "" + Math.round((rs.getDouble("Dist") / 1000) * 10) / 10.0;
-                        ld.isOkay = isOkay(ld.doNum, runId);
+                        if(ld.doNum.length() > 0) {
+                            ld.isOkay = isOkay(ld.doNum, runId);
+                        }
+                        
+                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
+                            for (int i = 0; i < mapColor.size(); i++) {
+                                for (int os = 0; os < mapColor.get(i).size(); os++) {
+                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
+                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
+                                    }
+                                }
+                            }
+                        }
 
                         alDelivery.add(ld);
 
@@ -242,23 +255,9 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                             ldBreak.dist = "0";
 
                             hasBreak = true;
-                            breakTime = getBreakTime(getDayByDate(dateDeliv));
                             alDelivery.add(ldBreak);
                         } else if (ld.depart.equals("")) {
                             hasBreak = false;
-                        }
-
-                        if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
-                            System.out.println("IN " + mapColor.size());
-                            for (int i = 0; i < mapColor.size(); i++) {
-                                System.out.println("MAP SIZE: " + mapColor.get(i).size());
-                                for (int os = 0; os < mapColor.get(i).size(); os++) {
-                                    if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
-                                        ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
-                                        System.out.println(ld.color);
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -325,72 +324,79 @@ public class RouteJobListingResultEdit implements BusinessLogic {
     }
 
     public boolean isOkay(String doNum, String runId) throws Exception {
+        System.out.println(doNum);
         boolean isOkay = true;
-        String errorStatus = "";
         String[] doNumSplit = doNum.split(";");
         for (int i = 0; i < doNumSplit.length; i++) {
             try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
                 try (Statement stm = con.createStatement()) {
                     String sql = "";
-                    sql = "SELECT\n"
-                            + "	prj.DO_Number do,\n"
-                            + "	table1.sp,\n"
-                            + "	table1.ss,\n"
-                            + "	table1.rs\n"
-                            + "FROM\n"
-                            + "	[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
+                    sql = "SELECT TOP 1 \n"
+                            + "	DO_Number,\n"
+                            + "	table2.sp,\n"
+                            + "	table2.ss,\n"
+                            + "	table2.rs\n"
+                            + "FROM \n"
+                            + "	[BOSNET1].[dbo].[TMS_PreRouteJob] tprj\n"
                             + "FULL JOIN(\n"
                             + "	SELECT\n"
-                            + "		sp.DO_Number sp,\n"
-                            + "		ss.Delivery_Number ss,\n"
-                            + "		rs.Delivery_Number rs\n"
+                            + "		table1.sp,\n"
+                            + "		table1.ss,\n"
+                            + "		table1.rs\n"
                             + "	FROM\n"
-                            + "		[BOSNET1].[dbo].[TMS_ShipmentPlan] sp\n"
-                            + "	LEFT JOIN(\n"
+                            + "		[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
+                            + "	FULL JOIN(\n"
                             + "		SELECT\n"
-                            + "			ss.Delivery_Number\n"
-                            + "		FROM \n"
-                            + "			[BOSNET1].[dbo].[TMS_Status_Shipment] ss\n"
+                            + "			sp.DO_Number sp,\n"
+                            + "			ss.Delivery_Number ss,\n"
+                            + "			rs.Delivery_Number rs\n"
+                            + "		FROM\n"
+                            + "			[BOSNET1].[dbo].[TMS_ShipmentPlan] sp\n"
+                            + "		LEFT JOIN(\n"
+                            + "			SELECT\n"
+                            + "				ss.Delivery_Number\n"
+                            + "			FROM \n"
+                            + "				[BOSNET1].[dbo].[TMS_Status_Shipment] ss\n"
+                            + "			WHERE\n"
+                            + "				ss.Delivery_Number = '"+doNumSplit[i]+"'\n"
+                            + "		) ss ON ss.Delivery_Number = sp.DO_Number\n"
+                            + "		LEFT JOIN(\n"
+                            + "			SELECT\n"
+                            + "				rs.Delivery_Number\n"
+                            + "			FROM \n"
+                            + "				[BOSNET1].[dbo].[TMS_Result_Shipment] rs\n"
+                            + "			WHERE\n"
+                            + "				rs.Delivery_Number = '"+doNumSplit[i]+"'\n"
+                            + "		) rs ON rs.Delivery_Number = sp.DO_Number\n"
                             + "		WHERE\n"
-                            + "			ss.Delivery_Number = '" + doNumSplit[i] + "'\n"
-                            + "	) ss ON ss.Delivery_Number = sp.DO_Number\n"
-                            + "	LEFT JOIN(\n"
-                            + "		SELECT\n"
-                            + "			rs.Delivery_Number\n"
-                            + "		FROM \n"
-                            + "			[BOSNET1].[dbo].[TMS_Result_Shipment] rs\n"
-                            + "		WHERE\n"
-                            + "			rs.Delivery_Number = '" + doNumSplit[i] + "'\n"
-                            + "	) rs ON rs.Delivery_Number = sp.DO_Number\n"
-                            + "	WHERE\n"
-                            + "		sp.DO_Number = '" + doNumSplit[i] + "'\n"
-                            + "		AND (sp.Already_Shipment <> 'Y'\n"
-                            + "		AND sp.Batch <> 'NULL'\n"
-                            + "		AND sp.NotUsed_Flag is NULL\n"
-                            + "		AND sp.Incoterm = 'FCO'\n"
-                            + "		AND(\n"
-                            + "			sp.Order_Type = 'ZDCO' OR sp.Order_Type = 'ZDTO'\n"
-                            + "		)\n"
-                            + "		AND sp.create_date >= DATEADD (DAY, - 7, GETDATE()))\n"
-                            + ") table1 ON table1.sp = prj.DO_Number\n"
+                            + "			sp.DO_Number = '"+doNumSplit[i]+"'\n"
+                            + "			AND (sp.Already_Shipment <> 'Y'\n"
+                            + "			AND sp.Batch <> 'NULL'\n"
+                            + "			AND sp.NotUsed_Flag is NULL\n"
+                            + "			AND sp.Incoterm = 'FCO'\n"
+                            + "			AND(\n"
+                            + "				sp.Order_Type = 'ZDCO' OR sp.Order_Type = 'ZDTO'\n"
+                            + "			)\n"
+                            + "			AND sp.create_date >= DATEADD (DAY, - 7, GETDATE()))\n"
+                            + "	) table1 ON table1.sp = prj.DO_Number\n"
+                            + "	WHERE \n"
+                            + "		prj.DO_Number = '"+doNumSplit[i]+"'\n"
+                            + "		AND prj.runID = '"+runId+"'\n"
+                            + "		AND prj.Is_Exclude = 'inc'\n"
+                            + "		AND prj.Is_Edit = 'edit') table2 ON table2.sp = tprj.DO_Number\n"
                             + "WHERE \n"
-                            + "	prj.DO_Number = '" + doNumSplit[i] + "'\n"
-                            + "	AND prj.runID = '" + runId + "'\n"
-                            + "	AND prj.Is_Edit = 'edit'";
+                            + "	DO_Number = '"+doNumSplit[i]+"'";
                     try (ResultSet rs = stm.executeQuery(sql)) {
                         while (rs.next()) {
                             if (rs.getString("sp") == null) {
-                                errorStatus = "sp";
                                 isOkay = false;
                                 break;
                             }
                             if (rs.getString("ss") != null) {
-                                errorStatus = "ss";
                                 isOkay = false;
                                 break;
                             }
                             if (rs.getString("rs") != null) {
-                                errorStatus = "rs";
                                 isOkay = false;
                                 break;
                             }
@@ -405,25 +411,25 @@ public class RouteJobListingResultEdit implements BusinessLogic {
     }
 
     public int getBreakTime(String day) throws Exception {
-        int breakTime = 0;
+        int breakMinutes = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
                 String sql = "";
                 if (day.equals("Friday")) {
-                    sql = "SELECT value FROM BOSNET1.dbo.TMS_Params WHERE param = 'fridayBreak'";
+                    sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE param = 'fridayBreak' and RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"')";
                 } else {
-                    sql = "SELECT value FROM BOSNET1.dbo.TMS_Params WHERE param = 'defaultBreak'";
+                    sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE param = 'defaultBreak' and RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"')";
                 }
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
-                        breakTime = rs.getInt("value");
+                        breakMinutes = rs.getInt("value");
                     }
                 }
             }
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
-        return breakTime;
+        return breakMinutes;
     }
 
     public static Timestamp getTimeStamp() throws ParseException {

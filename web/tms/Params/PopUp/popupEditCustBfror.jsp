@@ -354,11 +354,11 @@
                     $('#select-all').click(function(event) {   
                         if(this.checked) {
                             // Iterate each checkbox
-                            $(':checkbox').each(function() {
+                            $(':checkbox:visible').each(function() {
                                 this.checked = true;                        
                             });
                         } else {
-                            $(':checkbox').each(function() {
+                            $(':checkbox:visible').each(function() {
                                 this.checked = false;                       
                             });
                         }
@@ -431,6 +431,9 @@
                     $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                         if (data == 'OK') {
                             alert('sukses');
+                            $('input[type=checkbox]').each(function () {
+                                this.checked = false;
+                            });
                             //location.reload();
                         } else {
                             alert('submit error');

@@ -203,14 +203,20 @@ public class ShowPreRouteVehicleAPI {
                     "			v.vehicle_code = vh.vehicle_code\n" +
                     "		LEFT OUTER JOIN bosnet1.dbo.TMS_vehicleAtr va ON\n" +
                     "			v.vehicle_code = va.vehicle_code\n" +
-                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params pr ON\n" +
+                    "		LEFT OUTER JOIN BOSNET1.dbo.TMS_Progress ru ON\n" +
+                    "			ru.runID = '"+he.RunId+"'\n" +
+                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams pr ON\n" +
                     "			pr.param = 'HargaSolar'\n" +
-                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params bm ON\n" +
+                    "			And pr.RunId = ru.OriRunId\n" +
+                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams bm ON\n" +
                     "			bm.param = 'DefaultKonsumsiBBm'\n" +
-                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params rt ON\n" +
+                    "			And bm.RunId = ru.OriRunId\n" +
+                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams rt ON\n" +
                     "			rt.param = 'Defaultagentpriority'\n" +
-                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_Params ry ON\n" +
+                    "			And rt.RunId = ru.OriRunId\n" +
+                    "		LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams ry ON\n" +
                     "			ry.param = 'DefaultMaxCust'\n" +
+                    "			And ry.RunId = ru.OriRunId\n" +                    
                     "		WHERE\n" +
                     "			va.vehicle_code = '"+he.vehicle_code+"'\n";
             }

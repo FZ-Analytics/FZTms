@@ -89,10 +89,7 @@ public class SubmitEditRouteJob {
     @POST
     @Path("submitEditRouteJob")
     @Produces(MediaType.APPLICATION_JSON)
-    public String submitEditRouteJob(String content) throws Exception {
-        ArrayList<Double> alParam = getParam();
-        speedTruck = alParam.get(0);
-        trafficFactor = alParam.get(1);
+    public String submitEditRouteJob(String content) throws Exception {        
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String ret = "OK";
@@ -100,6 +97,10 @@ public class SubmitEditRouteJob {
             String[] tableArrSplit = decodeContent(content);
             
             getRunIdAndOriRunId(tableArrSplit[tableArrSplit.length - 1]);
+            
+            ArrayList<Double> alParam = getParam(runId);
+            speedTruck = alParam.get(0);
+            trafficFactor = alParam.get(1);
             for (int i = 0; i < tableArrSplit.length - 1; i++) {
                 String str = tableArrSplit[i];
                 String data = str;
@@ -340,11 +341,11 @@ public class SubmitEditRouteJob {
         return ((distanceMtr / 1000) / speedKmPHr * 60);
     }
 
-    public ArrayList<Double> getParam() throws Exception {
+    public ArrayList<Double> getParam(String runId) throws Exception {
         ArrayList<Double> alParam = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
-                String sql = "SELECT value FROM BOSNET1.dbo.TMS_Params WHERE param = 'SpeedKmPHour' OR param = 'TrafficFactor'";
+                String sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"') and (param = 'SpeedKmPHour' OR param = 'TrafficFactor')";
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
                         alParam.add(rs.getDouble("value")); // Index 0 = speed, index 1 = traffic factor
