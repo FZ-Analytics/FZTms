@@ -176,6 +176,7 @@ public class AlgoRunner implements BusinessLogic {
                     }
                     
                     if (resp.equalsIgnoreCase("OK") && reRun.equals("A")) {
+                        System.out.println(url);
                         errMsg = "TMSAlgo Error" + url;
                         resp = UrlResponseGetter.getURLResponse(url.toString());
                     }

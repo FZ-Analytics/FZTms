@@ -44,6 +44,8 @@ public class Delivery {
     public String isFix = "";
     public boolean isOkay = true;
     public String color = "";
+    public String deliv_start = "";
+    public String deliv_end = "";
     
     public String getMapLink() {
         String s = "https://www.google.com/maps/dir/"

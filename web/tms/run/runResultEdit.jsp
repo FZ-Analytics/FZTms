@@ -439,7 +439,8 @@
             function orderNo() {
                 var tableLength = document.getElementById('table').rows.length;
                 var idx = 1;
-                for (i = 0; i <= tableLength; i++) {
+                for (i = 0; i < tableLength; i++) {
+                    //console.log(i+'|'+tableLength);
                     var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
                     if (currentVehicleCode !== "NA") {
                         var custId = document.getElementById('table').rows[i].cells[3].innerHTML;
