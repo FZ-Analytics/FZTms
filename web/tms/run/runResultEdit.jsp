@@ -627,7 +627,7 @@
                             out.print("0");
                         }%>  
                     </td>
-                    <td class="center">
+                    <td class="center" style="font-weight:bold;">
                         <%if (j.arrive.length() > 0) {%>
                             <a href="<%=j.getMapLink()%>" target="_blank"><%=j.storeName%></a>
                         <%} else {%>

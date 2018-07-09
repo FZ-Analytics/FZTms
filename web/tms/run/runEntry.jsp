@@ -78,17 +78,16 @@
                 </div>
                 <div style="float: left; width: 50%">
                     <br><br>            
-                    <label class="fzLabel">Default Distance</label>
+                    <label class="fzLabel">Distance</label>
                     <select class="fzInput" id="DefaultDistance" name="DefaultDistance" />
-                        <option value="1">1</option>
-                        <option value="2">2</option>
+                        <option value="0">Unconstrain</option>
                         <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5" selected="true">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
+                        <option value="5">5</option>
+                        <option value="7" selected="true">7</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>                        
                     </select>
                     
                     <br><br><br><br><br><br><br><br><br>
