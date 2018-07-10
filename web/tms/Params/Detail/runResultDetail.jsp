@@ -68,7 +68,9 @@
                 text-align: center;
                 font-variant:small-caps;
             }
-
+            a:link {
+                
+            }
 
         </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
@@ -212,7 +214,7 @@
                                     <td class="fzCell center" style="<%if (j.bat == "1" ) {%> 
                                         background-color: #ffe6e6 <%}%>;min-width: 95px;" ><%=j.DONum%></td>
                                     <td class="fzCell center" style="min-width: 35px"><%=j.getServiceTime()%></td>
-                                    <td class="fzCell center" style="min-width: 115px">
+                                    <td class="fzCell center" style="min-width: 115px;font-weight: bold;">
                                         <%if (j.arrive.length() > 0) {%>
                                         <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
                                         <%} else {%><%=j.name1%><%}%>
@@ -285,7 +287,7 @@
                                     <td class="fzCell center" style="<%if (j.bat == "1" ) {%> 
                                         background-color: #ffe6e6 <%}%>;min-width: 95px;" ><%=j.DONum%></td>
                                     <td class="fzCell center" style="min-width: 35px"><%=j.getServiceTime()%></td>
-                                    <td class="fzCell center" style="min-width: 115px">
+                                    <td class="fzCell center" style="min-width: 115px;font-weight: bold;">
                                         <%if (j.arrive.length() > 0) {%>
                                         <a href="<%=j.getMapLink()%>" target="_blank"><%=j.name1%></a>
                                         <%} else {%><%=j.name1%><%}%>

@@ -86,6 +86,7 @@ public class PageTopUtils {
     
     public static boolean checkLogin(PageContext pc)
         throws Exception {
+        System.out.println("cek logins()");
         try {
             
             HttpServletRequest request 

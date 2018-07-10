@@ -439,7 +439,8 @@
             function orderNo() {
                 var tableLength = document.getElementById('table').rows.length;
                 var idx = 1;
-                for (i = 0; i <= tableLength; i++) {
+                for (i = 0; i < tableLength; i++) {
+                    //console.log(i+'|'+tableLength);
                     var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
                     if (currentVehicleCode !== "NA") {
                         var custId = document.getElementById('table').rows[i].cells[3].innerHTML;
@@ -626,7 +627,7 @@
                             out.print("0");
                         }%>  
                     </td>
-                    <td class="center">
+                    <td class="center" style="font-weight:bold;">
                         <%if (j.arrive.length() > 0) {%>
                             <a href="<%=j.getMapLink()%>" target="_blank"><%=j.storeName%></a>
                         <%} else {%>
