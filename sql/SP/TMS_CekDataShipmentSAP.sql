@@ -37,7 +37,7 @@ LEFT OUTER JOIN(
 			)
 			AND create_date >= DATEADD(
 				DAY,
-				- 7,
+				- 30,
 				GETDATE()
 			)
 			AND batch IS NOT NULL

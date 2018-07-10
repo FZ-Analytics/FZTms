@@ -96,6 +96,21 @@ public class SubmitEditRouteJob {
         try {
             String[] tableArrSplit = decodeContent(content);
             
+            /*String strs = "";
+            int x = 0;
+            for(int a=0; a<tableArrSplit.length-1;a++){
+                if(!tableArrSplit[a].equalsIgnoreCase(",,")){
+                    strs += a>0? "|" : "";
+                    String aw = tableArrSplit[a];
+                    String aq = String.valueOf(aw.charAt(0));
+                    aw = aw.substring(aw.length()-1).equalsIgnoreCase(",") ?
+                            aw + "end" : aw;
+                    strs += aq.equalsIgnoreCase(",") ?
+                            x+++","+aw.substring(1) : x+++","+aw;
+                }                
+            }
+            System.out.println(strs);*/
+            
             getRunIdAndOriRunId(tableArrSplit[tableArrSplit.length - 1]);
             
             ArrayList<Double> alParam = getParam(runId);
@@ -171,7 +186,7 @@ public class SubmitEditRouteJob {
                             + "     BOSNET1.dbo.TMS_RouteJob\n"
                             + "WHERE \n"
                             + "     runID = '" + runId + "' and vehicle_code = '" + vehicleCode + "' and " + param + "= ''";
-
+                    System.out.println(sql);
                     try (ResultSet rs = stm.executeQuery(sql)) {
                         while (rs.next()) {
                             RouteJobLog r = new RouteJobLog();
@@ -255,7 +270,7 @@ public class SubmitEditRouteJob {
                             + "		customer_id = '" + custId + "'\n"
                             + "		AND RunId = '" + runId + "') prj ON prj.customer_id = rj.customer_id\n"
                             + "WHERE rj.runID = '" + runId + "' and rj.customer_id = '" + custId + "'";
-
+                    System.out.println(sql);
                     try (ResultSet rs = stm.executeQuery(sql)) {
                         while (rs.next()) {
                             RouteJobLog r = new RouteJobLog();

@@ -218,7 +218,7 @@
                                 out.print("0");
                             }%>  
                         </td>
-                        <td class="fzCell center">
+                        <td class="fzCell center" style="font-weight:bold;">
                             <%if (!j.vehicleCode.equals("NA")) {%>
                                 <a href="<%=j.getMapLink()%>" target="_blank"><%=j.storeName%></a>
                             <%} else {%>

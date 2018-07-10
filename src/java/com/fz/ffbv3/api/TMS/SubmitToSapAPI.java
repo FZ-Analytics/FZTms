@@ -383,7 +383,7 @@ public class SubmitToSapAPI {
                         + "         )\n"
                         + "         AND sp.create_date >= DATEADD(\n"
                         + "		DAY,\n"
-                        + "		- 7,\n"
+                        + "		- 30,\n"
                         + "		GETDATE()\n"
                         + "         )\n"
                         + "ORDER BY\n"
