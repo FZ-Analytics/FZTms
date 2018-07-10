@@ -1,11 +1,11 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_runResultEditResultShow]    Script Date: 04/07/2018 15:34:56 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_runResultEditResultShow]    Script Date: 09/07/2018 16:24:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[TMS_runResultEditResultShow] --exec dbo.TMS_runResultEditResultShow '20180704_134354097'
+ALTER PROCEDURE [dbo].[TMS_runResultEditResultShow] --exec dbo.TMS_runResultEditResultShow '20180704_134354097'
 @RunId varchar(100)
 AS
 SET NOCOUNT ON;

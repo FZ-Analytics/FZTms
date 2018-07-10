@@ -919,7 +919,7 @@ public class AlgoRunner implements BusinessLogic {
                 "	)\n" +
                 "	AND sp.create_date >= DATEADD(\n" +
                 "		DAY,\n" +
-                "		- 7,\n" +
+                "		- 30,\n" +
                 "		GETDATE()\n" +
                 "	)\n" +
                 "	AND ss.Delivery_Number IS NULL\n" +
@@ -1774,7 +1774,7 @@ public class AlgoRunner implements BusinessLogic {
                 "			)\n" +
                 "			AND create_date >= DATEADD(\n" +
                 "				DAY,\n" +
-                "				- 7,\n" +
+                "				- 30,\n" +
                 "				GETDATE()\n" +
                 "			)\n" +
                 "	) sp ON\n" +
