@@ -22,6 +22,11 @@
           $( "#dateDeliv" ).datepicker( "option", "dateFormat", "yy-mm-dd");
           $( "#dateDeliv" ).val(yyyymmddDate(new Date()));
         } );
+        function br() {
+            window.open('../Params/PopUp/CekShipment.jsp?branch=' + $('#branch').val(), null,
+                    'scrollbars=1,resizable=1,height=500,width=950');
+
+        }
         </script>
         <br>
         <form class="container" action="runProcess.jsp" method="post">
@@ -48,6 +53,7 @@
                             <option value='<%=hd.branchId%>' <%if (hd.branchId.equals(WorkplaceID)) {%> selected="true" <%}%>><%=hd.branchId%> - <%=hd.name%></option>
                         <% } /* end for Branch Id */ %>
                     </select> 
+                    <span class="glyphicon glyphicon-check" aria-hidden="true" onclick="br();"></span>
 
                     <br><br>            
                     <label class="fzLabel">Date Deliv</label>
