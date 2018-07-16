@@ -233,7 +233,7 @@ public class ShowPreRouteVehicleAPI {
                 con.setAutoCommit(true);
 
                 tr = "OK";
-
+                ps.close();
             }catch(Exception e){
                 System.out.println(e.getMessage());
             }

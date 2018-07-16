@@ -147,10 +147,15 @@ public class PopupDetilDo  implements BusinessLogic {
                     Boolean tr = true;
                     Double rst = new Double(dt.DOQty);
                     String uom = dt.DOQtyUOM;
+                    System.out.print(uom);
                     while(tr){
                         if(isKAR){
                             if(!uom.equalsIgnoreCase("KAR")){
-                                String str = uom.equalsIgnoreCase(dt.Base_Units_of_Measurement) ? "KAR" : uom;
+                                if(dt.DO_Number.equalsIgnoreCase("8802050058"))
+                                    System.out.println();                                
+                                String str = "";
+                                str = uom.equalsIgnoreCase(dt.Base_Units_of_Measurement)? "KAR" : uom;
+                                System.out.print(str);
                                 String pr = "";
                                 
                                 if(dt.UoM1.equalsIgnoreCase(str)){
@@ -169,43 +174,10 @@ public class PopupDetilDo  implements BusinessLogic {
                                     rst = rst/dt.Numeration5*dt.Conversion5;
                                     pr = dt.UoM5;
                                 }
-                                uom = str;
-                                
-                                /*//jika uom sesuai Base_Units_of_Measurement
-                                //langsung konversi ke kar
-                                if(uom.equalsIgnoreCase(dt.Base_Units_of_Measurement)){
-                                    if(dt.UoM1.equalsIgnoreCase("KAR")){
-                                        rst = rst/dt.Numeration1*dt.Conversion1;
-                                        uom = dt.UoM1;
-                                    }else if(dt.UoM2.equalsIgnoreCase("KAR")){
-                                        rst = rst/dt.Numeration2*dt.Conversion2;
-                                        uom = dt.UoM2;
-                                    }else if(dt.UoM3.equalsIgnoreCase("KAR")){
-                                        rst = rst/dt.Numeration3*dt.Conversion3;
-                                        uom = dt.UoM3;
-                                    }else if(dt.UoM4.equalsIgnoreCase("KAR")){
-                                        rst = rst/dt.Numeration4*dt.Conversion4;
-                                        uom = dt.UoM4;
-                                    }else if(dt.UoM5.equalsIgnoreCase("KAR")){
-                                        rst = rst/dt.Numeration5*dt.Conversion5;
-                                        uom = dt.UoM5;
-                                    }
-                                }else{
-                                //selain itu
-                                    if(dt.UoM1.equalsIgnoreCase(uom)){
-                                        rst = rst/dt.Numeration1*dt.Conversion1;
-                                    }else if(dt.UoM2.equalsIgnoreCase(uom)){
-                                        rst = rst/dt.Numeration2*dt.Conversion2;
-                                    }else if(dt.UoM3.equalsIgnoreCase(uom)){
-                                        rst = rst/dt.Numeration3*dt.Conversion3;
-                                    }else if(dt.UoM4.equalsIgnoreCase(uom)){
-                                        rst = rst/dt.Numeration4*dt.Conversion4;
-                                    }else if(dt.UoM5.equalsIgnoreCase(uom)){
-                                        rst = rst/dt.Numeration5*dt.Conversion5;
-                                    }
-                                    
+                                if(!uom.equalsIgnoreCase(dt.Base_Units_of_Measurement))
                                     uom = dt.Base_Units_of_Measurement;
-                                }*/
+                                else
+                                    uom = str;
                             }
 
                             if(uom.equalsIgnoreCase("KAR")){
@@ -220,7 +192,7 @@ public class PopupDetilDo  implements BusinessLogic {
                         }
                         
                     }
-                    
+                    System.out.println();
                     //dt.sap = FZUtil.getRsString(rs, i++, "");  
                     /*                    
                     String str = FZUtil.getRsString(rs, i++, "");
@@ -260,7 +232,7 @@ public class PopupDetilDo  implements BusinessLogic {
                     else        ar.get(x).sap = "yes";
                     x++;
                 }
-                
+                ps.close();
                 request.setAttribute("ListDODetil", ar);
                 request.setAttribute("Name", getName(dt.DO_Number, runId));
                 request.setAttribute("branch", br);

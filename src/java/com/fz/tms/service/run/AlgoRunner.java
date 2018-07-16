@@ -44,7 +44,12 @@ public class AlgoRunner implements BusinessLogic {
         String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
         String urls = FZUtil.getHttpParam(request, "url");
+        
+        
+        //param
         String DefaultDistance = FZUtil.getHttpParam(request, "DefaultDistance");
+        String buffTime = FZUtil.getHttpParam(request, "buffTime");
+        String SpeedKmPHour = FZUtil.getHttpParam(request, "SpeedKmPHour");
         
         if(urls != null || urls.length() > 0){
             urls = urls.replace("9ETR9",":");
@@ -196,7 +201,7 @@ public class AlgoRunner implements BusinessLogic {
                     
                     if (resp.equalsIgnoreCase("OK")){
                         errMsg = "Insert Param";
-                        resp = InsertParam(runID, DefaultDistance);
+                        resp = InsertParam(runID, DefaultDistance, buffTime, SpeedKmPHour);
                     }
                     
                     if (resp.equalsIgnoreCase("OK")){
@@ -248,7 +253,7 @@ public class AlgoRunner implements BusinessLogic {
         }
     }
     
-    public String InsertParam(String runId, String DefaultDistance) throws Exception{
+    public String InsertParam(String runId, String DefaultDistance, String buffTime, String SpeedKmPHour) throws Exception{
         String str = "ERROR";
         
         String sql = "";
@@ -256,11 +261,16 @@ public class AlgoRunner implements BusinessLogic {
         List<HashMap<String, String>> asd = new ArrayList<HashMap<String, String>>();
         HashMap<String, String> pl = new HashMap<String, String>();
         
-        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams select '"+runId+"', param, value from BOSNET1.dbo.TMS_Params where param not in('DefaultDistance');");
+        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams select '"+runId+"', param, value from BOSNET1.dbo.TMS_Params where param not in('DefaultDistance','TrafficFactor');");
         asd.add(pl);
-        
         pl = new HashMap<String, String>();
         pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams values('"+runId+"', 'DefaultDistance', '"+DefaultDistance+"');");
+        asd.add(pl);
+        pl = new HashMap<String, String>();
+        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams values('"+runId+"', 'TrafficFactor', '"+buffTime+"');");
+        asd.add(pl);
+        pl = new HashMap<String, String>();
+        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams values('"+runId+"', 'SpeedKmPHour', '"+SpeedKmPHour+"');");
         asd.add(pl);
         
         try (Connection con = (new Db()).getConnection("jdbc/fztms")){            
@@ -590,7 +600,7 @@ public class AlgoRunner implements BusinessLogic {
                 "		WHERE\n" +
                 "			va.included = 1\n" +
                 "			and va.Channel in (" + shn + ");";
-
+        System.out.println(sql);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)) {
 

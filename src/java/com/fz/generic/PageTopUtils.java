@@ -107,7 +107,7 @@ public class PageTopUtils {
                     str = getLink(url, request, pc);
                 }else{
                     str = "OK";
-                    setDate(EmpyID, Key);
+                    //setDate(EmpyID, Key);
                 }
                 
                 String isParam = "";
@@ -203,7 +203,7 @@ public class PageTopUtils {
                 "		HOUR,\n" +
                 "		UpdateTable,\n" +
                 "		GETDATE()\n" +
-                "	)> 5;";
+                "	)> 2;";
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)) {
             con.setAutoCommit(false);

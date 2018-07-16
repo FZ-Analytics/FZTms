@@ -160,6 +160,7 @@ public class GoogleMapAPI {
                                 ps.executeUpdate();
                                 tr = "OK";
                                 System.out.println(tr);
+                                ps.close();
                                 //trys = false;
                             }
                         }

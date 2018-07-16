@@ -93,6 +93,7 @@ public class HistoryAPI {
             //psHdr.executeUpdate();            
             //con.setAutoCommit(true);
             str = "OK";
+            psHdr.close();
         }
         return str;
     }
