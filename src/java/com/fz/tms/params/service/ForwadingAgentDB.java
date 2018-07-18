@@ -120,6 +120,7 @@ public class ForwadingAgentDB {
             // commit transaction
             con.setAutoCommit(true);
             insert = "OK";
+            con.close();
         }
         return insert;
     } 

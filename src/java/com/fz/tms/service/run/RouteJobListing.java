@@ -177,6 +177,7 @@ public class RouteJobListing implements BusinessLogic {
                 psHdr.setString(15, channel);
 
                 psHdr.executeUpdate();
+                psHdr.close();
             }
         }
     }
@@ -202,6 +203,7 @@ public class RouteJobListing implements BusinessLogic {
 
             con.setAutoCommit(true);
             str = "OK";
+            psHdr.close();
         }
         return str;
     }
@@ -237,6 +239,7 @@ public class RouteJobListing implements BusinessLogic {
 
             con.setAutoCommit(true);
             str = "OK";
+            psHdr.close();
         }
         return str;
     }
@@ -318,6 +321,7 @@ public class RouteJobListing implements BusinessLogic {
                     //ps.executeUpdate();
                     //con.setAutoCommit(true);
                 }
+                ps.close();
             }
         }
 
@@ -341,6 +345,7 @@ public class RouteJobListing implements BusinessLogic {
                     //ps.executeUpdate();
                     //con.setAutoCommit(true);
                 }
+                ps.close();
             }
         }
 

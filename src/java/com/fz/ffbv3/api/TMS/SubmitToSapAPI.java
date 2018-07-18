@@ -635,6 +635,7 @@ public class SubmitToSapAPI {
                 psHdr.executeUpdate();
 
                 ret = "ok";
+                psHdr.close();
             }
         }
         return ret;

@@ -112,6 +112,7 @@ public class LoginLogic implements BusinessLogic {
             
              con.setAutoCommit(true);
              str = "OK";
+             psHdr.close();
         }
         
         return str;

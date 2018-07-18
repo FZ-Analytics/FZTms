@@ -436,6 +436,7 @@ public class SubmitEditRouteJob {
                 psHdr.setDouble(20, r.dist);
 
                 psHdr.executeUpdate();
+                psHdr.close();
             }
         }
     }

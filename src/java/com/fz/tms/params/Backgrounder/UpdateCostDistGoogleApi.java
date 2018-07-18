@@ -92,6 +92,7 @@ public class UpdateCostDistGoogleApi {
                     py.put("run", rs.getString("run"));
                 }
                 //System.out.println("getCustCombi" + "()" + px.size());
+                ps.close();
             }
         }
         return py;
@@ -109,6 +110,7 @@ public class UpdateCostDistGoogleApi {
             con.setAutoCommit(true);
 
             str = "OK";
+            ps.close();
         } 
         return str;
     }
@@ -370,6 +372,7 @@ public class UpdateCostDistGoogleApi {
                                         try (PreparedStatement ps = con.prepareStatement(sql) ){
                                             ps.executeUpdate();
                                             str = "OK";
+                                            ps.close();
                                         }
                                     }
                                 }

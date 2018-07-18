@@ -254,6 +254,7 @@ public class PopupDetilDo  implements BusinessLogic {
                     int i = 1;
                     str = FZUtil.getRsString(rs, i++, "");
                 }
+                ps.close();
             }
         }
         return str;

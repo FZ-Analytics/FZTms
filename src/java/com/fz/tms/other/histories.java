@@ -53,6 +53,7 @@ public class histories implements BusinessLogic {
                     hs.Dates = FZUtil.getRsString(rs, i++, "");   
                     js.add(hs);
                 }
+                ps.close();
             }
         }
         

@@ -1,6 +1,6 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_CekShipment]    Script Date: 09/07/2018 16:41:00 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_CekShipment]    Script Date: 18/07/2018 09:44:31 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -15,9 +15,15 @@ SELECT
 	ju.Name1,
 	aq.DO_Number,
 	sw.DO_Number ShipPlant,
-	sw.Request_Delivery_Date RDD,
+	CAST(
+		FORMAT(
+			aq.Request_Delivery_Date,
+			'yyyy-MM-dd'
+		) AS VARCHAR
+	) RDD,
 	hy.DeliveryDeadline,
-	de.Ship_No_SAP StatusShip,
+	de.Delivery_Number StatusShip,
+	de.Ship_No_SAP noShipSAP,
 	fr.Delivery_Number ResultShip,
 	gt.GoodsMovementStat,
 	gt.PODStatus
@@ -26,7 +32,8 @@ FROM
 		SELECT
 			DISTINCT Customer_ID,
 			DO_Number,
-			Plant
+			Plant,
+			Request_Delivery_Date
 		FROM
 			BOSNET1.dbo.TMS_ShipmentPlan aq
 		WHERE
@@ -56,6 +63,7 @@ LEFT OUTER JOIN(
 				'ZDTO'
 			)
 			AND batch IS NOT NULL
+			AND Request_Delivery_Date IS NOT NULL
 	) sw ON
 	aq.DO_Number = sw.DO_Number
 LEFT OUTER JOIN(
@@ -107,5 +115,4 @@ LEFT OUTER JOIN(
 	aq.Customer_ID = ju.Customer_ID
 WHERE
 	aq.Plant = @BrId
-
-
+	AND aq.Request_Delivery_Date IS NOT NULL;

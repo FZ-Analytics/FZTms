@@ -233,6 +233,7 @@ public class VehicleAttrDB {
             // commit transaction
             con.setAutoCommit(true);
             insert = "OK";
+            psHdr.close();
         }
         return insert;
     }

@@ -40,7 +40,7 @@
 
                 <br>
                 <label class="fzLabel">Service Time:</label> 
-                <input class="fzInput" type="text" id="service_time" name="service_time" value="<%=get("service_time")%>" maxlength="2">
+                <input class="fzInput" type="text" id="service_time" name="service_time" value="<%=get("service_time")%>" maxlength="3">
 
                 <br>
                 <label class="fzLabel">Deliv Start:</label> 

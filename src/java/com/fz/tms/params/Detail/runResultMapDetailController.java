@@ -35,7 +35,7 @@ public class runResultMapDetailController implements BusinessLogic {
     String key = Constava.googleKey;
     List<String> vehi = new ArrayList<String>();  
     
-    public String[] myList = {"0019DC","A20CE8","FF0000","E8720C","FFD30D","6DA1BA","632152","00546B","E9FF00",
+    public static String[] myList = {"0019DC","A20CE8","FF0000","E8720C","FFD30D","6DA1BA","632152","00546B","E9FF00",
                     "FF8C91","E0AAFF","C6C641","FFF8DC","DC143C","00FFFF","00008B","008B8B","B8860B","A9A9A9","006400","BDB76B",
                     "8B008B","8B0000","556B2F","FF8C00","9932CC","E9967A","8FBC8F","483D8B","00CED1","9400D3","00CED1","9400D3",
                     "FF1493","B22222","00BFFF","228B22","FF00FF","1E90FF","FFD700","008000","FF69B4","CD5C5C","DAA520","ADFF2F",
@@ -286,6 +286,7 @@ public class runResultMapDetailController implements BusinessLogic {
                         asd = new ArrayList<HashMap<String, String>>();
                     }
                 }
+                ps.close();
             }
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
@@ -328,6 +329,7 @@ public class runResultMapDetailController implements BusinessLogic {
                     int i = 1;
                     vehi.add(FZUtil.getRsString(rs, i++, ""));
                 }
+                ps.close();
             }
         }
     }

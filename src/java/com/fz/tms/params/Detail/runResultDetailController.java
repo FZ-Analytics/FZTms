@@ -40,6 +40,7 @@ public class runResultDetailController implements BusinessLogic {
     Set<String> vehicles = new HashSet<String>();
     String shift = "";
     String branch = "";
+    
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
             , PageContext pc) throws Exception {
@@ -146,8 +147,7 @@ public class runResultDetailController implements BusinessLogic {
                         }*/
                         
                         //set color
-                        GoogleDirMapAllVehi gv = new GoogleDirMapAllVehi();
-                        String clr = gv.myList[Integer.valueOf(FZUtil.getRsString(rs, i++, ""))-1].toUpperCase();
+                        String clr = runResultMapDetailController.myList[Integer.valueOf(FZUtil.getRsString(rs, i++, ""))-1].toUpperCase();
                         j.color = "#" + clr;
                         
                         if(!j.vehicleCode.equalsIgnoreCase(vehicleCode)
@@ -294,6 +294,7 @@ public class runResultDetailController implements BusinessLogic {
             
             con.setAutoCommit(true);
             str = "OK";
+            psHdr.close();
         }
         
         return str;

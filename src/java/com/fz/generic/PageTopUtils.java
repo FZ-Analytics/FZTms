@@ -209,6 +209,7 @@ public class PageTopUtils {
             con.setAutoCommit(false);
             ps.executeUpdate();
             con.setAutoCommit(true);
+            ps.close();
         }
     }
     
@@ -267,6 +268,7 @@ public class PageTopUtils {
                     }else{
                         throw new Exception(); 
                     }
+                    ps.close();
                 }
             }
         }        

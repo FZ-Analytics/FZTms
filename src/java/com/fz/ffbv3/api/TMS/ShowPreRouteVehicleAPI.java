@@ -257,6 +257,7 @@ public class ShowPreRouteVehicleAPI {
                     Double tr = FZUtil.getRsDouble(rs, 1, 0);
                     str  = tr > 0 ? "OK" : "ERROR";
                 }
+                ps.close();
             }
         }
         return str;
@@ -391,7 +392,7 @@ public class ShowPreRouteVehicleAPI {
                 con.setAutoCommit(true);
 
                 tr = "OK";
-
+                ps.close();
             }catch(Exception e){
                 System.out.println(e.getMessage());
             }

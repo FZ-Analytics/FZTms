@@ -166,6 +166,7 @@ public class ShowPreRouteVehicle implements BusinessLogic {
                 request.setAttribute("VehicleList", js);
                 request.setAttribute("branch", br);
                 request.setAttribute("runId", runId);
+                ps.close();
             }
         }
     }

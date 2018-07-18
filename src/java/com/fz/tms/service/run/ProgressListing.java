@@ -85,7 +85,9 @@ public class ProgressListing implements BusinessLogic {
                 request.setAttribute("runId", runID);
                 request.setAttribute("oriRunID", OriRunID);
                 request.setAttribute("dateDeliv", dateDeliv);
+                ps.close();
             }
+            
         }
     }
 }

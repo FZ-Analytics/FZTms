@@ -138,6 +138,7 @@ public class popupEditPreRouteVehicle  implements BusinessLogic {
                 request.setAttribute("NamaDriver", ve.NamaDriver);
                 request.setAttribute("agent_priority", ve.agent_priority);
                 request.setAttribute("max_cust", ve.max_cust);
+                ps.close();
             }
          }
     }
@@ -179,6 +180,7 @@ public class popupEditPreRouteVehicle  implements BusinessLogic {
             
              con.setAutoCommit(true);
              str = "OK";
+             psHdr.close();
         }
         
         return str;        

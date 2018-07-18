@@ -51,6 +51,7 @@ public class Other {
             // commit transaction
             con.setAutoCommit(true);
             insert = "OK";
+            psHdr.close();
         }
         return insert;
     }
@@ -84,6 +85,7 @@ public class Other {
                 // commit transaction
                 con.setAutoCommit(true);
                 insert = "OK";
+                psHdr.close();
             }
         }else if(tr.equalsIgnoreCase("ERROR")){
             insert = "OK";

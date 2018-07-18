@@ -121,7 +121,7 @@ public class AlgoRunner implements BusinessLogic {
             ps.setString(10, oriRunID);
             ps.setString(11, channel);
             ps.executeUpdate();
-
+            ps.close();
             success = true;
 
             // call algo web
@@ -281,6 +281,7 @@ public class AlgoRunner implements BusinessLogic {
                 try (PreparedStatement ps = con.prepareStatement(sql) ){
                     ps.executeUpdate();
                     str = "OK";
+                    ps.close();
                 }catch(Exception e){
                     str = "ERROR " + e.getMessage();
                 }
@@ -396,6 +397,7 @@ public class AlgoRunner implements BusinessLogic {
                         }
                     }
                     ps.executeBatch();
+                    ps.close();
                 }
             }
             cds = "OK";
@@ -450,6 +452,7 @@ public class AlgoRunner implements BusinessLogic {
             con.setAutoCommit(true);
 
             cds = "OK";
+            ps.close();
         }catch (Exception e) {
             HashMap<String, String> pl = new HashMap<String, String>();
             pl.put("ID", runID);
@@ -609,6 +612,7 @@ public class AlgoRunner implements BusinessLogic {
             con.setAutoCommit(true);
 
             cds = "OK";
+            ps.close();
         } catch (Exception e) {
             HashMap<String, String> pl = new HashMap<String, String>();
             pl.put("ID", runID);
@@ -638,6 +642,7 @@ public class AlgoRunner implements BusinessLogic {
             con.setAutoCommit(true);
 
             str = "OK";
+            ps.close();
         }catch (Exception e) {
             HashMap<String, String> pl = new HashMap<String, String>();
             pl.put("ID", RunId);
@@ -665,6 +670,7 @@ public class AlgoRunner implements BusinessLogic {
             ps.setString(1, branchCode);
             ps.execute();
             str = "OK";
+            ps.close();
         }catch (Exception e) {
             //HashMap<String, String> pl = new HashMap<String, String>();
             //pl.put("ID", "");
@@ -693,6 +699,7 @@ public class AlgoRunner implements BusinessLogic {
                     int i = 1;
                     str = FZUtil.getRsString(rs, i++, "");
                 }
+                ps.close();
             }
         }
         return str;
@@ -990,6 +997,7 @@ public class AlgoRunner implements BusinessLogic {
                     }
                     str = "OK";
                 }
+                ps.close();
             }
         }
         
@@ -1052,7 +1060,7 @@ public class AlgoRunner implements BusinessLogic {
                 //cek hari buka                
                 int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
                 //System.out.println(dayOfWeek);
-                if(pl.get("DO_Number").equals("8020109240")){
+                if(pl.get("DO_Number").equals("8802050045")){
                     //System.out.println(pl.get("Customer_ID"));
                     //System.out.println(pl.get("DayWinEnd"));
                     //System.out.println(asd.get(a).get("DayWinEnd"));
@@ -1081,6 +1089,12 @@ public class AlgoRunner implements BusinessLogic {
             
             ins = treeSAP(asd);
             //cekData(ins);
+            
+            for(int a = 0;a<ins.size();a++){ 
+                if(ins.get(a).get("DO_Number").equalsIgnoreCase("8802050045")){
+                    System.out.println("com.fz.tms.service.run.AlgoRunner.QueryCust()");
+                }
+            }
             
             try (Connection con = (new Db()).getConnection("jdbc/fztms")){
                 try (PreparedStatement ps = con.prepareStatement(sql) ){
@@ -1129,6 +1143,7 @@ public class AlgoRunner implements BusinessLogic {
                         }
                     }
                     ps.executeBatch();
+                    ps.close();
                 }            
             }
         }        
@@ -1188,7 +1203,7 @@ public class AlgoRunner implements BusinessLogic {
                     if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
                     else if(str > -3 && str < 0)    pl.replace("Customer_priority", String.valueOf(2));
                     else if(str > 0)                pl.replace("Customer_priority", String.valueOf(3));
-                    else                            pl.replace("Customer_priority", String.valueOf(10));
+                    else                            pl.replace("Customer_priority", String.valueOf(3));
                 }
             }else{
                 //repale channel to GT
@@ -1312,7 +1327,7 @@ public class AlgoRunner implements BusinessLogic {
                 
                 if(num == 0)
                     err = "OK";
-                
+                ps.close();
             }
         }
         return err;
@@ -1331,7 +1346,9 @@ public class AlgoRunner implements BusinessLogic {
         for(int a = 0;a<py.size();a++){
             px = new HashMap<String, String>();
             px = py.get(a);
-            
+            if(px.get("DO_Number").equalsIgnoreCase("8802050045")){
+                System.out.println("com.fz.tms.service.run.AlgoRunner.callPI_DeliveryOrder()");
+            }
             if(s.length() > 0)  s = s + ",'" + px.get("DO_Number") + "'";
             else    s = s + "'" + px.get("DO_Number") + "'";            
         }
@@ -1354,6 +1371,7 @@ public class AlgoRunner implements BusinessLogic {
                     
                     pl.add(px);
                 }
+                ps.close();
             }
         }
         
@@ -1362,7 +1380,7 @@ public class AlgoRunner implements BusinessLogic {
             px = new HashMap<String, String>();
             px = py.get(a);
             if(pl.size() > 0){
-                for (HashMap<String, String> pl1 : pl) {                    
+                for (HashMap<String, String> pl1 : pl) {  
                     if(px.get("DO_Number").equalsIgnoreCase(pl1.get("DONumber"))){
                        //px.replace("Customer_priority", String.valueOf(10));
                        //System.out.println(px.get("DO_Number") + "()" + pl1.get("GoodsMovementStat") + "()" + pl1.get("PODStatus"));
@@ -1711,6 +1729,7 @@ public class AlgoRunner implements BusinessLogic {
                         ps.executeBatch();
                         
                         str = "OK";
+                        ps.close();
                     }            
                 }
             }
@@ -1865,6 +1884,7 @@ public class AlgoRunner implements BusinessLogic {
                     //ps.executeUpdate();
                     //con.setAutoCommit(true);
                 }
+                ps.close();
             }    
         }
         
