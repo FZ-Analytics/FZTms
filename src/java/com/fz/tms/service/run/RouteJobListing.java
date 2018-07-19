@@ -57,6 +57,9 @@ public class RouteJobListing implements BusinessLogic {
     String dateDeliv = "";
     String channel = "";
     List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
+    
+    public static String EmpyID;
+    public static String Key;
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -96,6 +99,12 @@ public class RouteJobListing implements BusinessLogic {
         request.setAttribute("branch", branch);
         request.setAttribute("shift", shift);
         request.setAttribute("OriRunID", OriRunID);
+        
+        //update login
+        EmpyID = (String) pc.getSession().getAttribute("EmpyID");
+        Key = (String) pc.getSession().getAttribute("Key");
+        RunThread R1 = new RunThread("Thread",EmpyID,Key);
+        R1.start();
     }
 
     public static String getNextRunId(String runId) {

@@ -261,7 +261,7 @@ public class AlgoRunner implements BusinessLogic {
         List<HashMap<String, String>> asd = new ArrayList<HashMap<String, String>>();
         HashMap<String, String> pl = new HashMap<String, String>();
         
-        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams select '"+runId+"', param, value from BOSNET1.dbo.TMS_Params where param not in('DefaultDistance','TrafficFactor');");
+        pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams select '"+runId+"', param, value from BOSNET1.dbo.TMS_Params where param not in('DefaultDistance','TrafficFactor','SpeedKmPHour');");
         asd.add(pl);
         pl = new HashMap<String, String>();
         pl.put("sql", "insert into BOSNET1.dbo.TMS_PreRouteParams values('"+runId+"', 'DefaultDistance', '"+DefaultDistance+"');");

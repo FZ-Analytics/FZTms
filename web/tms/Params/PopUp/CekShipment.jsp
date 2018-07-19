@@ -45,6 +45,7 @@
                     <th width="100px" class="fzCol">DO_Number</th>
                     <th width="100px" class="fzCol">ShipPlant</th>
                     <th width="100px" class="fzCol">RDD</th>
+                    <th width="100px" class="fzCol">Create Date</th>
                     <th width="100px" class="fzCol">Delivery</th>
                     <th width="100px" class="fzCol">StatusShip</th>
                     <th width="100px" class="fzCol">noShipSAP</th>
@@ -61,6 +62,7 @@
                     <td class="fzCell"><%=j.DO_Number%></td>
                     <td class="fzCell"><%=j.ShipPlant%></td>
                     <td class="fzCell"><%=j.RDD%></td>
+                    <td class="fzCell"><%=j.createDate%></td>
                     <td class="fzCell"><%=j.DeliveryDeadline%></td>
                     <td class="fzCell"><%=j.StatusShip%></td>
                     <td class="fzCell"><%=j.noShipSAP%></td>
