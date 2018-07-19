@@ -55,6 +55,7 @@ public class CekShipment  implements BusinessLogic {
                     dos.DO_Number = FZUtil.getRsString(rs, i++, "");
                     dos.ShipPlant = FZUtil.getRsString(rs, i++, "");
                     dos.RDD = FZUtil.getRsString(rs, i++, "");
+                    dos.createDate = FZUtil.getRsString(rs, i++, "");
                     dos.DeliveryDeadline = FZUtil.getRsString(rs, i++, "");
                     dos.StatusShip = FZUtil.getRsString(rs, i++, "");
                     dos.noShipSAP = FZUtil.getRsString(rs, i++, "");

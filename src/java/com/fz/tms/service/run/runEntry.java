@@ -25,6 +25,9 @@ import javax.servlet.jsp.PageContext;
  * @author dwi.oktaviandi
  */
 public class runEntry implements BusinessLogic {
+    
+    public static String EmpyID;
+    public static String Key;
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
@@ -33,8 +36,8 @@ public class runEntry implements BusinessLogic {
         List<Branch> lBr = getBranch(br);
         
         //update login
-        String EmpyID = (String) pc.getSession().getAttribute("EmpyID");
-        String Key = (String) pc.getSession().getAttribute("Key");
+        EmpyID = (String) pc.getSession().getAttribute("EmpyID");
+        Key = (String) pc.getSession().getAttribute("Key");
         RunThread R1 = new RunThread("Thread",EmpyID,Key);
         R1.start();
         
@@ -102,7 +105,7 @@ class RunThread implements Runnable {
         System.out.println("Running " +  threadName );
         try {
             Thread.sleep(50);
-            PageTopUtils.setDate(EmpyID, Key);
+            PageTopUtils.setDate(runEntry.EmpyID, runEntry.Key);
             System.out.println("Finnish " +  threadName );
         } catch (InterruptedException e) {
            System.out.println("InterruptedException e" +  e.getMessage());

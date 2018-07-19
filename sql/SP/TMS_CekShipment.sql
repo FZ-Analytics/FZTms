@@ -1,6 +1,6 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_CekShipment]    Script Date: 18/07/2018 09:44:31 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_CekShipment]    Script Date: 19/07/2018 09:03:02 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -21,6 +21,12 @@ SELECT
 			'yyyy-MM-dd'
 		) AS VARCHAR
 	) RDD,
+	CAST(
+		FORMAT(
+			aq.Create_Date,
+			'yyyy-MM-dd'
+		) AS VARCHAR
+	) Create_Date,
 	hy.DeliveryDeadline,
 	de.Delivery_Number StatusShip,
 	de.Ship_No_SAP noShipSAP,
@@ -33,7 +39,8 @@ FROM
 			DISTINCT Customer_ID,
 			DO_Number,
 			Plant,
-			Request_Delivery_Date
+			Request_Delivery_Date,
+			Create_Date
 		FROM
 			BOSNET1.dbo.TMS_ShipmentPlan aq
 		WHERE

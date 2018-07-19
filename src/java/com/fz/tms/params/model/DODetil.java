@@ -46,4 +46,5 @@ public class DODetil {
     public String ResultShip;
     public String GoodsMovementStat;
     public String PODStatus;
+    public String createDate;
 }
