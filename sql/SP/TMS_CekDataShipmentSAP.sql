@@ -1,12 +1,12 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_CekDataShipmentSAP]    Script Date: 18/07/2018 09:44:00 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_CekDataShipmentSAP]    Script Date: 25/07/2018 15:20:39 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 ALTER PROCEDURE [dbo].[TMS_CekDataShipmentSAP] --exec [dbo].[TMS_CekDataShipmentSAP] '20180525_100044389'
-@RunId varchar(100)
+@RunId varchar(100), @dt int
 AS
 SET NOCOUNT ON;
 SELECT
@@ -42,7 +42,7 @@ LEFT OUTER JOIN(
 			)
 			AND create_date >= DATEADD(
 				DAY,
-				- 30,
+				@dt,
 				GETDATE()
 			)
 			AND batch IS NOT NULL

@@ -1,14 +1,28 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_QueryCust_Redeliv]    Script Date: 20/07/2018 11:14:01 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_QueryCust_Redeliv]    Script Date: 25/07/2018 15:22:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 ALTER PROCEDURE [dbo].[TMS_QueryCust_Redeliv] --exec [dbo].[TMS_QueryCust_Redeliv] '20180525_154124248'
-@RunId varchar(100)
+@RunId varchar(100), @chn varchar(100)
 AS
 SET NOCOUNT ON;
+DECLARE @tb AS TABLE
+	(
+		chn VARCHAR(100)
+	);
+
+INSERT
+	INTO
+		@tb SELECT
+			*
+		FROM
+			dbo.splitstring(
+				@chn,
+				','
+			);
 INSERT
 	INTO
 		BOSNET1.dbo.TMS_PreRouteJob SELECT
@@ -188,7 +202,12 @@ INSERT
 			)
 		WHERE
 			rd.RedeliveryStatus = 1
-			AND Customer_ID IS NOT NULL;
-
+			AND Customer_ID IS NOT NULL
+			AND Distribution_Channel IN(
+		SELECT
+			*
+		FROM
+			@tb
+	)
 SELECT
 	'ok';
