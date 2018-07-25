@@ -84,6 +84,13 @@
                 </div>
                 <div style="float: left; width: 50%">
                     <br><br>            
+                    <label class="fzLabel">reDeliv</label>
+                    <select class="fzInput" id="reDeliv" name="reDeliv" />
+                        <option value="true" selected="true">yes</option>
+                        <option value="false">no</option>                   
+                    </select>
+                    
+                    <br><br>            
                     <label class="fzLabel">Max Distance</label>
                     <select class="fzInput" id="DefaultDistance" name="DefaultDistance" />
                         <option value="0">Unconstrain</option>
@@ -115,7 +122,7 @@
                         <option value="1">0%</option>
                     </select>
                     
-                    <br><br><br><br><br>
+                    <br><br><br>
                 </div>
             </div>           
 

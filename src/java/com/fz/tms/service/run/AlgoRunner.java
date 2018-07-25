@@ -51,6 +51,7 @@ public class AlgoRunner implements BusinessLogic {
         String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
         String urls = FZUtil.getHttpParam(request, "url");        
+        Boolean redeliv = Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv"));
         
         
         //param
@@ -212,8 +213,10 @@ public class AlgoRunner implements BusinessLogic {
                     runIdT = runId;
                     threadName = "QueryCust";
                     chns = chn;
-                    AlgoRunnerThread al = new  AlgoRunnerThread();
-                    al.start();
+                    if(redeliv){
+                        AlgoRunnerThread al = new  AlgoRunnerThread();
+                        al.start();
+                    }
                     
                     if (resp.equalsIgnoreCase("OK")){
                         errMsg = "Insert Param";
