@@ -125,13 +125,14 @@ public class SubmitToSapAPI {
                         rs.Plant = hmSP.get("Plant");
                         rs.Shipment_Route = route;
                         rs.Description = "";
-                        rs.Status_Plan = getNextDate(parseRunId(runId, true), true);
+                        rs.Status_Plan = getNextDate(parseRunId(runId, true), true, 1);
                         rs.Status_Check_In = null;
                         rs.Status_Load_Start = null;
                         rs.Status_Load_End = null;
                         rs.Status_Complete = null;
-                        rs.Status_Shipment_Start = getNextDate(parseRunId(runId, false), false) + " " + alStartAndEndTime.get(0);
-                        rs.Status_Shipment_End = getNextDate(parseRunId(runId, false), false) + " " + alStartAndEndTime.get(1);
+                        rs.Status_Shipment_Start = getNextDate(parseRunId(runId, false), false,1) + " " + alStartAndEndTime.get(0);
+                        int nxt = Integer.parseInt(alStartAndEndTime.get(2)) > 0 ? 2 : 1;
+                        rs.Status_Shipment_End = getNextDate(parseRunId(runId, false), false,nxt) + " " + alStartAndEndTime.get(1);
                         rs.Service_Agent_Id = hmPRV.get("IdDriver");
                         if (rs.Shipment_Type.equals("ZDSI")) {
                             rs.Shipment_Number_Dummy = runId.replace("_", "") + he.vehicle_no;
@@ -188,7 +189,7 @@ public class SubmitToSapAPI {
         return content;
     }
 
-    public String getNextDate(String date, boolean full) throws ParseException {
+    public String getNextDate(String date, boolean full, int nxt) throws ParseException {
         SimpleDateFormat dateFormat;
         if (full) {
             dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss:sss");
@@ -197,7 +198,7 @@ public class SubmitToSapAPI {
         }
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateFormat.parse(date));
-        cal.add(Calendar.DATE, 1);
+        cal.add(Calendar.DATE, nxt);
         String convertedDate = dateFormat.format(cal.getTime());
 
         return "" + convertedDate;
@@ -383,7 +384,7 @@ public class SubmitToSapAPI {
                         + "         )\n"
                         + "         AND sp.create_date >= DATEADD(\n"
                         + "		DAY,\n"
-                        + "		- 30,\n"
+                        + "		- 90,\n"
                         + "		GETDATE()\n"
                         + "         )\n"
                         + "ORDER BY\n"
@@ -529,7 +530,42 @@ public class SubmitToSapAPI {
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
                 String sql;
-                sql = "SELECT arrive, depart FROM BOSNET1.dbo.TMS_RouteJob where runID = '" + runId + "' and vehicle_code = '" + vehicleCode + "' and customer_id = '';";
+                sql = "SELECT\n" +
+                        "	arrive,\n" +
+                        "	depart,\n" +
+                        "	cnt\n" +
+                        "FROM\n" +
+                        "	BOSNET1.dbo.TMS_RouteJob aw,\n" +
+                        "	(\n" +
+                        "		SELECT\n" +
+                        "			COUNT(*) cnt\n" +
+                        "		FROM\n" +
+                        "			(\n" +
+                        "				SELECT\n" +
+                        "					CAST(\n" +
+                        "						arrive AS DATETIME2\n" +
+                        "					) arrive,\n" +
+                        "					CAST(\n" +
+                        "						depart AS DATETIME2\n" +
+                        "					) depart\n" +
+                        "				FROM\n" +
+                        "					BOSNET1.dbo.TMS_RouteJob\n" +
+                        "				WHERE\n" +
+                        "					runID = '"+runId+"'\n" +
+                        "					AND vehicle_code = '"+vehicleCode+"'\n" +
+                        "			) ad\n" +
+                        "		WHERE\n" +
+                        "			ad.arrive >= CAST(\n" +
+                        "				'00:01' AS DATETIME2\n" +
+                        "			)\n" +
+                        "			AND ad.arrive <= CAST(\n" +
+                        "				'05:00' AS DATETIME2\n" +
+                        "			)\n" +
+                        "	) aq\n" +
+                        "WHERE\n" +
+                        "	runID = '"+runId+"'\n" +
+                        "	AND vehicle_code = '"+vehicleCode+"'\n" +
+                        "	AND customer_id = '';";
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     int i = 0;
                     while (rs.next()) {
@@ -537,6 +573,7 @@ public class SubmitToSapAPI {
                             al.add(rs.getString("depart"));
                         } else {
                             al.add(rs.getString("arrive"));
+                            al.add(rs.getString("cnt"));
                         }
                         i++;
                     }
