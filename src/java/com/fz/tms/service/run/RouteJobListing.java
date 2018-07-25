@@ -287,7 +287,7 @@ public class RouteJobListing implements BusinessLogic {
                 + "			)\n"
                 + "			AND create_date >= DATEADD(\n"
                 + "				DAY,\n"
-                + "				- 30,\n"
+                + "				"+AlgoRunner.dy+",\n"
                 + "				GETDATE()\n"
                 + "			)\n"
                 + "			AND batch IS NOT NULL\n"

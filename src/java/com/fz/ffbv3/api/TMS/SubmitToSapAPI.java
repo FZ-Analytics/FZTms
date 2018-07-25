@@ -8,6 +8,7 @@ package com.fz.ffbv3.api.TMS;
 import com.fz.generic.Db;
 import com.fz.tms.params.model.ResultShipment;
 import com.fz.tms.params.model.RunResultEditResultSubmitToSap;
+import com.fz.tms.service.run.AlgoRunner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.UnsupportedEncodingException;
@@ -327,7 +328,7 @@ public class SubmitToSapAPI {
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
                 String sql;
-                sql = "SELECT DISTINCT\n"
+                /*sql = "SELECT DISTINCT\n"
                         + "     sp.DO_Number,\n"
                         + "     sp.Route,\n"
                         + "     sp.Item_Number,\n"
@@ -383,12 +384,111 @@ public class SubmitToSapAPI {
                         + "         )\n"
                         + "         AND sp.create_date >= DATEADD(\n"
                         + "		DAY,\n"
-                        + "		- 30,\n"
+                        + "		"+AlgoRunner.dy+",\n"
                         + "		GETDATE()\n"
                         + "         )\n"
                         + "ORDER BY\n"
-                        + "         sp.DO_Number";
+                        + "         sp.DO_Number";*/
+                sql = "SELECT\n" +
+                        "	DISTINCT prj.DO_Number,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Route\n" +
+                        "		ELSE rs.Shipment_Route\n" +
+                        "	END Route,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Item_Number\n" +
+                        "		ELSE rs.Delivery_Item\n" +
+                        "	END Item_Number,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Plant\n" +
+                        "		ELSE rs.Plant\n" +
+                        "	END Plant,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.DOQty\n" +
+                        "		ELSE rs.Delivery_Quantity\n" +
+                        "	END DOQty,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Product_ID\n" +
+                        "		ELSE rs.Material\n" +
+                        "	END Product_ID,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Batch\n" +
+                        "		ELSE rs.Batch\n" +
+                        "	END Batch,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.NotUsed_Flag\n" +
+                        "		ELSE 'N'\n" +
+                        "	END NotUsed_Flag,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Incoterm\n" +
+                        "		ELSE 'FCO'\n" +
+                        "	END Incoterm,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Order_Type\n" +
+                        "		ELSE 'ZDCO'\n" +
+                        "	END Order_Type,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Create_Date\n" +
+                        "		ELSE format(\n" +
+                        "			getdate(),\n" +
+                        "			'yyyy-MM-dd'\n" +
+                        "		)\n" +
+                        "	END Create_Date,\n" +
+                        "	rj.arrive,\n" +
+                        "	rj.depart\n" +
+                        "FROM\n" +
+                        "	(\n" +
+                        "		SELECT\n" +
+                        "			DISTINCT runId,\n" +
+                        "			prj.Request_Delivery_Date,\n" +
+                        "			Customer_ID,\n" +
+                        "			DO_Number,\n" +
+                        "			RedeliveryCount\n" +
+                        "		FROM\n" +
+                        "			[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n" +
+                        "	) prj\n" +
+                        "LEFT OUTER JOIN(\n" +
+                        "		SELECT\n" +
+                        "			*\n" +
+                        "		FROM\n" +
+                        "			BOSNET1.dbo.TMS_ShipmentPlan\n" +
+                        "		WHERE\n" +
+                        "			Already_Shipment <> 'Y'\n" +
+                        "			AND Batch <> 'NULL'\n" +
+                        "			AND NotUsed_Flag IS NULL\n" +
+                        "			AND incoterm = 'FCO'\n" +
+                        "			AND(\n" +
+                        "				Order_Type = 'ZDCO'\n" +
+                        "				OR Order_Type = 'ZDTO'\n" +
+                        "			)\n" +
+                        "			AND create_date >= DATEADD(\n" +
+                        "				DAY,\n" +
+                        "				"+AlgoRunner.dy+",\n" +
+                        "				GETDATE()\n" +
+                        "			)\n" +
+                        "	) sp ON\n" +
+                        "	prj.Customer_ID = sp.Customer_ID\n" +
+                        "	AND prj.DO_Number = sp.DO_Number\n" +
+                        "LEFT OUTER JOIN(\n" +
+                        "		SELECT\n" +
+                        "			runId,\n" +
+                        "			rj.customer_id,\n" +
+                        "			rj.arrive,\n" +
+                        "			rj.depart\n" +
+                        "		FROM\n" +
+                        "			[BOSNET1].[dbo].[TMS_RouteJob] rj\n" +
+                        "	) rj ON\n" +
+                        "	prj.Customer_ID = rj.Customer_ID\n" +
+                        "	AND prj.RunId = rj.runID\n" +
+                        "LEFT OUTER JOIN BOSNET1.dbo.TMS_Result_Shipment rs ON\n" +
+                        "	rs.Delivery_Number = prj.DO_Number\n" +
+                        "WHERE\n" +
+                        "	rj.Customer_ID = '" + custId + "'\n" +
+                        "	AND prj.runId = '" + runId + "'\n" +
+                        "ORDER BY\n" +
+                        "	prj.DO_Number";
 
+                System.out.println(sql);
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
                         HashMap<String, String> hm = new HashMap<>();
