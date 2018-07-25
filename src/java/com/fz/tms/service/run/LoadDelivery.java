@@ -182,12 +182,13 @@ public class LoadDelivery implements BusinessLogic {
                         + "ORDER BY\n"
                         + "	rj.routeNb, rj.jobNb";
                 try (ResultSet rs = stm.executeQuery(sql)) {*/
-        String sql = "{call bosnet1.dbo.TMS_runResultEditResultShow(?)}";
+        String sql = "{call bosnet1.dbo.TMS_runResultEditResultShow(?,?)}";
         System.out.println(sql + runId);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 java.sql.CallableStatement stmt =
                 con.prepareCall(sql)) {
             stmt.setString(1, runId);
+            stmt.setInt(2, AlgoRunner.dy);
             try(ResultSet rs = stmt.executeQuery()){
                 String prevLong = "";
                 String prevLat = "";

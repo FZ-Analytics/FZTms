@@ -8,6 +8,7 @@ package com.fz.ffbv3.api.TMS;
 import com.fz.generic.Db;
 import com.fz.tms.params.model.ResultShipment;
 import com.fz.tms.params.model.RunResultEditResultSubmitToSap;
+import com.fz.tms.service.run.AlgoRunner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.UnsupportedEncodingException;
@@ -327,69 +328,107 @@ public class SubmitToSapAPI {
         ArrayList<HashMap<String, String>> al = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
-                String sql;
-                sql = "SELECT DISTINCT\n"
-                        + "     sp.DO_Number,\n"
-                        + "     sp.Route,\n"
-                        + "     sp.Item_Number,\n"
-                        + "     sp.Plant,\n"
-                        + "     sp.DOQty,\n"
-                        + "     sp.Product_ID,\n"
-                        + "     sp.Batch,\n"
-                        + "     sp.NotUsed_Flag,\n"
-                        + "     sp.Incoterm,\n"
-                        + "     sp.Order_Type,\n"
-                        + "     sp.Create_Date,\n"
-                        + "     rj.arrive,\n"
-                        + "     rj.depart\n"
-                        + "FROM\n"
-                        + "     [BOSNET1].[dbo].[TMS_ShipmentPlan] sp\n"
-                        + "INNER JOIN (\n"
-                        + "	SELECT\n"
-                        + "		rj.customer_id,\n"
-                        + "		rj.arrive,\n"
-                        + "		rj.depart\n"
-                        + "	FROM\n"
-                        + "		[BOSNET1].[dbo].[TMS_RouteJob] rj\n"
-                        + "	WHERE\n"
-                        + "		rj.runId = '" + runId + "'\n"
-                        + "		AND rj.Customer_ID = '" + custId + "') rj ON rj.customer_id = sp.Customer_ID\n"
-                        + "INNER JOIN (\n"
-                        + "	SELECT DISTINCT\n"
-                        + "		prj.Request_Delivery_Date\n"
-                        + "	FROM \n"
-                        + "		[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
-                        + "	WHERE \n"
-                        + "		prj.runId = '" + runId + "'\n"
-                        + "             AND prj.Customer_ID = '" + custId + "') prj "
-                        + "     ON \n"
-                        + "             prj.Request_Delivery_Date = \n"
-                        + "             CASE \n"
-                        + "			WHEN \n"
-                        + "				DATENAME(dw, sp.Request_Delivery_Date) = 'Sunday'\n"
-                        + "			THEN \n"
-                        + "				DATEADD(day, -1, sp.Request_Delivery_Date)\n"
-                        + "			ELSE\n"
-                        + "				sp.Request_Delivery_Date\n"
-                        + "		END\n"
-                        + "WHERE\n"
-                        + "         sp.Customer_ID = '" + custId + "'\n"
-                        + "         AND sp.Already_Shipment <> 'Y'\n"
-                        + "         AND sp.Batch <> 'NULL'\n"
-                        + "         AND sp.NotUsed_Flag is NULL\n"
-                        + "         AND sp.incoterm = 'FCO'\n"
-                        + "         AND(\n"
-                        + "		sp.Order_Type = 'ZDCO'\n"
-                        + "		OR sp.Order_Type = 'ZDTO'\n"
-                        + "         )\n"
-                        + "         AND sp.create_date >= DATEADD(\n"
-                        + "		DAY,\n"
-                        + "		- 90,\n"
-                        + "		GETDATE()\n"
-                        + "         )\n"
-                        + "ORDER BY\n"
-                        + "         sp.DO_Number";
+                String sql;                
+                sql = "SELECT\n" +
+                        "	DISTINCT prj.DO_Number,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Route\n" +
+                        "		ELSE rs.Shipment_Route\n" +
+                        "	END Route,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Item_Number\n" +
+                        "		ELSE rs.Delivery_Item\n" +
+                        "	END Item_Number,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Plant\n" +
+                        "		ELSE rs.Plant\n" +
+                        "	END Plant,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.DOQty\n" +
+                        "		ELSE rs.Delivery_Quantity\n" +
+                        "	END DOQty,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Product_ID\n" +
+                        "		ELSE rs.Material\n" +
+                        "	END Product_ID,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Batch\n" +
+                        "		ELSE rs.Batch\n" +
+                        "	END Batch,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.NotUsed_Flag\n" +
+                        "		ELSE 'N'\n" +
+                        "	END NotUsed_Flag,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Incoterm\n" +
+                        "		ELSE 'FCO'\n" +
+                        "	END Incoterm,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Order_Type\n" +
+                        "		ELSE 'ZDCO'\n" +
+                        "	END Order_Type,\n" +
+                        "	CASE\n" +
+                        "		WHEN RedeliveryCount = '' THEN sp.Create_Date\n" +
+                        "		ELSE format(\n" +
+                        "			getdate(),\n" +
+                        "			'yyyy-MM-dd'\n" +
+                        "		)\n" +
+                        "	END Create_Date,\n" +
+                        "	rj.arrive,\n" +
+                        "	rj.depart\n" +
+                        "FROM\n" +
+                        "	(\n" +
+                        "		SELECT\n" +
+                        "			DISTINCT runId,\n" +
+                        "			prj.Request_Delivery_Date,\n" +
+                        "			Customer_ID,\n" +
+                        "			DO_Number,\n" +
+                        "			RedeliveryCount\n" +
+                        "		FROM\n" +
+                        "			[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n" +
+                        "	) prj\n" +
+                        "LEFT OUTER JOIN(\n" +
+                        "		SELECT\n" +
+                        "			*\n" +
+                        "		FROM\n" +
+                        "			BOSNET1.dbo.TMS_ShipmentPlan\n" +
+                        "		WHERE\n" +
+                        "			Already_Shipment <> 'Y'\n" +
+                        "			AND Batch <> 'NULL'\n" +
+                        "			AND NotUsed_Flag IS NULL\n" +
+                        "			AND incoterm = 'FCO'\n" +
+                        "			AND(\n" +
+                        "				Order_Type = 'ZDCO'\n" +
+                        "				OR Order_Type = 'ZDTO'\n" +
+                        "			)\n" +
+                        "			AND create_date >= DATEADD(\n" +
+                        "				DAY,\n" +
+                        "				"+AlgoRunner.dy+",\n" +
+                        "				GETDATE()\n" +
+                        "			)\n" +
+                        "	) sp ON\n" +
+                        "	prj.Customer_ID = sp.Customer_ID\n" +
+                        "	AND prj.DO_Number = sp.DO_Number\n" +
+                        "LEFT OUTER JOIN(\n" +
+                        "		SELECT\n" +
+                        "			runId,\n" +
+                        "			rj.customer_id,\n" +
+                        "			rj.arrive,\n" +
+                        "			rj.depart\n" +
+                        "		FROM\n" +
+                        "			[BOSNET1].[dbo].[TMS_RouteJob] rj\n" +
+                        "	) rj ON\n" +
+                        "	prj.Customer_ID = rj.Customer_ID\n" +
+                        "	AND prj.RunId = rj.runID\n" +
+                        "LEFT OUTER JOIN BOSNET1.dbo.TMS_Result_Shipment rs ON\n" +
+                        "	rs.Delivery_Number = prj.DO_Number\n" +
+                        "WHERE\n" +
+                        "	rj.Customer_ID = '" + custId + "'\n" +
+                        "	AND prj.runId = '" + runId + "'\n" +
+                        "ORDER BY\n" +
+                        "	prj.DO_Number";
 
+                System.out.println(sql);
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
                         HashMap<String, String> hm = new HashMap<>();
