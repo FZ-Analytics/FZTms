@@ -28,7 +28,9 @@
 
         }
         </script>
+        <label style="float: right;" class="fzLabel"><a href="../usrMgt/logout.jsp">Log out</a></label>
         <br>
+        
         <form class="container" action="runProcess.jsp" method="post">
             <div class="fzErrMsg">
                 <%=get("errMsg")%>
@@ -86,8 +88,8 @@
                     <br><br>            
                     <label class="fzLabel">reDeliv</label>
                     <select class="fzInput" id="reDeliv" name="reDeliv" />
-                        <option value="true" selected="true">yes</option>
-                        <option value="false">no</option>                   
+                        <option value="true">yes</option>
+                        <option value="false" selected="true">no</option>                   
                     </select>
                     
                     <br><br>            
