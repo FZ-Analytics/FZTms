@@ -1,12 +1,14 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_QueryCust_Redeliv]    Script Date: 25/07/2018 15:22:21 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_QueryCust_Redeliv]    Script Date: 10/08/2018 16:20:57 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 ALTER PROCEDURE [dbo].[TMS_QueryCust_Redeliv] --exec [dbo].[TMS_QueryCust_Redeliv] '20180525_154124248'
 @RunId varchar(100), @chn varchar(100)
+--set @RunId = '20180525_154124248';
+--set @chn = 'Gt,FS,IT';
 AS
 SET NOCOUNT ON;
 DECLARE @tb AS TABLE
@@ -23,6 +25,7 @@ INSERT
 				@chn,
 				','
 			);
+
 INSERT
 	INTO
 		BOSNET1.dbo.TMS_PreRouteJob SELECT
@@ -93,75 +96,116 @@ INSERT
 					prj.DOQty,
 					prj.DOQtyUOM,
 					prj.Name1,
-					cs.Street,
+					prj.Street,
 					prj.Distribution_Channel,
 					prj.Customer_Order_Block_all,
 					prj.Customer_Order_Block,
 					prj.Request_Delivery_Date,
 					prj.MarketId,
-					cs.Desa_Kelurahan,
-					cs.Kecamatan,
-					cs.Kodya_Kabupaten,
+					prj.Desa_Kelurahan,
+					prj.Kecamatan,
+					prj.Kodya_Kabupaten,
 					prj.Batch,
 					prj.Ket_DO,
 					MAX( prj.RedeliveryCount ) RedeliveryCount
 				FROM
 					(
 						SELECT
-							concat(
-								REPLACE(
-									prj.RunId,
-									'_',
-									''
-								),
-								rj.vehicle_code
-							) runs,
-							prj.*
-						FROM
-							BOSNET1.dbo.TMS_PreRouteJob prj
-						INNER JOIN(
-								SELECT
-									DISTINCT runId,
-									customer_id,
-									vehicle_code
-								FROM
-									BOSNET1.dbo.TMS_RouteJob
-							) rj ON
-							prj.runId = rj.runId
-							AND prj.customer_id = rj.customer_id
-					) prj
-				INNER JOIN BOSNET1.dbo.TMS_Status_Shipment ss ON
-					prj.runs = ss.Shipment_Number_Dummy
-				INNER JOIN(
-						SELECT
-							a.*
+							prj.Customer_ID,
+							prj.DO_Number,
+							prj.Long,
+							prj.Lat,
+							prj.Customer_priority,
+							prj.Service_time,
+							prj.deliv_start,
+							prj.deliv_end,
+							prj.vehicle_type_list,
+							prj.total_kg,
+							prj.total_cubication,
+							prj.DeliveryDeadline,
+							prj.DayWinStart,
+							prj.DayWinEnd,
+							prj.Is_Edit,
+							prj.Product_Description,
+							prj.Gross_Amount,
+							prj.DOQty,
+							prj.DOQtyUOM,
+							prj.Name1,
+							cs.Street,
+							prj.Distribution_Channel,
+							prj.Customer_Order_Block_all,
+							prj.Customer_Order_Block,
+							prj.Request_Delivery_Date,
+							prj.MarketId,
+							cs.Desa_Kelurahan,
+							cs.Kecamatan,
+							cs.Kodya_Kabupaten,
+							'0' Batch,
+							prj.Ket_DO,
+							CASE
+								WHEN prj.RedeliveryCount IS NULL THEN 0
+								ELSE prj.RedeliveryCount
+							END RedeliveryCount
 						FROM
 							(
 								SELECT
-									ROW_NUMBER() OVER(
-										PARTITION BY Customer_ID
-									ORDER BY
-										Customer_ID
-									) AS noId,
-									*
+									concat(
+										REPLACE(
+											prj.RunId,
+											'_',
+											''
+										),
+										rj.vehicle_code
+									) runs,
+									prj.*
 								FROM
-									bosnet1.dbo.customer
-								WHERE
+									BOSNET1.dbo.TMS_PreRouteJob prj
+								INNER JOIN(
+										SELECT
+											DISTINCT runId,
+											customer_id,
+											vehicle_code
+										FROM
+											BOSNET1.dbo.TMS_RouteJob
+									) rj ON
+									prj.runId = rj.runId
+									AND prj.customer_id = rj.customer_id
+							) prj
+						INNER JOIN BOSNET1.dbo.TMS_Status_Shipment ss ON
+							prj.runs = ss.Shipment_Number_Dummy
+						INNER JOIN(
+								SELECT
+									a.*
+								FROM
 									(
-										Customer_Order_Block IS NULL
-										OR Customer_Order_Block = ''
-									)
-									AND(
-										Customer_Order_Block_all IS NULL
-										OR Customer_Order_Block_all = ''
-									)
-							) a
+										SELECT
+											ROW_NUMBER() OVER(
+												PARTITION BY Customer_ID
+											ORDER BY
+												Customer_ID
+											) AS noId,
+											*
+										FROM
+											bosnet1.dbo.customer
+										WHERE
+											(
+												Customer_Order_Block IS NULL
+												OR Customer_Order_Block = ''
+											)
+											AND(
+												Customer_Order_Block_all IS NULL
+												OR Customer_Order_Block_all = ''
+											)
+									) a
+								WHERE
+									a.noid = 1
+							) cs ON
+							prj.Customer_ID = cs.Customer_ID
 						WHERE
-							a.noid = 1
-					) cs ON
-					prj.Customer_ID = cs.Customer_ID
-				WHERE
-					ss.SAP_Status IS NULL
+							ss.SAP_Status IS NULL --and prj.RedeliveryCount is not null
+ --and prj.RedeliveryCount <> ''
+ --and prj.DO_Number = '8020001577'
+					) prj
 				GROUP BY
 					prj.Customer_ID,
 					prj.DO_Number,
@@ -183,31 +227,27 @@ INSERT
 					prj.DOQty,
 					prj.DOQtyUOM,
 					prj.Name1,
-					cs.Street,
+					prj.Street,
 					prj.Distribution_Channel,
 					prj.Customer_Order_Block_all,
 					prj.Customer_Order_Block,
 					prj.Request_Delivery_Date,
 					prj.MarketId,
-					cs.Desa_Kelurahan,
-					cs.Kecamatan,
-					cs.Kodya_Kabupaten,
+					prj.Desa_Kelurahan,
+					prj.Kecamatan,
+					prj.Kodya_Kabupaten,
 					prj.Batch,
 					prj.Ket_DO
 			) rj ON
 			rd.DONumber = rj.DO_Number
-			AND(
-				rd.RedeliveryCount > rj.RedeliveryCount
-				OR rj.RedeliveryCount IS NULL
-			)
+			AND rd.RedeliveryCount > rj.RedeliveryCount
 		WHERE
 			rd.RedeliveryStatus = 1
 			AND Customer_ID IS NOT NULL
 			AND Distribution_Channel IN(
-		SELECT
-			*
-		FROM
-			@tb
-	)
-SELECT
-	'ok';
+				SELECT
+					*
+				FROM
+					@tb
+			) SELECT
+				'ok';
