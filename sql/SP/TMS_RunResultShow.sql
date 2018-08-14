@@ -1,10 +1,11 @@
 USE [BOSNET1]
 GO
+/****** Object:  StoredProcedure [dbo].[TMS_RunResultShow]    Script Date: 18/07/2018 09:49:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE [dbo].[TMS_RunResultShow] --exec [dbo].[TMS_RunResultShow] '20180525_100044389'
+ALTER PROCEDURE [dbo].[TMS_RunResultShow] --exec [dbo].[TMS_RunResultShow] '20180717_104539450'
 @RunId varchar(100)
 AS
 SET NOCOUNT ON;
@@ -37,6 +38,7 @@ INSERT
 
 DECLARE @sap AS TABLE
 	(
+		Cust VARCHAR(100) NULL,
 		DOPR VARCHAR(100) NULL,
 		DOSP VARCHAR(100) NULL,
 		DOSS VARCHAR(100) NULL,
@@ -128,7 +130,13 @@ SELECT
 		)
 	) AS Dist,
 	Request_Delivery_Date,
-	xq.RowNumber
+	xq.RowNumber,
+	CASE
+		WHEN xw.DOSP IS NULL
+		AND xw.DORS IS NULL
+		AND xw.DOSS IS NULL THEN '0'
+		ELSE '1'
+	END batch
 FROM
 	bosnet1.dbo.tms_RouteJob j
 LEFT OUTER JOIN(
@@ -173,6 +181,18 @@ LEFT OUTER JOIN(
 INNER JOIN @run xq ON
 	xq.vehicle_code = j.vehicle_code
 	AND xq.runID = j.runID
+LEFT OUTER JOIN(
+		SELECT
+			DISTINCT s.Cust,
+			MIN( s.DOSP ) DOSP,
+			MIN( s.DORS ) DORS,
+			MIN( s.DOSS ) DOSS
+		FROM
+			@sap s
+		GROUP BY
+			s.Cust
+	) xw ON
+	xw.Cust = j.customer_ID
 WHERE
 	j.runID = @RunId
 ORDER BY

@@ -56,6 +56,7 @@ public class ShowParams implements BusinessLogic {
                         op.Desc = FZUtil.getRsString(rs, i++, "");
                         js.add(op);
                     }
+                    ps.close();
                 }
             }
         }
@@ -95,6 +96,7 @@ public class ShowParams implements BusinessLogic {
             ps.executeUpdate();
             con.setAutoCommit(true);
             str = "OK";
+            ps.close();
         }
         return str;
     }
@@ -113,6 +115,7 @@ public class ShowParams implements BusinessLogic {
             
              con.setAutoCommit(true);
              str = "OK";
+             psHdr.close();
         }
         return str;
     }

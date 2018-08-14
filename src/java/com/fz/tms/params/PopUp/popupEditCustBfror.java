@@ -124,6 +124,7 @@ public class popupEditCustBfror implements BusinessLogic {
                 request.setAttribute("runId", runId);
                 request.setAttribute("oriRunID", oriRunID);
                 request.setAttribute("channel", channel);
+                ps.close();
             }
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
@@ -158,6 +159,7 @@ public class popupEditCustBfror implements BusinessLogic {
                     int i = 1;
                     str = FZUtil.getRsString(rs, i++, "");
                 }
+                ps.close();
             }
         }
         

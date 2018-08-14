@@ -132,6 +132,7 @@ public class AccessGoogleDirection {
                     tmp.add(lt);
                 }
                  */
+                ps.close();
             }
         }
 

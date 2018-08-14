@@ -437,6 +437,7 @@ public class ManualRouteDB {
             psHdr.executeUpdate();
             
             insert = "OK";
+            psHdr.close();
         }
         return insert;
     }

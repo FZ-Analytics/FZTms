@@ -33,4 +33,19 @@ public class RouteJobLog {
     public double activityCost = 0;
     public double dist = 0;
     public String isFix = "";
+    
+    public String start;
+    public String end;
+    public String servicetime;
+    public int times;
+    public double costPerM;
+    
+    public String print(){
+        System.out.println(jobId+"|"+custId+"|"+countDoNo+"|"+vehicleCode+"|"+activity+"|"+routeNb+"|"+jobNb+"|"+
+                arrive+"|"+depart
+                +"|"+runId+"|"+branch+"|"+shift+"|"+lon+"|"+lat+"|"+weight+"|"+volume
+                +"|"+transportCost+"|"+activityCost+"|"+dist
+        );
+        return "";
+    }
 }

@@ -107,7 +107,7 @@ public class PageTopUtils {
                     str = getLink(url, request, pc);
                 }else{
                     str = "OK";
-                    setDate(EmpyID, Key);
+                    //setDate(EmpyID, Key);
                 }
                 
                 String isParam = "";
@@ -188,27 +188,30 @@ public class PageTopUtils {
                 "	BOSNET1.dbo.TMS_UserStatus\n" +
                 "SET\n" +
                 "	Status = '0'\n" +
+                "	,UpdateTable = '"+dt+"'\n" +
                 "WHERE\n" +
                 "	DATEDIFF(\n" +
                 "		HOUR,\n" +
                 "		UpdateTable,\n" +
                 "		GETDATE()\n" +
-                "	)> 2;\n" +
+                "	)> 3;\n" +
                 "\n" +
                 "DELETE\n" +
                 "FROM\n" +
                 "	BOSNET1.dbo.TMS_UserStatus\n" +
                 "WHERE\n" +
-                "	DATEDIFF(\n" +
+                "	Status = '0'\n" +
+                "	AND DATEDIFF(\n" +
                 "		HOUR,\n" +
                 "		UpdateTable,\n" +
                 "		GETDATE()\n" +
-                "	)> 5;";
+                "	)> 1;";
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)) {
             con.setAutoCommit(false);
             ps.executeUpdate();
             con.setAutoCommit(true);
+            ps.close();
         }
     }
     
@@ -267,6 +270,7 @@ public class PageTopUtils {
                     }else{
                         throw new Exception(); 
                     }
+                    ps.close();
                 }
             }
         }        

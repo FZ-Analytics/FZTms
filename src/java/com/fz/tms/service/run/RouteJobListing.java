@@ -57,6 +57,9 @@ public class RouteJobListing implements BusinessLogic {
     String dateDeliv = "";
     String channel = "";
     List<List<HashMap<String, String>>> all = new ArrayList<List<HashMap<String, String>>>();
+    
+    public static String EmpyID;
+    public static String Key;
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -74,7 +77,7 @@ public class RouteJobListing implements BusinessLogic {
         //all = map.runs(runID, jss);
 
         //TMS_Progress for what if
-        insertNextProgress();
+        insertNextProgress(runID);
 
         /*Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonOutput = gson.toJson(all);
@@ -96,6 +99,12 @@ public class RouteJobListing implements BusinessLogic {
         request.setAttribute("branch", branch);
         request.setAttribute("shift", shift);
         request.setAttribute("OriRunID", OriRunID);
+        
+        //update login
+        EmpyID = (String) pc.getSession().getAttribute("EmpyID");
+        Key = (String) pc.getSession().getAttribute("Key");
+        RunThread R1 = new RunThread("Thread",EmpyID,Key);
+        R1.start();
     }
 
     public static String getNextRunId(String runId) {
@@ -126,7 +135,7 @@ public class RouteJobListing implements BusinessLogic {
         return timeStampDate;
     }
 
-    public void insertNextProgress() throws Exception {
+    public void insertNextProgress(String str) throws Exception {
         Timestamp createTime = getTimeStamp();
         int rowNum = 0;
         String originalRunId = "";
@@ -158,9 +167,10 @@ public class RouteJobListing implements BusinessLogic {
             String sql = "INSERT INTO bosnet1.dbo.TMS_Progress "
                     + "(runID, status, msg, pct, mustFinish, branch, shift, tripCalc, lastUpd, created, maxIter, DelivDate, Re_RunId, OriRunId, Channel) "
                     + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-
+            String next = getNextRunId(runID);
+            System.out.println("INSERT "+next+" "+originalRunId);
             try (Connection con = (new Db()).getConnection("jdbc/fztms"); PreparedStatement psHdr = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
-                psHdr.setString(1, getNextRunId(runID));
+                psHdr.setString(1, next);
                 psHdr.setString(2, "DONE");
                 psHdr.setString(3, "Done");
                 psHdr.setString(4, "100");
@@ -172,11 +182,12 @@ public class RouteJobListing implements BusinessLogic {
                 psHdr.setString(10, "" + createTime);
                 psHdr.setString(11, null);
                 psHdr.setString(12, dateDeliv);
-                psHdr.setString(13, "-");
+                psHdr.setString(13, str);
                 psHdr.setString(14, originalRunId);
                 psHdr.setString(15, channel);
 
                 psHdr.executeUpdate();
+                psHdr.close();
             }
         }
     }
@@ -202,6 +213,7 @@ public class RouteJobListing implements BusinessLogic {
 
             con.setAutoCommit(true);
             str = "OK";
+            psHdr.close();
         }
         return str;
     }
@@ -237,6 +249,7 @@ public class RouteJobListing implements BusinessLogic {
 
             con.setAutoCommit(true);
             str = "OK";
+            psHdr.close();
         }
         return str;
     }
@@ -318,6 +331,7 @@ public class RouteJobListing implements BusinessLogic {
                     //ps.executeUpdate();
                     //con.setAutoCommit(true);
                 }
+                ps.close();
             }
         }
 
@@ -341,6 +355,7 @@ public class RouteJobListing implements BusinessLogic {
                     //ps.executeUpdate();
                     //con.setAutoCommit(true);
                 }
+                ps.close();
             }
         }
 

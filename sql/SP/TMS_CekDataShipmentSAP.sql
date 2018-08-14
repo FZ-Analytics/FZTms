@@ -1,5 +1,6 @@
 USE [BOSNET1]
 GO
+/****** Object:  StoredProcedure [dbo].[TMS_CekDataShipmentSAP]    Script Date: 18/07/2018 09:44:00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -9,8 +10,12 @@ ALTER PROCEDURE [dbo].[TMS_CekDataShipmentSAP] --exec [dbo].[TMS_CekDataShipment
 AS
 SET NOCOUNT ON;
 SELECT
+	prj.Customer_ID as Cust,
 	prj.DO_Number AS DOPR,
-	sp.DO_Number AS DOSP,
+	CASE
+		WHEN sp.DO_Number IS NULL THEN '802000000'
+		ELSE NULL
+	END AS DOSP,
 	ss.Delivery_Number AS DOSS,
 	sn.Delivery_Number AS DORS
 FROM
@@ -61,3 +66,5 @@ LEFT OUTER JOIN(
 	prj.DO_Number = sn.Delivery_Number
 WHERE
 	prj.RunId = @RunId
+order by
+	prj.DO_Number

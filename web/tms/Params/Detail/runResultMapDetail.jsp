@@ -61,15 +61,18 @@
                         center: new google.maps.LatLng(
                                 parseFloat(mark[0].lat),
                                 parseFloat(mark[0].lng)),
-                        zoom: 30,
+                        zoom: 15,
                         mapTypeId: google.maps.MapTypeId.ROADMAP
                     };
+					
+
 
                     var infoWindow = new google.maps.InfoWindow();
                     map = new google.maps.Map(document.getElementById("map"), mapOptions);
                     var lat_lng = new Array();
 
-                    
+					map.setZoom(10);
+										
                     for (var a = 0; a < markers.length; a++) {
                         mark = null;
                         mark = markers[a];
@@ -106,7 +109,7 @@
 
                                     //directionsTaskTimer = setInterval(function () {    
                                 }            
-                                recursive(src, des, a, i, clr);
+                                //recursive(src, des, a, i, clr);
                             }else if(mark[i].jobNb == "0"){
                                 console.log(mark[i].jobNb);
                                 var clr = mark[i].color;

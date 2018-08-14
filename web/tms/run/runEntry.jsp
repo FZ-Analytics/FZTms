@@ -22,6 +22,11 @@
           $( "#dateDeliv" ).datepicker( "option", "dateFormat", "yy-mm-dd");
           $( "#dateDeliv" ).val(yyyymmddDate(new Date()));
         } );
+        function br() {
+            window.open('../Params/PopUp/CekShipment.jsp?branch=' + $('#branch').val(), null,
+                    'scrollbars=1,resizable=1,height=500,width=950');
+
+        }
         </script>
         <br>
         <form class="container" action="runProcess.jsp" method="post">
@@ -48,6 +53,7 @@
                             <option value='<%=hd.branchId%>' <%if (hd.branchId.equals(WorkplaceID)) {%> selected="true" <%}%>><%=hd.branchId%> - <%=hd.name%></option>
                         <% } /* end for Branch Id */ %>
                     </select> 
+                    <span class="glyphicon glyphicon-check" aria-hidden="true" onclick="br();"></span>
 
                     <br><br>            
                     <label class="fzLabel">Date Deliv</label>
@@ -78,7 +84,7 @@
                 </div>
                 <div style="float: left; width: 50%">
                     <br><br>            
-                    <label class="fzLabel">Distance</label>
+                    <label class="fzLabel">Max Distance</label>
                     <select class="fzInput" id="DefaultDistance" name="DefaultDistance" />
                         <option value="0">Unconstrain</option>
                         <option value="3">3</option>
@@ -90,7 +96,26 @@
                         <option value="25">25</option>                        
                     </select>
                     
-                    <br><br><br><br><br><br><br><br><br>
+                    <br><br>            
+                    <label class="fzLabel">Speed</label>
+                    <select class="fzInput" id="SpeedKmPHour" name="SpeedKmPHour" />
+                        <option value="25" selected="true">25</option>
+                        <option value="50">50</option>
+                        <option value="75">75</option>
+                        <option value="100">100</option>       
+                    </select>
+                    
+                    <br><br>            
+                    <label class="fzLabel">Buffer Time</label>
+                    <select class="fzInput" id="buffTime" name="buffTime" />
+                        <option value="2" selected="true">100%</option>
+                        <option value="1.7">70%</option>
+                        <option value="1.5">50%</option>
+                        <option value="1.2">20%</option>
+                        <option value="1">0%</option>
+                    </select>
+                    
+                    <br><br><br><br><br>
                 </div>
             </div>           
 

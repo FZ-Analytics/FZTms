@@ -118,6 +118,7 @@ public class PreRouteJobDB {
             
              con.setAutoCommit(true);
              tr = "OK";
+             psHdr.close();
         }
         return tr;
     }
@@ -146,6 +147,7 @@ public class PreRouteJobDB {
             
             con.setAutoCommit(true);
             tr = "OK";
+            psHdr.close();
         }
         return tr;
     }
@@ -179,6 +181,7 @@ public class PreRouteJobDB {
             
              con.setAutoCommit(true);
              tr = "OK";
+             psHdr.close();
         }
         return tr;
     }

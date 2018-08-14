@@ -7,6 +7,7 @@ package com.fz.tms.service.run;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.tms.params.Detail.runResultMapDetailController;
 import com.fz.tms.params.model.Delivery;
 import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.PreRouteJobLog;
@@ -52,7 +53,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
 
     boolean hasBreak = false;
 
-    List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
+    //List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response, PageContext pc) throws Exception {
@@ -67,8 +68,8 @@ public class RouteJobListingResultEdit implements BusinessLogic {
         //breakTime = getBreakTime(getDayByDate(dateDeliv));
 
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
-        List<OptionModel> jss = new ArrayList<OptionModel>();
-        mapColor = map.runs(oriRunId, jss);
+        //List<OptionModel> jss = new ArrayList<OptionModel>();
+        //mapColor = map.runs(oriRunId, jss);
         ArrayList<Delivery> alTableData = getTableData(runId, oriRunId);
 
         request.setAttribute("listDelivery", alTableData);
@@ -137,21 +138,15 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                         ld.isOkay = rs.getString("bat").equalsIgnoreCase("0") ? true : false;//isOkay(ld.doNum, runId);
                     }
 
-                    if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
-                        for (int i = 0; i < mapColor.size(); i++) {
-                            for (int os = 0; os < mapColor.get(i).size(); os++) {
-                                if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
-                                    ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
-                                }
-                            }
-                        }
-                    }
-
                     alDelivery.add(ld);
 
+                    if(!ld.vehicleCode.equals("NA")){
+                        String clr = runResultMapDetailController.myList[Integer.valueOf((rs.getString("RowNumber")))-1].toUpperCase();
+                        ld.color = "#" + clr;
+                    }
                     if (ld.no.equals("0") && !ld.vehicleCode.equals("NA")) {
                         //prevLong = rs.getString("startLon");
-                        //prevLat = rs.getString("startLat");
+                        //prevLat = rs.getString("startLat");                        
                     } else {
                         //prevLong = ld.lon2;
                         //prevLat = ld.lat2;

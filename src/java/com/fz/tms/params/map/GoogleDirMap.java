@@ -125,7 +125,7 @@ public class GoogleDirMap implements BusinessLogic {
                 System.out.println(jsonOutput.toString());
                 request.setAttribute("test", jsonOutput.toString());
                 //request.setAttribute("branch", br);
-                
+                ps.close();
             }
         }
     }

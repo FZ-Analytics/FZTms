@@ -79,6 +79,7 @@ public class progressLogic {
                     System.out.println("ERROR : "+e.getMessage());
                     throw new Exception("Error update mustFinish tmprogress. SQL = " + sql, e);
                 }*/
+                ps.close();
             }catch(Exception e){
                 System.out.println("ERROR : "+e.getMessage());
                 throw new Exception("Error connect tmprogress. SQL = " + sql, e);

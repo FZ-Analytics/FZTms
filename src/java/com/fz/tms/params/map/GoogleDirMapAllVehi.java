@@ -249,6 +249,7 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                         asd = new ArrayList<HashMap<String, String>>();
                     }
                 }
+                ps.close();
             }
         }catch(Exception e){
             HashMap<String, String> pl = new HashMap<String, String>();
@@ -291,6 +292,7 @@ public class GoogleDirMapAllVehi implements BusinessLogic {
                     int i = 1;
                     vehi.add(FZUtil.getRsString(rs, i++, ""));
                 }
+                ps.close();
             }
         }
     }

@@ -7,12 +7,15 @@ package com.fz.tms.service.run;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.generic.PageTopUtils;
 import com.fz.tms.params.model.Branch;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
@@ -22,12 +25,23 @@ import javax.servlet.jsp.PageContext;
  * @author dwi.oktaviandi
  */
 public class runEntry implements BusinessLogic {
+    
+    public static String EmpyID;
+    public static String Key;
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response
             , PageContext pc) throws Exception {
         String br = (String) pc.getSession().getAttribute("WorkplaceID");        
         List<Branch> lBr = getBranch(br);
+        
+        //update login
+        EmpyID = (String) pc.getSession().getAttribute("EmpyID");
+        Key = (String) pc.getSession().getAttribute("Key");
+        RunThread R1 = new RunThread("Thread",EmpyID,Key);
+        R1.start();
+        
+        
         request.setAttribute("ListBranch", lBr);
     }
     
@@ -73,4 +87,37 @@ public class runEntry implements BusinessLogic {
         return ar;
     }
     
+}
+
+class RunThread implements Runnable {
+   private Thread t;
+   private String threadName;
+   private String EmpyID;
+   private String Key;
+   
+   RunThread(String name, String EmpyID, String Key) {
+       threadName = name;
+       EmpyID = EmpyID;
+       Key = Key;
+   }
+   
+    public void run() {
+        System.out.println("Running " +  threadName );
+        try {
+            Thread.sleep(50);
+            PageTopUtils.setDate(runEntry.EmpyID, runEntry.Key);
+            System.out.println("Finnish " +  threadName );
+        } catch (InterruptedException e) {
+           System.out.println("InterruptedException e" +  e.getMessage());
+        } catch (Exception ex) {
+           System.out.println("Thread ex" +  ex.getMessage());
+       }
+    }
+
+    public void start () {
+        if (t == null) {
+            t = new Thread (this, threadName);
+            t.start ();
+        }
+    }
 }

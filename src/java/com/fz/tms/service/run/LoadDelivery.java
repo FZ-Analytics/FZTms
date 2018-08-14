@@ -7,10 +7,13 @@ package com.fz.tms.service.run;
 
 import com.fz.generic.BusinessLogic;
 import com.fz.generic.Db;
+import com.fz.tms.params.Detail.runResultMapDetailController;
 import com.fz.tms.params.map.GoogleDirMapAllVehi;
 import com.fz.tms.params.model.Delivery;
 import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.RouteJobLog;
+import static com.fz.tms.service.run.RouteJobListing.EmpyID;
+import static com.fz.tms.service.run.RouteJobListing.Key;
 import com.fz.util.FZUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,8 +44,11 @@ public class LoadDelivery implements BusinessLogic {
     //int breakTime = 0;
     boolean hasBreak = false;
 
-    List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
+    //List<List<HashMap<String, String>>> mapColor = new ArrayList<List<HashMap<String, String>>>();
 
+    public static String EmpyID;
+    public static String Key;
+    
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response, PageContext pc) throws Exception {
         runId = FZUtil.getHttpParam(request, "runId");
@@ -56,7 +62,7 @@ public class LoadDelivery implements BusinessLogic {
 
         GoogleDirMapAllVehi map = new GoogleDirMapAllVehi();
         List<OptionModel> jss = new ArrayList<OptionModel>();
-        mapColor = map.runs(oriRunId, jss);
+        //mapColor = map.runs(oriRunId, jss);
 
         ArrayList<Delivery> alTableData = getTableData(runId);
         request.setAttribute("branchId", branch);
@@ -66,6 +72,12 @@ public class LoadDelivery implements BusinessLogic {
         request.setAttribute("runId", runId);
         request.setAttribute("oriRunId", oriRunId);
         request.setAttribute("listDelivery", alTableData);
+        
+        //update login
+        EmpyID = (String) pc.getSession().getAttribute("EmpyID");
+        Key = (String) pc.getSession().getAttribute("Key");
+        RunThread R1 = new RunThread("Thread",EmpyID,Key);
+        R1.start();
     }
 
     public ArrayList<Delivery> getTableData(String runId) throws Exception {
@@ -245,25 +257,22 @@ public class LoadDelivery implements BusinessLogic {
                             ld.feasibleTruck = isTimeinRange(ld.arrive, rs.getString("startTime"), addTime(rs.getString("endTime"), 60));
                         }
                     }
+                    
+                    if(!ld.vehicleCode.equals("NA")){
+                        String clr = runResultMapDetailController.myList[Integer.valueOf((rs.getString("RowNumber")))-1].toUpperCase();
+                        ld.color = "#" + clr;
+                    }
 
                     if (ld.no.equals("0") && !ld.vehicleCode.equals("NA")) {
                         prevLong = rs.getString("startLon");
                         prevLat = rs.getString("startLat");
+                        
+                        
                     } else {
                         prevLong = ld.lon2;
                         prevLat = ld.lat2;
                     }
-
-                    if (!ld.vehicleCode.equalsIgnoreCase("NA")) {
-                        for (int i = 0; i < mapColor.size(); i++) {
-                            for (int os = 0; os < mapColor.get(i).size(); os++) {
-                                if (mapColor.get(i).get(os).get("description").contains(ld.vehicleCode)) {
-                                    ld.color = "#" + mapColor.get(i).get(os).get("color").toUpperCase();
-                                }
-                            }
-                        }
-                    }
-
+                    
                     alDelivery.add(ld);
 
                     System.out.println(ld.custId + " " + ld.depart);
@@ -312,6 +321,7 @@ public class LoadDelivery implements BusinessLogic {
                 if (rs.next()) {
                     count = rs.getString("cnt");
                 }
+                ps.close();
             }
         }
         return count;

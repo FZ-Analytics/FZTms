@@ -74,7 +74,7 @@
                 });
                 $('#mapAll').click(function () {
                     if ($(this).text().length > 0) {
-                        window.open("../Params/map/GoogleDirMapAllVehi.jsp?runID=" + $("#RunIdClick").text() + '&channel=' + $('#channel').text(), null,
+                        window.open("../Params/Detail/runResultMapDetail.jsp?runID=" + $("#RunIdClick").text() + '&channel=' + $('#channel').text(), null,
                                 "scrollbars=1,resizable=1,height=530,width=530");
                         return true;
                     }

@@ -99,6 +99,7 @@ public class DriverAttrAddView implements BusinessLogic {
                 // commit transaction
                 con.setAutoCommit(true);
                 str = "OK";
+                psHdr.close();
         }catch (Exception e){
             throw new Exception(e.getMessage());
         }

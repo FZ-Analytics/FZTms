@@ -35,4 +35,16 @@ public class DODetil {
     public int Conversion5;
     public String UoM5;
     public String result;
+    
+    public String Customer_ID;
+    public String Name1;
+    public String ShipPlant;
+    public String RDD;
+    public String DeliveryDeadline;
+    public String StatusShip;
+    public String noShipSAP;
+    public String ResultShip;
+    public String GoodsMovementStat;
+    public String PODStatus;
+    public String createDate;
 }

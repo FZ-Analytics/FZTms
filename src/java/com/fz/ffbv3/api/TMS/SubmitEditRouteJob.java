@@ -116,7 +116,7 @@ public class SubmitEditRouteJob {
             ArrayList<Double> alParam = getParam(runId);
             speedTruck = alParam.get(0);
             trafficFactor = alParam.get(1);
-            for (int i = 0; i < tableArrSplit.length - 1; i++) {
+            /*for (int i = 0; i < tableArrSplit.length - 1; i++) {
                 String str = tableArrSplit[i];
                 String data = str;
                 if (i != 0) {
@@ -130,8 +130,9 @@ public class SubmitEditRouteJob {
                     //truck back to DEPO row
                     setDataRow(dataSplit[0], "end", runId);
                 }
-            }
-            updateRouteJob(arlistR, runId);
+            }*/
+            ArrayList<RouteJobLog> arr = changeRouteJob(tableArrSplit, speedTruck, trafficFactor, runId);
+            updateRouteJob(arr, runId);
         } catch (Exception e) {
             System.out.println("ERROR" + e.getLocalizedMessage());
             ret = "ERROR";
@@ -139,7 +140,285 @@ public class SubmitEditRouteJob {
         String jsonOutput = gson.toJson(ret);
         return jsonOutput;
     }
+    
+    public ArrayList<RouteJobLog> changeRouteJob(String[] tableArrSplit, double speedTruck, double trafficFactor, String runId) throws Exception{
+        ArrayList<RouteJobLog> arlistR = new ArrayList<>();
+        ArrayList<RouteJobLog> arr = new ArrayList<>();
+        
+        String sql = "SELECT\n" +
+                "	routeNb,\n" +
+                "	jobNb,\n" +
+                "	rj.job_id,\n" +
+                "	rj.customer_id,\n" +
+                "	rj.do_number,\n" +
+                "	rj.vehicle_code,\n" +
+                "	rj.activity,\n" +
+                "	rj.branch,\n" +
+                "	rj.shift,\n" +
+                "	rj.weight,\n" +
+                "	rj.volume,\n" +
+                "	CASE\n" +
+                "		WHEN job_id = 'DEPO' THEN rv.startLon\n" +
+                "		ELSE rj.Lon\n" +
+                "	END lon,\n" +
+                "	CASE\n" +
+                "		WHEN job_id = 'DEPO' THEN rv.endLat\n" +
+                "		ELSE rj.Lat\n" +
+                "	END lat,\n" +
+                "	CASE\n" +
+                "		WHEN job_id = 'DEPO' THEN rv.startTime\n" +
+                "		ELSE prj.deliv_start\n" +
+                "	END START,\n" +
+                "	CASE\n" +
+                "		WHEN job_id = 'DEPO' THEN rv.endTime\n" +
+                "		ELSE prj.deliv_end\n" +
+                "	END [end],\n" +
+                "	prj.Service_time,\n" +
+                "	rv.costPerM,\n" +
+                "	rv.fixedCost\n" +
+                "FROM\n" +
+                "	BOSNET1.dbo.TMS_RouteJob rj\n" +
+                "LEFT OUTER JOIN(\n" +
+                "		SELECT\n" +
+                "			DISTINCT RunId,\n" +
+                "			customer_id,\n" +
+                "			long,\n" +
+                "			lat,\n" +
+                "			deliv_start,\n" +
+                "			deliv_end,\n" +
+                "			Service_time\n" +
+                "		FROM\n" +
+                "			BOSNET1.dbo.TMS_PreRouteJob\n" +
+                "		WHERE\n" +
+                "			isActive = 1\n" +
+                "			AND Is_Edit = 'edit'\n" +
+                "			AND Is_Exclude = 'inc'\n" +
+                "	) prj ON\n" +
+                "	rj.runID = prj.RunId\n" +
+                "	AND rj.job_id = prj.Customer_ID\n" +
+                "LEFT OUTER JOIN BOSNET1.dbo.TMS_PreRouteVehicle rv ON\n" +
+                "	rj. runID = rv.RunId\n" +
+                "	AND rj.vehicle_code = rv.vehicle_code\n" +
+                "	AND rv.isActive = 1\n" +
+                "WHERE\n" +
+                "	rj.runID =(\n" +
+                "		SELECT\n" +
+                "			Re_RunId\n" +
+                "		FROM\n" +
+                "			BOSNET1.dbo.TMS_Progress\n" +
+                "		WHERE\n" +
+                "			runid = '"+runId+"'\n" +
+                "	)\n" +
+                "ORDER BY\n" +
+                "	routeNb,\n" +
+                "	jobNb";
+        
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                Statement stm = con.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(sql)) {
+                while (rs.next()) {
+                    RouteJobLog r = new RouteJobLog();
+                    r.jobId = rs.getString("job_id");
+                    r.custId = rs.getString("customer_id");
+                    r.countDoNo = rs.getString("do_number");
+                    r.vehicleCode = rs.getString("vehicle_code");
+                    r.activity = rs.getString("activity");
+                    r.branch = rs.getString("branch");
+                    r.shift = rs.getString("shift");
+                    r.weight = rs.getString("weight");
+                    r.volume = rs.getString("volume");
+                    r.lon = rs.getString("lon");
+                    r.lat = rs.getString("lat");
+                    r.start = rs.getString("start");
+                    r.end = rs.getString("end");
+                    r.servicetime = rs.getString("Service_time");
+                    r.costPerM = rs.getDouble("costPerM");
+                    r.activityCost = rs.getDouble("fixedCost");
+                    arlistR.add(r);
+                }
+            }
+        }
+        
+        int minutes = 0;
+        int routeNb = 0;
+        int jobNb = 0;
+        String vehi = "";
+        String prevLon = " ";
+        String prevLat = " ";
+        
+        for (int i = 0; i < tableArrSplit.length - 1; i++) {
+            RouteJobLog s = new RouteJobLog();            
+            
+            String str = tableArrSplit[i];
+            str = String.valueOf(tableArrSplit[i].charAt(0)).equalsIgnoreCase(",") ? 
+                    str.substring(1) : str;
+            String[] dataSplit = str.split(",");
+            
+            String yu = "";
+            String data = "";
+            
+            if(dataSplit.length > 0){                
+                if(dataSplit.length == 2){
+                    if(dataSplit[1].equalsIgnoreCase("5810029995")){
+                        System.out.println("com.fz.ffbv3.api.TMS.SubmitEditRouteJob.changeRouteJob()");
+                    }
+                    if(dataSplit[1].equalsIgnoreCase("start")){
+                        //start            
+                        yu = "vehi";
+                        routeNb += 1;
+                        jobNb = 1;
+                        data = dataSplit[0];
+                    }else if(dataSplit[0].length() > 0
+                            && dataSplit[1].length() > 0){
+                        if(dataSplit[0].equalsIgnoreCase("NA")){
+                            yu = "NA";
+                            routeNb = 0;
+                            jobNb = 0;
+                        }else{
+                            //cust
+                            yu = "cust";
+                            jobNb += 1;
+                        }
+                        data = dataSplit[1];
+                        
+                    }
+                }else if(dataSplit.length == 1){
+                    //end
+                    yu = "vehi";
+                    jobNb += 1;               
+                    data = dataSplit[0];
+                }                
 
+                s = loopRouteJobLog(runId, arlistR, data, yu, minutes, 
+                        routeNb, jobNb, dataSplit[0], prevLon, prevLat,
+                        speedTruck, trafficFactor);
+
+                //System.out.println(tableArrSplit[i]);
+                //s.print();
+                
+                //set var
+                prevLon = s.lon;
+                prevLat = s.lat;
+                minutes = s.times;
+                arr.add(s);
+            }            
+            
+        }
+        
+        return arr;
+    }
+    
+    public RouteJobLog loopRouteJobLog(String runId, ArrayList<RouteJobLog> arlistR, String str, String obj, int minutes, int routeNb, 
+            int jobNb, String vehi, String prevLon, String prevLat, double speedTruck, double trafficFactor){
+        //search from prev data
+        RouteJobLog r = new RouteJobLog();
+        for(int j=0;j<arlistR.size();j++){
+            //System.out.println(arlistR.get(j).vehicleCode+"()"+arlistR.get(j).custId);
+            //System.out.println(str);
+            if(obj.equalsIgnoreCase("vehi")){
+                if(arlistR.get(j).vehicleCode.equalsIgnoreCase(str)){
+                    r = arlistR.get(j);
+                }
+            }else{//if(obj.equalsIgnoreCase("cust"))
+                if(arlistR.get(j).custId.equalsIgnoreCase(str)){
+                    r = arlistR.get(j);
+                }
+            }
+        }
+        
+        if(str.equalsIgnoreCase("5810091915")){
+            //System.out.println(vehi);
+        }
+        
+        RouteJobLog t = new RouteJobLog();
+        t.jobId = obj.equalsIgnoreCase("vehi") ? "DEPO" : r.custId;
+        t.custId = obj.equalsIgnoreCase("vehi") ? "" : r.custId;
+        t.countDoNo = obj.equalsIgnoreCase("vehi") ? "" : r.countDoNo;
+        t.vehicleCode = vehi;        
+        t.routeNb = routeNb; 
+        t.jobNb = jobNb;
+        if(obj.equalsIgnoreCase("vehi") && jobNb == 1){
+            //start
+            t.activity =  "DEPO";
+            minutes = clockToMin(r.start);
+            t.arrive = "";
+            t.depart = r.start;      
+            t.dist = 0;
+            t.transportCost = 0;
+            t.activityCost = r.activityCost;
+        }else if(obj.equalsIgnoreCase("vehi") && jobNb > 1){
+            //end
+            t.activity = "DEPO";
+            double distance1 = calcTraficDist(prevLon, prevLat, r.lon, r.lat);
+            minutes += calcTraficTime(distance1, speedTruck, trafficFactor);
+            t.arrive = minToHour(minutes);
+            t.depart = "";
+            minutes = 0;
+            t.dist = distance1;
+            t.transportCost = (int) Math.round(r.costPerM * distance1);
+            t.activityCost = 0;
+        }else{
+            //cust
+            if(obj.equalsIgnoreCase("cust")){
+                t.activity = r.custId;
+                double distance1 = calcTraficDist(prevLon, prevLat, r.lon, r.lat);
+                minutes += calcTraficTime(distance1, speedTruck, trafficFactor);
+                t.arrive = minToHour(minutes);
+                minutes += Integer.valueOf(r.servicetime);
+                t.depart = minToHour(minutes);
+                t.dist = distance1;
+                t.transportCost = (int) Math.round(r.costPerM * distance1);
+                t.activityCost = 0;
+            }else if(obj.equalsIgnoreCase("NA")){
+                t.activity = "";
+                t.arrive = "";
+                t.depart = "";
+                t.dist = 0;
+                t.transportCost = 0;
+                t.activityCost = 0;
+            }
+        }
+        t.times = minutes;
+        t.runId = runId;
+        //t.createTime
+        t.branch = r.branch;
+        t.shift = r.shift;
+        t.lon = r.lon;
+        t.lat = r.lat;
+        t.weight = obj.equalsIgnoreCase("vehi") ? "" : r.weight;
+        t.volume = obj.equalsIgnoreCase("vehi") ? "" : r.volume;
+        
+        return t;
+    }
+    
+    public double calcTraficDist(String prevLon, String prevLat, String lon, String lat){
+        double distance1 = calcMeterDist(Double.parseDouble(prevLon), Double.parseDouble(prevLat), Double.parseDouble(lon), Double.parseDouble(lat));
+        return distance1;
+    }
+    
+    public int calcTraficTime(double distance1, double speedTruck, double trafficFactor){        
+        int times = (int) Math.round((distance1 / (speedTruck * 1000 / 60)) * trafficFactor);        
+        return times;
+    }
+    
+    public String minToHour(int min){
+        String str="";
+        str = (String.valueOf(min/60).length() == 1 ? "0" + min/60 : min/60)
+                + ":" + 
+                (String.valueOf(min%60).length() == 1 ? "0" + min%60 : min%60);        
+        return str;
+    }
+    
+    public int clockToMin(String clock){
+        String sh = clock.substring(0,2);
+        String sm = clock.substring(3,5);
+        int h = Integer.parseInt(sh);
+        int m = Integer.parseInt(sm);
+        int r = (h*60) + m;
+        return r;
+    }
+
+    
     public static String[] decodeContent(String content) throws UnsupportedEncodingException {
         content = java.net.URLDecoder.decode(content, "UTF-8");
         content = content.substring(16);
@@ -185,8 +464,8 @@ public class SubmitEditRouteJob {
                             + "FROM \n"
                             + "     BOSNET1.dbo.TMS_RouteJob\n"
                             + "WHERE \n"
-                            + "     runID = '" + runId + "' and vehicle_code = '" + vehicleCode + "' and " + param + "= ''";
-                    System.out.println(sql);
+                            + "     runID = (select Re_RunId from BOSNET1.dbo.TMS_Progress where runid = '" + runId + "') and vehicle_code = '" + vehicleCode + "' and " + param + "= ''";
+                    //System.out.println(sql);
                     try (ResultSet rs = stm.executeQuery(sql)) {
                         while (rs.next()) {
                             RouteJobLog r = new RouteJobLog();
@@ -270,7 +549,7 @@ public class SubmitEditRouteJob {
                             + "		customer_id = '" + custId + "'\n"
                             + "		AND RunId = '" + runId + "') prj ON prj.customer_id = rj.customer_id\n"
                             + "WHERE rj.runID = '" + runId + "' and rj.customer_id = '" + custId + "'";
-                    System.out.println(sql);
+                    //System.out.println(sql);
                     try (ResultSet rs = stm.executeQuery(sql)) {
                         while (rs.next()) {
                             RouteJobLog r = new RouteJobLog();
@@ -360,7 +639,7 @@ public class SubmitEditRouteJob {
         ArrayList<Double> alParam = new ArrayList<>();
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
-                String sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"') and (param = 'SpeedKmPHour' OR param = 'TrafficFactor')";
+                String sql = "SELECT value FROM BOSNET1.dbo.TMS_PreRouteParams WHERE RunId = (SELECT distinct OriRunId FROM BOSNET1.dbo.TMS_Progress where runID = '"+runId+"') and (param = 'SpeedKmPHour' OR param = 'TrafficFactor') order by param asc";
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
                         alParam.add(rs.getDouble("value")); // Index 0 = speed, index 1 = traffic factor
@@ -382,7 +661,7 @@ public class SubmitEditRouteJob {
         return timeStampDate;
     }
 
-    public void updateRouteJob(ArrayList<RouteJobLog> arlistR, String runId) throws Exception {
+    public void updateRouteJob(ArrayList<RouteJobLog> arr, String runId) throws Exception {
         Timestamp createTime = getTimeStamp();
         int rowNum = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
@@ -407,35 +686,24 @@ public class SubmitEditRouteJob {
 
             }
         }
-        String sql = "INSERT INTO bosnet1.dbo.TMS_RouteJob "
+        /*String sql = "INSERT INTO bosnet1.dbo.TMS_RouteJob "
                 + "(job_id, customer_id, do_number, vehicle_code, activity, routeNb, jobNb, arrive, depart, runID, create_dtm, branch, shift, lon, lat, weight, volume, transportCost, activityCost, Dist) "
-                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";*/
+        
+        for (int i = 0; i < arr.size(); i++) {
+            RouteJobLog r = arr.get(i);
+            String sql = "INSERT INTO bosnet1.dbo.TMS_RouteJob "
+                    + "(job_id, customer_id, do_number, vehicle_code, activity, routeNb, jobNb, arrive, depart, runID, create_dtm, branch, shift, lon, lat, weight, volume, transportCost, activityCost, Dist) "
+                    + "values('"+r.jobId+"','"+r.custId+"','"+r.countDoNo+"','"+r.vehicleCode+"','"+r.activity+"',"+r.routeNb+","+r.jobNb
+                    +",'"+r.arrive+"','"+r.depart+"','"+r.runId+"',CONVERT(datetime, '"+createTime+"'),'"+r.branch+"','"+r.shift+"','"+r.lon+"','"+r.lat
+                    +"','"+r.weight+"','"+r.volume+"',"+r.transportCost+","+r.activityCost+","+r.dist+");";
 
-        for (int i = 0; i < arlistR.size(); i++) {
-            RouteJobLog r = arlistR.get(i);
-            try (Connection con = (new Db()).getConnection("jdbc/fztms"); PreparedStatement psHdr = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
-                psHdr.setString(1, r.jobId);
-                psHdr.setString(2, r.custId);
-                psHdr.setString(3, r.countDoNo);
-                psHdr.setString(4, r.vehicleCode);
-                psHdr.setString(5, r.activity);
-                psHdr.setInt(6, r.routeNb);
-                psHdr.setInt(7, r.jobNb);
-                psHdr.setString(8, r.arrive);
-                psHdr.setString(9, r.depart);
-                psHdr.setString(10, r.runId);
-                psHdr.setTimestamp(11, createTime);
-                psHdr.setString(12, r.branch);
-                psHdr.setString(13, r.shift);
-                psHdr.setString(14, r.lon);
-                psHdr.setString(15, r.lat);
-                psHdr.setString(16, r.weight);
-                psHdr.setString(17, r.volume);
-                psHdr.setDouble(18, r.transportCost);
-                psHdr.setDouble(19, r.activityCost);
-                psHdr.setDouble(20, r.dist);
-
+        
+            try (Connection con = (new Db()).getConnection("jdbc/fztms"); 
+                    PreparedStatement psHdr = con.prepareStatement(sql);) {
+                //System.out.println(sql);
                 psHdr.executeUpdate();
+                psHdr.close();                
             }
         }
     }

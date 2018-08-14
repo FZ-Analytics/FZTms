@@ -187,7 +187,7 @@ public class PopupDetilDo  implements BusinessLogic {
                 request.setAttribute("Name", getName(dt.DO_Number));
                 request.setAttribute("branch", br);
                 request.setAttribute("total", totalkg.toString());
-                
+                ps.close();
             }
         }
     }
@@ -204,6 +204,7 @@ public class PopupDetilDo  implements BusinessLogic {
                     int i = 1;
                     str = FZUtil.getRsString(rs, i++, "");
                 }
+                ps.close();
             }
         }
         return str;

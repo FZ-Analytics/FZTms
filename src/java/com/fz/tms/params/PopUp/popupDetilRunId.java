@@ -330,6 +330,7 @@ public class popupDetilRunId implements BusinessLogic {
                 tservice = tservice.divide(BigDecimal.valueOf(asd.size()), MathContext.DECIMAL128);
                 tkm = tkm.divide(BigDecimal.valueOf(asd.size()), MathContext.DECIMAL128);
                 //tcust = tcust.divide(BigDecimal.valueOf(asd.size()));
+                ps.close();
             }
         }
         return asd;
@@ -403,6 +404,7 @@ public class popupDetilRunId implements BusinessLogic {
                     pl.put("lat", FZUtil.getRsString(rs, i++, ""));
                     asd.add(pl);
                 }
+                ps.close();
             }
         }
         FZUtil fz = new FZUtil();
@@ -486,6 +488,7 @@ public class popupDetilRunId implements BusinessLogic {
                     pl.put("Weight", FZUtil.getRsString(rs, i++, ""));
                     asd.add(pl);
                 }
+                ps.close();
             }
         }
         return asd;

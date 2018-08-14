@@ -1,14 +1,40 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_runResultEditResultShow]    Script Date: 09/07/2018 16:24:54 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_runResultEditResultShow]    Script Date: 18/07/2018 09:49:09 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE [dbo].[TMS_runResultEditResultShow] --exec dbo.TMS_runResultEditResultShow '20180704_134354097'
+ALTER PROCEDURE [dbo].[TMS_runResultEditResultShow] --exec dbo.TMS_runResultEditResultShow '20180717_104539450'
 @RunId varchar(100)
 AS
 SET NOCOUNT ON;
+DECLARE @run AS TABLE
+	(
+		RowNumber VARCHAR(5) NOT NULL,
+		vehicle_code VARCHAR(100) NOT NULL,
+		runID VARCHAR(100) NOT NULL
+	);
+
+INSERT
+	INTO
+		@run SELECT
+			ROW_NUMBER() OVER(
+			ORDER BY
+				vehicle_code
+			) AS RowNumber,
+			vehicle_code,
+			runID
+		FROM
+			(
+				SELECT
+					DISTINCT aq.vehicle_code,
+					aq.runID
+				FROM
+					BOSNET1.dbo.TMS_RouteJob aq
+				WHERE
+					runID = @RunId
+			) t;
 
 DECLARE @DelivDate VARCHAR(100);
 
@@ -83,7 +109,8 @@ SELECT
 	CASE
 		WHEN @DelivDate = 'Friday' THEN prma.value
 		ELSE prms.value
-	END breaks
+	END breaks,
+	xq.RowNumber
 FROM
 	BOSNET1.dbo.TMS_RouteJob rj
 LEFT JOIN(
@@ -143,6 +170,9 @@ LEFT JOIN(
 	) prj ON
 	rj.runID = prj.RunId
 	AND rj.customer_id = prj.Customer_ID
+INNER JOIN @run xq ON
+	xq.vehicle_code = rj.vehicle_code
+	AND xq.runID = rj.runID
 LEFT JOIN(
 		SELECT
 			prv.vehicle_code,
