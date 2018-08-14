@@ -1,30 +1,14 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_runResultEditResultShow]    Script Date: 25/07/2018 15:23:32 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_runResultEditResultShow]    Script Date: 18/07/2018 09:49:09 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE [dbo].[TMS_runResultEditResultShow] --exec dbo.TMS_runResultEditResultShow '20180704_134354097'
-@RunId varchar(100), @dt int
+ALTER PROCEDURE [dbo].[TMS_runResultEditResultShow] --exec dbo.TMS_runResultEditResultShow '20180717_104539450'
+@RunId varchar(100)
 AS
 SET NOCOUNT ON;
-
-DECLARE @DelivDate VARCHAR(100);
-
-DECLARE @OriRunId VARCHAR(100);
-
-SELECT
-	@DelivDate = datename(
-		dw,
-		DelivDate
-	),
-	@OriRunId = OriRunId
-FROM
-	BOSNET1.dbo.TMS_Progress
-WHERE
-	runID = @RunId;
-
 DECLARE @run AS TABLE
 	(
 		RowNumber VARCHAR(5) NOT NULL,
@@ -51,6 +35,21 @@ INSERT
 				WHERE
 					runID = @RunId
 			) t;
+
+DECLARE @DelivDate VARCHAR(100);
+
+DECLARE @OriRunId VARCHAR(100);
+
+SELECT
+	@DelivDate = datename(
+		dw,
+		DelivDate
+	),
+	@OriRunId = OriRunId
+FROM
+	BOSNET1.dbo.TMS_Progress
+WHERE
+	runID = @RunId;
 
 SELECT
 	CASE
@@ -171,6 +170,9 @@ LEFT JOIN(
 	) prj ON
 	rj.runID = prj.RunId
 	AND rj.customer_id = prj.Customer_ID
+INNER JOIN @run xq ON
+	xq.vehicle_code = rj.vehicle_code
+	AND xq.runID = rj.runID
 LEFT JOIN(
 		SELECT
 			prv.vehicle_code,
@@ -201,9 +203,6 @@ INNER JOIN BOSNET1.dbo.TMS_PreRouteParams prma ON
 INNER JOIN BOSNET1.dbo.TMS_PreRouteParams prms ON
 	prms.RunId = @OriRunId
 	AND prms.param = 'defaultBreak'
-INNER JOIN @run xq ON
-	xq.vehicle_code = rj.vehicle_code
-	AND xq.runID = rj.runID
 WHERE
 	rj.runID = @RunId
 ORDER BY

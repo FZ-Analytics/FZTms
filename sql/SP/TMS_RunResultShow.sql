@@ -1,13 +1,12 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_RunResultShow]    Script Date: 25/07/2018 15:24:23 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_RunResultShow]    Script Date: 18/07/2018 09:49:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE [dbo].[TMS_RunResultShow] --exec [dbo].[TMS_RunResultShow] '20180525_154124248'
-@RunId varchar(100), @dt int
---select @RunId='20180723_110128134';
+ALTER PROCEDURE [dbo].[TMS_RunResultShow] --exec [dbo].[TMS_RunResultShow] '20180717_104539450'
+@RunId varchar(100)
 AS
 SET NOCOUNT ON;
 DECLARE @run AS TABLE
@@ -48,7 +47,7 @@ DECLARE @sap AS TABLE
 
 INSERT
 	INTO
-		@sap EXEC [dbo].[TMS_CekDataShipmentSAP] @RunId, @dt;
+		@sap EXEC [dbo].[TMS_CekDataShipmentSAP] @RunId;
 
 SELECT
 	j.customer_ID,
@@ -133,13 +132,10 @@ SELECT
 	Request_Delivery_Date,
 	xq.RowNumber,
 	CASE
-		WHEN RedeliveryCount IS NULL THEN CASE
-			WHEN xw.DOSP IS NULL
-			AND xw.DORS IS NULL
-			AND xw.DOSS IS NULL THEN '0'
-			ELSE '1'
-		END
-		ELSE '0'
+		WHEN xw.DOSP IS NULL
+		AND xw.DORS IS NULL
+		AND xw.DOSS IS NULL THEN '0'
+		ELSE '1'
 	END batch
 FROM
 	bosnet1.dbo.tms_RouteJob j
@@ -153,8 +149,7 @@ LEFT OUTER JOIN(
 			name1,
 			street,
 			distribution_channel,
-			MIN( Request_Delivery_Date ) Request_Delivery_Date,
-			RedeliveryCount
+			MIN( Request_Delivery_Date ) Request_Delivery_Date
 		FROM
 			(
 				SELECT
@@ -166,8 +161,7 @@ LEFT OUTER JOIN(
 					name1,
 					street,
 					distribution_channel,
-					Request_Delivery_Date,
-					RedeliveryCount
+					Request_Delivery_Date
 				FROM
 					bosnet1.dbo.TMS_PreRouteJob
 				WHERE
@@ -180,8 +174,7 @@ LEFT OUTER JOIN(
 			UpdatevDate,
 			name1,
 			street,
-			distribution_channel,
-			RedeliveryCount
+			distribution_channel
 	) d ON
 	j.runID = d.RunId
 	AND j.customer_id = d.Customer_ID

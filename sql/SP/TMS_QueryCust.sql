@@ -1,15 +1,14 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_QueryCust]    Script Date: 25/07/2018 15:22:00 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_QueryCust]    Script Date: 11/07/2018 09:58:28 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE [dbo].[TMS_QueryCust] --exec [dbo].[TMS_QueryCust] 'GT,FS,IT','20180711_141742896','D312',-30
-@Channel varchar(100), @runID varchar(100), @plant varchar(100), @day int
+CREATE PROCEDURE [dbo].[TMS_QueryCust] --exec [dbo].[TMS_QueryCust] 'GT,FS,IT'
+@Channel varchar(100)
 AS
-SET NOCOUNT ON;
-
+SET NOCOUNT OFF;
 DECLARE @tb AS TABLE
 	(
 		chn VARCHAR(100)
@@ -25,46 +24,28 @@ INSERT
 				','
 			);
 
---DECLARE @do AS TABLE
---	(
---		Customer_ID VARCHAR(100),
---		MarketId VARCHAR(100),
---		DO_Number VARCHAR(100),
---		Long VARCHAR(100),
---		Lat VARCHAR(100),
---		Customer_priority VARCHAR(100),
---		Service_time VARCHAR(100),
---		deliv_start VARCHAR(100),
---		deliv_end VARCHAR(100),
---		vehicle_type_list VARCHAR(100),
---		total_kg_item VARCHAR(100),
---		total_cubication VARCHAR(100),
---		DeliveryDeadline VARCHAR(100),
---		DayWinStart VARCHAR(100),
---		DayWinEnd VARCHAR(100),
---		UpdatevDate VARCHAR(100),
---		CreateDate VARCHAR(100),
---		Request_Delivery_Date VARCHAR(100),
---		Product_Description VARCHAR(100),
---		Gross_Amount VARCHAR(100),
---		DOQty VARCHAR(100),
---		DOQtyUOM VARCHAR(100),
---		Name1 VARCHAR(100),
---		Street VARCHAR(100),
---		Distribution_Channel VARCHAR(100),
---		Customer_Order_Block_all VARCHAR(100),
---		Customer_Order_Block VARCHAR(100),
---		Priority_value VARCHAR(100),
---		BufferEndDefault VARCHAR(100),
---		SatDelivDefault VARCHAR(100),
---		ChannelNullDefault VARCHAR(100),
---		Desa_Kelurahan VARCHAR(100),
---		Kecamatan VARCHAR(100),
---		Kodya_Kabupaten VARCHAR(100),
---		Batch VARCHAR(100)
---	);
+DECLARE @do AS TABLE
+	(
+		Customer_ID VARCHAR(100),
+		MarketId VARCHAR(100),
+		DO_Number VARCHAR(100),
+		Long VARCHAR(100),
+		Lat VARCHAR(100),
+		Customer_priority VARCHAR(100),
+		Service_time VARCHAR(100),
+		deliv_start VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+		Customer_ID VARCHAR(100),
+	);
 
---insert into @do 
 SELECT
 	sp.Customer_ID,
 	cl.MarketId,
@@ -233,7 +214,7 @@ LEFT OUTER JOIN(
 LEFT OUTER JOIN bosnet1.dbo.TMS_CustAtr ca ON
 	sp.customer_id = ca.customer_id
 LEFT OUTER JOIN bosnet1.dbo.TMS_Progress dm ON
-	dm.runID = @runID
+	dm.runID = '20180711_095615972'
 LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams dd ON
 	dd.param = 'DeliveryDeadLine'
 	AND dd.RunId = dm.OriRunId
@@ -271,7 +252,7 @@ LEFT OUTER JOIN bosnet1.dbo.TMS_PreRouteParams du ON
 	du.param = 'ChannelNullDefault'
 	AND du.RunId = dm.OriRunId
 WHERE
-	sp.plant = @plant
+	sp.plant = 'D312'
 	AND sp.already_shipment = 'N'
 	AND sp.notused_flag IS NULL
 	AND sp.incoterm = 'FCO'
@@ -281,7 +262,7 @@ WHERE
 	)
 	AND sp.create_date >= DATEADD(
 		DAY,
-		-30,
+		- 30,
 		GETDATE()
 	)
 	AND ss.Delivery_Number IS NULL
@@ -294,5 +275,3 @@ WHERE
 	)
 ORDER BY
 	sp.Customer_ID ASC;
-
---select * from @do

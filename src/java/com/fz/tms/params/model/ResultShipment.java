@@ -43,6 +43,4 @@ public class ResultShipment {
     public String Shipment_Flag;
     public String distance;
     public String distanceUnit;
-    
-    public String RedeliveryCount;
 }

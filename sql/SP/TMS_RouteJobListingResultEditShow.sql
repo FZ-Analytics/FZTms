@@ -1,12 +1,12 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_RouteJobListingResultEditShow]    Script Date: 25/07/2018 15:22:59 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_RouteJobListingResultEditShow]    Script Date: 18/07/2018 09:48:16 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 ALTER PROCEDURE [dbo].[TMS_RouteJobListingResultEditShow] --exec [dbo].[TMS_RouteJobListingResultEditShow] '20180621_154747795'
-@RunId varchar(100), @OriRunId VARCHAR(100), @dt int
+@RunId varchar(100), @OriRunId VARCHAR(100)
 AS
 SET NOCOUNT ON;
 --DECLARE @RunId VARCHAR(100)= '20180621_154747795';
@@ -89,8 +89,7 @@ IF(
 			Kecamatan,
 			Kodya_Kabupaten,
 			Batch,
-			Ket_DO,
-			RedeliveryCount
+			Ket_DO
 		FROM
 			bosnet1.dbo.TMS_PreRouteJob
 		WHERE
@@ -139,7 +138,7 @@ END DECLARE @sap AS TABLE
 
 INSERT
 	INTO
-		@sap EXEC dbo.TMS_CekDataShipmentSAP @RunId, @dt;
+		@sap EXEC dbo.TMS_CekDataShipmentSAP @RunId;
 
 DECLARE @run AS TABLE
 	(
@@ -167,7 +166,6 @@ INSERT
 				WHERE
 					runID = @RunId
 			) t;
-
 
 SELECT
 	CASE
@@ -208,16 +206,13 @@ SELECT
 	prj.Request_Delivery_Date,
 	rj.transportCost TransportCost,
 	rj.Dist,
+	xq.RowNumber,
 	CASE
-		WHEN RedeliveryCount IS NULL THEN CASE
-			WHEN xw.DOSP IS NULL
-			AND xw.DORS IS NULL
-			AND xw.DOSS IS NULL THEN '0'
-			ELSE '1'
-		END
-		ELSE '0'
-	END bat,
-	xq.RowNumber
+		WHEN xw.DOSP IS NULL
+		AND xw.DORS IS NULL
+		AND xw.DOSS IS NULL THEN '0'
+		ELSE '1'
+	END bat
 FROM
 	BOSNET1.dbo.TMS_RouteJob rj
 LEFT JOIN(
@@ -230,8 +225,7 @@ LEFT JOIN(
 			MIN( Customer_priority ) Customer_priority,
 			Distribution_Channel,
 			Street,
-			MIN( Request_Delivery_Date ) Request_Delivery_Date,
-			RedeliveryCount
+			MIN( Request_Delivery_Date ) Request_Delivery_Date
 		FROM
 			(
 				SELECT
@@ -264,8 +258,7 @@ LEFT JOIN(
 					prj.Customer_priority,
 					prj.Distribution_Channel,
 					prj.Street,
-					prj.Request_Delivery_Date,
-					prj.RedeliveryCount
+					prj.Request_Delivery_Date
 				FROM
 					BOSNET1.dbo.TMS_PreRouteJob prj
 				WHERE
@@ -279,11 +272,13 @@ LEFT JOIN(
 			RunId,
 			Name1,
 			Distribution_Channel,
-			Street,
-			RedeliveryCount
+			Street
 	) prj ON
 	rj.runID = prj.RunId
 	AND rj.customer_id = prj.Customer_ID
+INNER JOIN @run xq ON
+	xq.vehicle_code = rj.vehicle_code
+	AND xq.runID = rj.runID
 LEFT OUTER JOIN(
 		SELECT
 			DISTINCT s.Cust,
@@ -296,9 +291,6 @@ LEFT OUTER JOIN(
 			s.Cust
 	) xw ON
 	xw.Cust = rj.customer_ID
-INNER JOIN @run xq ON
-	xq.vehicle_code = rj.vehicle_code
-	AND xq.runID = rj.runID
 WHERE
 	rj.runID = @RunId
 ORDER BY

@@ -12,7 +12,6 @@ import com.fz.tms.params.model.OptionModel;
 import com.fz.tms.params.model.RunResult;
 import com.fz.tms.params.service.Other;
 import com.fz.tms.params.service.VehicleAttrDB;
-import com.fz.tms.service.run.AlgoRunner;
 import com.fz.tms.service.run.RouteJob;
 import com.fz.tms.service.run.RouteJobListing;
 import com.fz.util.FZUtil;
@@ -67,13 +66,12 @@ public class runResultDetailController implements BusinessLogic {
         
         /*try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)){*/
-        String sql = "{call bosnet1.dbo.TMS_RunResultShow(?,?)}";
+        String sql = "{call bosnet1.dbo.TMS_RunResultShow(?)}";
         System.out.println(sql + runID);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 java.sql.CallableStatement stmt =
                 con.prepareCall(sql)) {
             stmt.setString(1, runID);
-            stmt.setInt(2, AlgoRunner.dy);
             try(ResultSet rs = stmt.executeQuery()){
             // get list
             //try (ResultSet rs = ps.executeQuery()){

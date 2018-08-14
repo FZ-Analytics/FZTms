@@ -85,7 +85,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
 
     public ArrayList<Delivery> getTableData(String runId, String oriRunId) throws Exception {
         ArrayList<Delivery> alDelivery = new ArrayList<>();
-        String sql = "{call bosnet1.dbo.TMS_RouteJobListingResultEditShow(?,?,?)}";
+        String sql = "{call bosnet1.dbo.TMS_RouteJobListingResultEditShow(?,?)}";
         System.out.println("sql "+sql);
         System.out.println("runId()" + runId);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
@@ -93,7 +93,6 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                 con.prepareCall(sql)) {
             stmt.setString(1, runId);
             stmt.setString(2, oriRunId);
-            stmt.setInt(3, AlgoRunner.dy);
             try(ResultSet rs = stmt.executeQuery()){
                     //String prevLong = "";
                     //String prevLat = "";
