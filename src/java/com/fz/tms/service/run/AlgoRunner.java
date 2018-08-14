@@ -376,8 +376,8 @@ public class AlgoRunner implements BusinessLogic {
                                 + asd.get(a).get("RunId") + "','"
                                 + asd.get(a).get("Customer_ID") + "','"
                                 + asd.get(a).get("DO_Number") + "','"
-                                + asd.get(a).get("Long") + "','"
-                                + asd.get(a).get("Lat") + "',"
+                                + asd.get(a).get("Long").replaceAll("\\s+","") + "','"
+                                + asd.get(a).get("Lat").replaceAll("\\s+","") + "',"
                                 + Integer.parseInt(asd.get(a).get("Customer_priority")) + ","
                                 + Integer.parseInt(asd.get(a).get("Service_time")) + ",'"
                                 + asd.get(a).get("deliv_start") + "','" 
@@ -1916,6 +1916,7 @@ public class AlgoRunner implements BusinessLogic {
         
         return px;
     }
+}
     
 class AlgoRunnerThread implements Runnable {
     private Thread t;
@@ -2094,5 +2095,4 @@ class AlgoRunnerThread implements Runnable {
         
         return str;
     }
-}
 }
