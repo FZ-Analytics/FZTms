@@ -167,6 +167,7 @@ public class SubmitToSapAPI {
                             rs.distance = null;
                         }
                         rs.distanceUnit = "M";
+                        rs.RedeliveryCount = hmSP.get("RedeliveryCount");
 
                         insertResultShipment(rs);
                     }
@@ -375,7 +376,8 @@ public class SubmitToSapAPI {
                         "		)\n" +
                         "	END Create_Date,\n" +
                         "	rj.arrive,\n" +
-                        "	rj.depart\n" +
+                        "	rj.depart,\n" +
+                        "	RedeliveryCount\n" +
                         "FROM\n" +
                         "	(\n" +
                         "		SELECT\n" +
@@ -441,6 +443,7 @@ public class SubmitToSapAPI {
                         hm.put("DOQty", rs.getString("DOQty"));
                         hm.put("Product_ID", rs.getString("Product_ID"));
                         hm.put("Batch", rs.getString("Batch"));
+                        hm.put("RedeliveryCount", rs.getString("RedeliveryCount"));
 
                         al.add(hm);
                     }
@@ -652,7 +655,10 @@ public class SubmitToSapAPI {
 
                 try (ResultSet rst = stm.executeQuery(sql)) {
                     while (rst.next()) {
-                        isExist += rst.getInt("isExist");
+                        if(rs.RedeliveryCount.length() == 0)
+                            isExist += rst.getInt("isExist");
+                        else 
+                            isExist += 0;
                         error = rst.getString("error");
                         System.out.println(isExist + " " + error);
                     }

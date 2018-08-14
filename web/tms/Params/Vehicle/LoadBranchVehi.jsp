@@ -204,7 +204,7 @@
 
                 <br>
                 <label class="fzLabel">fixedCost:</label> 
-                <input class="fzInput" type="text" id="fixedCost" name="fixedCost" maxlength="5">
+                <input class="fzInput" type="text" id="fixedCost" name="fixedCost" maxlength="7">
 
                 <br>
                 <label class="fzLabel">Channel:</label> 
