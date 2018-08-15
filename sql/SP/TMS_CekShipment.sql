@@ -1,6 +1,6 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_CekShipment]    Script Date: 19/07/2018 09:03:02 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_CekShipment]    Script Date: 14/08/2018 17:34:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

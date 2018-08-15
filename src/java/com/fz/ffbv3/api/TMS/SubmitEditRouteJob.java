@@ -175,7 +175,8 @@ public class SubmitEditRouteJob {
                 "	END [end],\n" +
                 "	prj.Service_time,\n" +
                 "	rv.costPerM,\n" +
-                "	rv.fixedCost\n" +
+                "	rv.fixedCost,\n" +
+                "	tp.DelivDate\n" +
                 "FROM\n" +
                 "	BOSNET1.dbo.TMS_RouteJob rj\n" +
                 "LEFT OUTER JOIN(\n" +
@@ -200,15 +201,9 @@ public class SubmitEditRouteJob {
                 "	rj. runID = rv.RunId\n" +
                 "	AND rj.vehicle_code = rv.vehicle_code\n" +
                 "	AND rv.isActive = 1\n" +
-                "WHERE\n" +
-                "	rj.runID =(\n" +
-                "		SELECT\n" +
-                "			Re_RunId\n" +
-                "		FROM\n" +
-                "			BOSNET1.dbo.TMS_Progress\n" +
-                "		WHERE\n" +
-                "			runid = '"+runId+"'\n" +
-                "	)\n" +
+                "INNER JOIN BOSNET1.dbo.TMS_Progress tp ON \n" +
+                "	tp.runID = '"+runId+"'\n" +
+                "	AND rj.runID = tp.Re_RunId\n" +
                 "ORDER BY\n" +
                 "	routeNb,\n" +
                 "	jobNb";
@@ -351,6 +346,7 @@ public class SubmitEditRouteJob {
             t.activity = "DEPO";
             double distance1 = calcTraficDist(prevLon, prevLat, r.lon, r.lat);
             minutes += calcTraficTime(distance1, speedTruck, trafficFactor);
+            minutes = minutes >= 1440 ? (minutes - 1440) : minutes;
             t.arrive = minToHour(minutes);
             t.depart = "";
             minutes = 0;
@@ -363,6 +359,7 @@ public class SubmitEditRouteJob {
                 t.activity = r.custId;
                 double distance1 = calcTraficDist(prevLon, prevLat, r.lon, r.lat);
                 minutes += calcTraficTime(distance1, speedTruck, trafficFactor);
+                minutes = minutes >= 1440 ? (minutes - 1440) : minutes;
                 t.arrive = minToHour(minutes);
                 minutes += Integer.valueOf(r.servicetime);
                 t.depart = minToHour(minutes);
