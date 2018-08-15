@@ -360,8 +360,8 @@ public class AlgoRunner implements BusinessLogic {
                             ps.setString(i++, asd.get(a).get("RunId"));
                             ps.setString(i++, asd.get(a).get("Customer_ID"));
                             ps.setString(i++, asd.get(a).get("DO_Number"));
-                            ps.setString(i++, asd.get(a).get("Long"));
-                            ps.setString(i++, asd.get(a).get("Lat"));                        
+                            ps.setString(i++, asd.get(a).get("Long").replaceAll("\\s+",""));
+                            ps.setString(i++, asd.get(a).get("Lat").replaceAll("\\s+",""));                        
                             ps.setInt(i++, Integer.parseInt(asd.get(a).get("Customer_priority")));
                             ps.setInt(i++, Integer.parseInt(asd.get(a).get("Service_time")));
                             ps.setString(i++, asd.get(a).get("deliv_start"));
