@@ -273,6 +273,7 @@ public class popupDetilRunId implements BusinessLogic {
                     tkm = tkm.add(km);
 
                     //Check error submit SAP
+                    String str = runID.replace("_", "");
                     ArrayList<String> alDo = new ArrayList<>();
                     if(flag.equals("runResultEditResult")) {
                         System.out.println(runID + " " + oriRunID);
@@ -287,8 +288,10 @@ public class popupDetilRunId implements BusinessLogic {
                         int checkResultShiment = checkResultShipment(doNum);
                         //If submitted to Result_Shipment
                         if (checkResultShiment > 0) {
-                            String checkStatusShipment = checkStatusShipment(doNum);
+                            String checkStatusShipment = checkStatusShipment(doNum, str);
                             //If submitted to Status_Shipment
+                            if(doNum.equalsIgnoreCase("8210072016"))
+                                System.out.println();
                             try {
                                 long isNumber = Long.parseLong(checkStatusShipment);
                                 sq.isFix = "" + isNumber;
@@ -320,6 +323,7 @@ public class popupDetilRunId implements BusinessLogic {
                         sq.isFix = "er";
                         sq.error = "Capacity and kubikasi overload";
                     }
+                    System.out.println(sq.truckid +"()"+ sq.isFix);
                     asd.add(sq);
                 }
                 tcap = tcap.divide(BigDecimal.valueOf(asd.size()), MathContext.DECIMAL128);
@@ -443,12 +447,16 @@ public class popupDetilRunId implements BusinessLogic {
         return rowNum;
     }
 
-    public String checkStatusShipment(String doNum) throws Exception {
+    public String checkStatusShipment(String doNum, String str) throws Exception {
         String msg = "";
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
+                if(doNum.equalsIgnoreCase("8210072016"))
+                    System.out.println();
+                
                 String sql;
-                sql = "SELECT TOP 1 SAP_Message, Ship_No_SAP FROM BOSNET1.dbo.TMS_Status_Shipment WHERE Delivery_Number = '" + doNum + "'";
+                sql = "SELECT TOP 1 SAP_Message, Ship_No_SAP FROM BOSNET1.dbo.TMS_Status_Shipment WHERE Delivery_Number = '" + doNum + "'"
+                        + " AND Shipment_Number_Dummy like '"+str+"%'";
 
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     if (rs.next()) {

@@ -158,23 +158,23 @@
                     <th width="100px" class="fzCol"><%=s.DOcount%></th>
                     <th width="100px" class="fzCol"><%=s.transportCost%></th>
                     <%if (s.isFix.equals("1")) {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-success btn-xs disabled">Submitting</button>
-                        <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-success btn-xs disabled">Submitting</button>
+                            <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
+                        </th>
                     <%} else if (Character.isDigit(s.isFix.charAt(0)) && s.isFix.length() == 10) {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>"><%=s.isFix%></button>
-                        <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>"><%=s.isFix%></button>
+                            <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
+                        </th>
                     <%} else if(s.isFix.equals("er")) {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>">Submit</button>
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>">Submit</button>
+                        </th>
                     <%} else {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>
+                        </th>
                     <%}%>
                     <th class="fzCell" style="font-size: 10px;"><%=s.error%></th>
                 </tr>

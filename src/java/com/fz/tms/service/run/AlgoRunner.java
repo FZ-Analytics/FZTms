@@ -37,6 +37,7 @@ public class AlgoRunner implements BusinessLogic {
     public static String runIdT;
     public static String chns;
     public static String threadName;
+    public static String br;
     
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -50,8 +51,9 @@ public class AlgoRunner implements BusinessLogic {
         String reRun = FZUtil.getHttpParam(request, "reRun");
         String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
-        String urls = FZUtil.getHttpParam(request, "url");        
-        Boolean redeliv = Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv"));
+        String urls = FZUtil.getHttpParam(request, "url");     
+        
+        Boolean redeliv = FZUtil.getHttpParam(request, "reDeliv") == null ? false : Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv"));
         
         
         //param
@@ -213,6 +215,7 @@ public class AlgoRunner implements BusinessLogic {
                     runIdT = runId;
                     threadName = "QueryCust";
                     chns = chn;
+                    br = branchCode;
                     if(redeliv){
                         AlgoRunnerThread al = new  AlgoRunnerThread();
                         al.start();
@@ -1931,7 +1934,7 @@ class AlgoRunnerThread implements Runnable {
             Thread.sleep(50);
             String channel = AlgoRunner.chns.replace("'", "");
             if(threadName.equalsIgnoreCase("QueryCust"))
-                redeliv(AlgoRunner.runIdT, channel);            
+                redeliv(AlgoRunner.runIdT, channel,AlgoRunner.br,AlgoRunner.dy);            
             System.out.println("Thread Finnish " +  threadName );
         } catch (InterruptedException e) {
            System.out.println("Thread InterruptedException e" +  e.getMessage());
@@ -1947,145 +1950,18 @@ class AlgoRunnerThread implements Runnable {
         }
     }
     
-    public String redeliv(String RunId, String chn) throws Exception{
+    public String redeliv(String RunId, String chn, String br, int dt) throws Exception{
        String str = "error";
-        
-        /*String sql = "INSERT\n" +
-                "	INTO\n" +
-                "		BOSNET1.dbo.TMS_PreRouteJob SELECT\n" +
-                "			'"+RunId+"' RunId,\n" +
-                "			Customer_ID,\n" +
-                "			DO_Number,\n" +
-                "			Long,\n" +
-                "			Lat,\n" +
-                "			Customer_priority,\n" +
-                "			Service_time,\n" +
-                "			deliv_start,\n" +
-                "			deliv_end,\n" +
-                "			vehicle_type_list,\n" +
-                "			total_kg,\n" +
-                "			total_cubication,\n" +
-                "			DeliveryDeadline,\n" +
-                "			DayWinStart,\n" +
-                "			DayWinEnd,\n" +
-                "			format(\n" +
-                "				getdate(),\n" +
-                "				'yyyy/MM/dd hh:mm'\n" +
-                "			) UpdatevDate,\n" +
-                "			format(\n" +
-                "				getdate(),\n" +
-                "				'yyyy/MM/dd hh:mm'\n" +
-                "			) CreateDate,\n" +
-                "			1 isActive,\n" +
-                "			'inc' Is_Exclude,\n" +
-                "			Is_Edit,\n" +
-                "			Product_Description,\n" +
-                "			Gross_Amount,\n" +
-                "			DOQty,\n" +
-                "			DOQtyUOM,\n" +
-                "			Name1,\n" +
-                "			Street,\n" +
-                "			Distribution_Channel,\n" +
-                "			Customer_Order_Block_all,\n" +
-                "			Customer_Order_Block,\n" +
-                "			Request_Delivery_Date,\n" +
-                "			MarketId,\n" +
-                "			Desa_Kelurahan,\n" +
-                "			Kecamatan,\n" +
-                "			Kodya_Kabupaten,\n" +
-                "			Batch,\n" +
-                "			Ket_DO,\n" +
-                "			rd.RedeliveryCount RedeliveryCount\n" +
-                "		FROM\n" +
-                "			SFAUtility.dbo.TCS_RedeliveryStatus rd\n" +
-                "		LEFT OUTER JOIN(\n" +
-                "				SELECT\n" +
-                "					Customer_ID,\n" +
-                "					DO_Number,\n" +
-                "					Long,\n" +
-                "					Lat,\n" +
-                "					Customer_priority,\n" +
-                "					Service_time,\n" +
-                "					deliv_start,\n" +
-                "					deliv_end,\n" +
-                "					vehicle_type_list,\n" +
-                "					total_kg,\n" +
-                "					total_cubication,\n" +
-                "					DeliveryDeadline,\n" +
-                "					DayWinStart,\n" +
-                "					DayWinEnd,\n" +
-                "					Is_Edit,\n" +
-                "					Product_Description,\n" +
-                "					Gross_Amount,\n" +
-                "					DOQty,\n" +
-                "					DOQtyUOM,\n" +
-                "					Name1,\n" +
-                "					Street,\n" +
-                "					Distribution_Channel,\n" +
-                "					Customer_Order_Block_all,\n" +
-                "					Customer_Order_Block,\n" +
-                "					Request_Delivery_Date,\n" +
-                "					MarketId,\n" +
-                "					Desa_Kelurahan,\n" +
-                "					Kecamatan,\n" +
-                "					Kodya_Kabupaten,\n" +
-                "					Batch,\n" +
-                "					Ket_DO,\n" +
-                "					MAX( RedeliveryCount ) RedeliveryCount\n" +
-                "				FROM\n" +
-                "					BOSNET1.dbo.TMS_PreRouteJob\n" +
-                "				GROUP BY\n" +
-                "					Customer_ID,\n" +
-                "					DO_Number,\n" +
-                "					Long,\n" +
-                "					Lat,\n" +
-                "					Customer_priority,\n" +
-                "					Service_time,\n" +
-                "					deliv_start,\n" +
-                "					deliv_end,\n" +
-                "					vehicle_type_list,\n" +
-                "					total_kg,\n" +
-                "					total_cubication,\n" +
-                "					DeliveryDeadline,\n" +
-                "					DayWinStart,\n" +
-                "					DayWinEnd,\n" +
-                "					Is_Edit,\n" +
-                "					Product_Description,\n" +
-                "					Gross_Amount,\n" +
-                "					DOQty,\n" +
-                "					DOQtyUOM,\n" +
-                "					Name1,\n" +
-                "					Street,\n" +
-                "					Distribution_Channel,\n" +
-                "					Customer_Order_Block_all,\n" +
-                "					Customer_Order_Block,\n" +
-                "					Request_Delivery_Date,\n" +
-                "					MarketId,\n" +
-                "					Desa_Kelurahan,\n" +
-                "					Kecamatan,\n" +
-                "					Kodya_Kabupaten,\n" +
-                "					Batch,\n" +
-                "					Ket_DO\n" +
-                "			) rj ON\n" +
-                "			rd.DONumber = rj.DO_Number\n" +
-                "			AND(\n" +
-                "				rd.RedeliveryCount > rj.RedeliveryCount\n" +
-                "				OR rj.RedeliveryCount IS NULL\n" +
-                "			)\n" +
-                "		LEFT OUTER JOIN BOSNET1.dbo.TMS_Status_Shipment stp ON\n" +
-                "			rd.DONumber = stp.Delivery_Number\n" +
-                "		WHERE\n" +
-                "			stp.Delivery_Number IS NOT NULL\n" +
-                "			AND rd.RedeliveryStatus = 1\n" +
-                "			AND Customer_ID IS NOT NULL";
-        */
-        String sql = "{call bosnet1.dbo.TMS_QueryCust_Redeliv(?,?)}";
-        System.out.println("redeliv"+sql+RunId+chn);
+       
+        String sql = "{call bosnet1.dbo.TMS_QueryCust_Redeliv(?,?,?,?)}";
+        System.out.println("redeliv"+sql+RunId+chn+br+dt);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 java.sql.CallableStatement stmt =
                 con.prepareCall(sql)) {
             stmt.setString(1, RunId);
             stmt.setString(2, chn);
+            stmt.setString(3, br);
+            stmt.setInt(4, dt);
             try(ResultSet rs = stmt.executeQuery()){
                 if (rs.next()) {
                     str = "OK";

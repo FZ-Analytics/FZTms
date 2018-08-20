@@ -334,27 +334,27 @@ public class SubmitToSapAPI {
                         "	DISTINCT prj.DO_Number,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.Route\n" +
-                        "		ELSE rs.Shipment_Route\n" +
+                        "		ELSE case when rs.Shipment_Route is null then sps.Route else rs.Shipment_Route end\n" +
                         "	END Route,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.Item_Number\n" +
-                        "		ELSE rs.Delivery_Item\n" +
+                        "		ELSE case when rs.Delivery_Item is null then sps.Item_Number else rs.Delivery_Item end\n" +
                         "	END Item_Number,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.Plant\n" +
-                        "		ELSE rs.Plant\n" +
+                        "		ELSE case when rs.Plant is null then sps.Plant else rs.Plant end\n" +
                         "	END Plant,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.DOQty\n" +
-                        "		ELSE rs.Delivery_Quantity\n" +
+                        "		ELSE case when rs.Delivery_Quantity is null then sps.DOQty else rs.Delivery_Quantity end\n" +
                         "	END DOQty,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.Product_ID\n" +
-                        "		ELSE rs.Material\n" +
+                        "		ELSE case when rs.Material is null then sps.Product_ID else rs.Material end\n" +
                         "	END Product_ID,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.Batch\n" +
-                        "		ELSE rs.Batch\n" +
+                        "		ELSE case when rs.Batch is null then sps.Batch else rs.Batch end\n" +
                         "	END Batch,\n" +
                         "	CASE\n" +
                         "		WHEN RedeliveryCount = '' THEN sp.NotUsed_Flag\n" +
@@ -413,6 +413,21 @@ public class SubmitToSapAPI {
                         "	AND prj.DO_Number = sp.DO_Number\n" +
                         "LEFT OUTER JOIN(\n" +
                         "		SELECT\n" +
+                        "			*\n" +
+                        "		FROM\n" +
+                        "			BOSNET1.dbo.TMS_ShipmentPlan\n" +
+                        "		WHERE\n" +
+                        "			Batch <> 'NULL'\n" +
+                        "			AND create_date >= DATEADD(\n" +
+                        "				DAY,\n" +
+                        "				"+AlgoRunner.dy+",\n" +
+                        "				GETDATE()\n" +
+                        "			)\n" +
+                        "	) sps ON\n" +
+                        "	prj.Customer_ID = sps.Customer_ID\n" +
+                        "	AND prj.DO_Number = sps.DO_Number\n" +
+                        "LEFT OUTER JOIN(\n" +
+                        "		SELECT\n" +
                         "			runId,\n" +
                         "			rj.customer_id,\n" +
                         "			rj.arrive,\n" +
@@ -425,8 +440,8 @@ public class SubmitToSapAPI {
                         "LEFT OUTER JOIN BOSNET1.dbo.TMS_Result_Shipment rs ON\n" +
                         "	rs.Delivery_Number = prj.DO_Number\n" +
                         "WHERE\n" +
-                        "	rj.Customer_ID = '" + custId + "'\n" +
-                        "	AND prj.runId = '" + runId + "'\n" +
+                        "	rj.Customer_ID = '"+custId+"'\n" +
+                        "	AND prj.runId = '"+runId+"'\n" +
                         "ORDER BY\n" +
                         "	prj.DO_Number";
 
@@ -449,8 +464,6 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
         return al;
     }
@@ -482,8 +495,6 @@ public class SubmitToSapAPI {
                         totDist += Math.round(rs.getDouble("Dist"));
                     }
                 }
-            } catch (Exception e) {
-                throw new Exception(e.getMessage());
             }
         }
         return totDist;
@@ -501,8 +512,6 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
         return route;
     }
@@ -543,8 +552,6 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception("OUCH: " + e.getMessage());
         }
         return hmLongLat;
     }
@@ -561,8 +568,6 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
         return al;
     }
@@ -608,6 +613,7 @@ public class SubmitToSapAPI {
                         "	runID = '"+runId+"'\n" +
                         "	AND vehicle_code = '"+vehicleCode+"'\n" +
                         "	AND customer_id = '';";
+                System.out.println(sql);
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     int i = 0;
                     while (rs.next()) {
@@ -621,8 +627,6 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
         return al;
     }
@@ -652,7 +656,7 @@ public class SubmitToSapAPI {
                         + "    rs.Delivery_Number = '" + rs.Delivery_Number + "'\n"
                         + "    AND rs.Delivery_Item = '" + rs.Delivery_Item + "'\n"
                         + "GROUP BY SAP_Message, rs.I_Status";
-
+                System.out.println(sql);
                 try (ResultSet rst = stm.executeQuery(sql)) {
                     while (rst.next()) {
                         if(rs.RedeliveryCount.length() == 0)
@@ -664,8 +668,6 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
         //It means current DO is failed to be submitted to SAP, the row at Result Shipment and Status Shipment will be deleted
         if (isExist > 0 && error != null) {
@@ -742,7 +744,7 @@ public class SubmitToSapAPI {
         return ret;
     }
 
-    public int deleteFromResultShipment(ResultShipment rs) {
+    public int deleteFromResultShipment(ResultShipment rs) throws Exception {
         int ret = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
@@ -755,9 +757,7 @@ public class SubmitToSapAPI {
                         + "   AND Delivery_Item = '" + rs.Delivery_Item + "';";
                 stm.executeQuery(sql);
             }
-        } catch (Exception e) {
-
-        }
+        } 
         return ret;
     }
 }
