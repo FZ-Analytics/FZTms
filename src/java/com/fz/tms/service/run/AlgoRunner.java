@@ -936,7 +936,7 @@ public class AlgoRunner implements BusinessLogic {
                 "	)\n" +
                 "	AND sp.create_date >= DATEADD(\n" +
                 "		DAY,\n" +
-                "		- 30,\n" +
+                "		- 90,\n" +
                 "		GETDATE()\n" +
                 "	)\n" +
                 "	AND ss.Delivery_Number IS NULL\n" +
@@ -1198,7 +1198,8 @@ public class AlgoRunner implements BusinessLogic {
                     if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
                     else if(str == 1)               pl.replace("Customer_priority", String.valueOf(2));
                     else if(str >= 2)               pl.replace("Customer_priority", String.valueOf(3));
-                    else if(str < 0)                pl.replace("Customer_priority", String.valueOf(10));
+                    else if(str < 0 && str >= -3)   pl.replace("Customer_priority", String.valueOf(4));
+                    else if(str < -3)               pl.replace("Customer_priority", String.valueOf(10));
                 }else if(pl.get("DeliveryDeadline").equalsIgnoreCase("AFTR")){
                     if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
                     else if(str > -3 && str < 0)    pl.replace("Customer_priority", String.valueOf(2));
@@ -1206,26 +1207,22 @@ public class AlgoRunner implements BusinessLogic {
                     else                            pl.replace("Customer_priority", String.valueOf(3));
                 }
             }else{
-                //repale channel to GT
-                //pl.replace("Distribution_Channel", "GT");
-                
                 if(pl.get("DeliveryDeadline").equalsIgnoreCase("BFOR")){
-                    //if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
-                    //else if(str > 0)                pl.replace("Customer_priority", String.valueOf(3));
-                    if(str < 0)                 pl.replace("Customer_priority",  String.valueOf(10));
-                    else                        pl.replace("Customer_priority", String.valueOf(2));
+                    //sudah expire tapi masih <=3 hari
+                    if(str >= -3 && str < 0)                 pl.replace("Customer_priority",  String.valueOf(3));
+                    //belum expire
+                    else if(str > 0)                         pl.replace("Customer_priority", String.valueOf(2));
+                    else                                     pl.replace("Customer_priority",  String.valueOf(10));
                 }else if(pl.get("DeliveryDeadline").equalsIgnoreCase("AFTR")){
-                                                pl.replace("Customer_priority", String.valueOf(2));
-                    /*if(str == 0)                    pl.replace("Customer_priority", String.valueOf(1));
-                    else if(str > 0)                pl.replace("Customer_priority", String.valueOf(3));
-                    else if(str < 0)                pl.replace("Customer_priority", String.valueOf(2));*/
+                    pl.replace("Customer_priority", String.valueOf(2));
                 }else if(pl.get("DeliveryDeadline").equalsIgnoreCase("ONDL")){
                     if(str == 0)                pl.replace("Customer_priority", String.valueOf(2));
                     else                        pl.replace("Customer_priority", String.valueOf(10));
                 }
             }//System.out.println(pl.get("Customer_ID"));
-
-            if(pl.get("Customer_ID").equals("5820001001") || pl.get("Customer_ID").equals("5820000348")){
+            
+            if(pl.get("DeliveryDeadline").equalsIgnoreCase("BFOR")){
+                System.out.println(pl.get("Customer_ID")+" "+pl.get("Customer_priority") +" " + pl.get("Distribution_Channel") + " " +str +" "+cal1.getTime() + "<>" + cal2.getTime());
                 /*System.out.println(pl.get("Customer_ID"));
                 System.out.println("DeliveryDeadline " + pl.get("DeliveryDeadline"));
                 System.out.println("Distribution_Channel "+pl.get("Distribution_Channel"));
@@ -1803,7 +1800,7 @@ public class AlgoRunner implements BusinessLogic {
                 "			)\n" +
                 "			AND create_date >= DATEADD(\n" +
                 "				DAY,\n" +
-                "				- 30,\n" +
+                "				- 90,\n" +
                 "				GETDATE()\n" +
                 "			)\n" +
                 "	) sp ON\n" +

@@ -130,9 +130,9 @@ public class SubmitToSapAPI {
                         rs.Status_Load_Start = null;
                         rs.Status_Load_End = null;
                         rs.Status_Complete = null;
-                        rs.Status_Shipment_Start = getNextDate(parseRunId(runId, false), false,1) + " " + alStartAndEndTime.get(0);
-                        int nxt = Integer.parseInt(alStartAndEndTime.get(2)) > 0 ? 2 : 1;
-                        rs.Status_Shipment_End = getNextDate(parseRunId(runId, false), false,nxt) + " " + alStartAndEndTime.get(1);
+                        rs.Status_Shipment_Start = getNextDate(alStartAndEndTime.get(3), false,0) + " " + alStartAndEndTime.get(0);
+                        int nxt = Integer.parseInt(alStartAndEndTime.get(2)) > 0 ? 1 : 0;
+                        rs.Status_Shipment_End = getNextDate(alStartAndEndTime.get(3), false,nxt) + " " + alStartAndEndTime.get(1);
                         rs.Service_Agent_Id = hmPRV.get("IdDriver");
                         if (rs.Shipment_Type.equals("ZDSI")) {
                             rs.Shipment_Number_Dummy = runId.replace("_", "") + he.vehicle_no;
@@ -167,6 +167,7 @@ public class SubmitToSapAPI {
                         }
                         rs.distanceUnit = "M";
 
+                        //untuk test comment disini
                         insertResultShipment(rs);
                     }
                     if (!ret.equals("OK")) {
@@ -533,7 +534,8 @@ public class SubmitToSapAPI {
                 sql = "SELECT\n" +
                         "	arrive,\n" +
                         "	depart,\n" +
-                        "	cnt\n" +
+                        "	cnt,\n" +
+                        "	DelivDate\n" +
                         "FROM\n" +
                         "	BOSNET1.dbo.TMS_RouteJob aw,\n" +
                         "	(\n" +
@@ -561,11 +563,14 @@ public class SubmitToSapAPI {
                         "			AND ad.arrive <= CAST(\n" +
                         "				'05:00' AS DATETIME2\n" +
                         "			)\n" +
-                        "	) aq\n" +
+                        "	) aq,\n" +
+                        "	BOSNET1.dbo.TMS_Progress p\n" +
                         "WHERE\n" +
-                        "	runID = '"+runId+"'\n" +
+                        "	aw.runID = '"+runId+"'\n" +
+                        "	AND aw.runID = p.runID\n" +
                         "	AND vehicle_code = '"+vehicleCode+"'\n" +
                         "	AND customer_id = '';";
+                System.out.println(sql);
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     int i = 0;
                     while (rs.next()) {
@@ -574,13 +579,12 @@ public class SubmitToSapAPI {
                         } else {
                             al.add(rs.getString("arrive"));
                             al.add(rs.getString("cnt"));
+                            al.add(rs.getString("DelivDate"));
                         }
                         i++;
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         }
         return al;
     }

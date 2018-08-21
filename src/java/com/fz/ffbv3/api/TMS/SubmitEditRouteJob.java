@@ -95,7 +95,7 @@ public class SubmitEditRouteJob {
         String ret = "OK";
         try {
             String[] tableArrSplit = decodeContent(content);
-            
+            System.out.println(tableArrSplit.toString());
             /*String strs = "";
             int x = 0;
             for(int a=0; a<tableArrSplit.length-1;a++){
@@ -132,7 +132,8 @@ public class SubmitEditRouteJob {
                 }
             }*/
             ArrayList<RouteJobLog> arr = changeRouteJob(tableArrSplit, speedTruck, trafficFactor, runId);
-            updateRouteJob(arr, runId);
+            if(arr.size()>0)
+                updateRouteJob(arr, runId);
         } catch (Exception e) {
             System.out.println("ERROR" + e.getLocalizedMessage());
             ret = "ERROR";
