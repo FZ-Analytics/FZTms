@@ -91,7 +91,7 @@ public class ShowPreRouteVehicle implements BusinessLogic {
                 "		FROM\n" +
                 "			BOSNET1.dbo.TMS_PreRouteVehicle\n" +
                 "		WHERE\n" +
-                "			RunId = '"+runId+"')";
+                "			RunId = '"+runId+"' group by branch having count(branch) > 1)";
         }else{
             sql = "SELECT\n" +
                 "	pr.vehicle_code,\n" +

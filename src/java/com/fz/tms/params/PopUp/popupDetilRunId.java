@@ -285,7 +285,7 @@ public class popupDetilRunId implements BusinessLogic {
                     for (int j = 0; j < alDo.size(); j++) {
                         String doNum = alDo.get(j);
 
-                        int checkResultShiment = checkResultShipment(doNum);
+                        int checkResultShiment = checkResultShipment(doNum, str);
                         //If submitted to Result_Shipment
                         if (checkResultShiment > 0) {
                             String checkStatusShipment = checkStatusShipment(doNum, str);
@@ -426,12 +426,13 @@ public class popupDetilRunId implements BusinessLogic {
         return all;
     }
 
-    public int checkResultShipment(String doNum) throws Exception {
+    public int checkResultShipment(String doNum, String str) throws Exception {
         int rowNum = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
                 String sql;
-                sql = "SELECT COUNT(*) rowNum FROM BOSNET1.dbo.TMS_Result_Shipment WHERE Delivery_Number = '" + doNum + "'";
+                sql = "SELECT COUNT(*) rowNum FROM BOSNET1.dbo.TMS_Result_Shipment WHERE Delivery_Number = '" + doNum + "'"
+                        + "  AND Shipment_Number_Dummy like '"+str+"%'";
 
                 try (ResultSet rs = stm.executeQuery(sql)) {
                     if (rs.next()) {

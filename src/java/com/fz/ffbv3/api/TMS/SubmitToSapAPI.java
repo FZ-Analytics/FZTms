@@ -120,6 +120,7 @@ public class SubmitToSapAPI {
 
                     ArrayList<HashMap<String, String>> alSP = getFromShipmentPlan(runId, alCustId.get(i));
                     System.out.println("alcust size: " + alSP.size());
+                    String str = runId.replace("_", "");
                     for (int j = 0; j < alSP.size(); j++) {
                         HashMap<String, String> hmSP = alSP.get(j); //HashMap Shipment Plan
                         rs.Shipment_Type = hmPRV.get("source1");
@@ -131,9 +132,9 @@ public class SubmitToSapAPI {
                         rs.Status_Load_Start = null;
                         rs.Status_Load_End = null;
                         rs.Status_Complete = null;
-                        rs.Status_Shipment_Start = getNextDate(parseRunId(runId, false), false,1) + " " + alStartAndEndTime.get(0);
-                        int nxt = Integer.parseInt(alStartAndEndTime.get(2)) > 0 ? 2 : 1;
-                        rs.Status_Shipment_End = getNextDate(parseRunId(runId, false), false,nxt) + " " + alStartAndEndTime.get(1);
+                        rs.Status_Shipment_Start = getNextDate(alStartAndEndTime.get(3), false,0) + " " + alStartAndEndTime.get(0);
+                        int nxt = Integer.parseInt(alStartAndEndTime.get(2)) > 0 ? 1 : 0;
+                        rs.Status_Shipment_End = getNextDate(alStartAndEndTime.get(3), false,nxt) + " " + alStartAndEndTime.get(1);
                         rs.Service_Agent_Id = hmPRV.get("IdDriver");
                         if (rs.Shipment_Type.equals("ZDSI")) {
                             rs.Shipment_Number_Dummy = runId.replace("_", "") + he.vehicle_no;
@@ -169,7 +170,7 @@ public class SubmitToSapAPI {
                         rs.distanceUnit = "M";
                         rs.RedeliveryCount = hmSP.get("RedeliveryCount");
 
-                        insertResultShipment(rs);
+                        insertResultShipment(rs, str);
                     }
                     if (!ret.equals("OK")) {
                         break;
@@ -387,7 +388,7 @@ public class SubmitToSapAPI {
                         "			DO_Number,\n" +
                         "			RedeliveryCount\n" +
                         "		FROM\n" +
-                        "			[BOSNET1].[dbo].[TMS_PreRouteJob] prj\n" +
+                        "			BOSNET1.dbo.TMS_PreRouteJob prj\n" +
                         "	) prj\n" +
                         "LEFT OUTER JOIN(\n" +
                         "		SELECT\n" +
@@ -580,7 +581,8 @@ public class SubmitToSapAPI {
                 sql = "SELECT\n" +
                         "	arrive,\n" +
                         "	depart,\n" +
-                        "	cnt\n" +
+                        "	cnt,\n" +
+                        "	DelivDate\n" +
                         "FROM\n" +
                         "	BOSNET1.dbo.TMS_RouteJob aw,\n" +
                         "	(\n" +
@@ -608,9 +610,11 @@ public class SubmitToSapAPI {
                         "			AND ad.arrive <= CAST(\n" +
                         "				'05:00' AS DATETIME2\n" +
                         "			)\n" +
-                        "	) aq\n" +
+                        "	) aq,\n" +
+                        "	BOSNET1.dbo.TMS_Progress p\n" +
                         "WHERE\n" +
-                        "	runID = '"+runId+"'\n" +
+                        "	aw.runID = '"+runId+"'\n" +
+                        "	AND aw.runID = p.runID\n" +
                         "	AND vehicle_code = '"+vehicleCode+"'\n" +
                         "	AND customer_id = '';";
                 System.out.println(sql);
@@ -622,6 +626,7 @@ public class SubmitToSapAPI {
                         } else {
                             al.add(rs.getString("arrive"));
                             al.add(rs.getString("cnt"));
+                            al.add(rs.getString("DelivDate"));
                         }
                         i++;
                     }
@@ -631,7 +636,7 @@ public class SubmitToSapAPI {
         return al;
     }
 
-    public String insertResultShipment(ResultShipment rs) throws Exception {
+    public String insertResultShipment(ResultShipment rs, String str) throws Exception {
         int isExist = 0;
         String error = "";
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
@@ -651,10 +656,12 @@ public class SubmitToSapAPI {
                         + "		bosnet1.dbo.TMS_Status_Shipment ss\n"
                         + "	WHERE \n"
                         + "		ss.Delivery_Number = '" + rs.Delivery_Number + "' and ss.Delivery_Item = '" + rs.Delivery_Item + "'\n"
+                        + "		and Shipment_Number_Dummy like '"+str+"%'\n"
                         + ") ss ON ss.Delivery_Number = rs.Delivery_Number\n"
                         + "WHERE\n"
                         + "    rs.Delivery_Number = '" + rs.Delivery_Number + "'\n"
                         + "    AND rs.Delivery_Item = '" + rs.Delivery_Item + "'\n"
+                        + "    AND rs.Shipment_Number_Dummy like '"+str+"%'\n"
                         + "GROUP BY SAP_Message, rs.I_Status";
                 System.out.println(sql);
                 try (ResultSet rst = stm.executeQuery(sql)) {

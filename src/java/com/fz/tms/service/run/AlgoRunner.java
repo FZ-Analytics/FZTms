@@ -335,6 +335,7 @@ public class AlgoRunner implements BusinessLogic {
             asd = treeSAP(asd); 
             try (Connection con = (new Db()).getConnection("jdbc/fztms")){                
                 for(int a = 0;a<asd.size();a++){ 
+                    System.out.println(asd.get(a).size() + " " + asd.get(a).get("Customer_priority"));
                     if(asd.get(a).size() > 0 && Integer.valueOf(asd.get(a).get("Customer_priority")) < 10){
                         sql = "INSERT\n" +
                                 "	INTO\n" +
@@ -412,6 +413,7 @@ public class AlgoRunner implements BusinessLogic {
                                 + asd.get(a).get("Batch") + "','" 
                                 + asd.get(a).get("Ket_DO") + "','" 
                                 + asd.get(a).get("RedeliveryCount") + "');";  
+                        System.out.println(sql);
                         try (PreparedStatement ps = con.prepareStatement(sql) ){
                             ps.executeUpdate();
                             cds = "OK";
@@ -1403,7 +1405,7 @@ public class AlgoRunner implements BusinessLogic {
             if(pl.size() > 0){
                 for (HashMap<String, String> pl1 : pl) {  
                     if(px.get("DO_Number").equalsIgnoreCase(pl1.get("DONumber")) 
-                            && px.get("RedeliveryCount").length() > 0){
+                            && px.get("RedeliveryCount").length() == 0){
                        //px.replace("Customer_priority", String.valueOf(10));
                        //System.out.println(px.get("DO_Number") + "()" + pl1.get("GoodsMovementStat") + "()" + pl1.get("PODStatus"));
                        py.get(a).replace("Customer_priority", String.valueOf(10));                           
