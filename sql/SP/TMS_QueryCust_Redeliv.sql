@@ -13,6 +13,7 @@ ALTER PROCEDURE [dbo].[TMS_QueryCust_Redeliv] --exec [dbo].[TMS_QueryCust_Redeli
 --set @chn = 'MT,GT,FS,IT';
 --set @br = 'D361';
 --set @dt = -90;
+
 AS
 SET NOCOUNT ON;
 DECLARE @tb AS TABLE

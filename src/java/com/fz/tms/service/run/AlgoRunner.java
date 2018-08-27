@@ -337,6 +337,7 @@ public class AlgoRunner implements BusinessLogic {
                 for(int a = 0;a<asd.size();a++){ 
                     System.out.println(asd.get(a).size() + " " + asd.get(a).get("Customer_priority"));
                     if(asd.get(a).size() > 0 && Integer.valueOf(asd.get(a).get("Customer_priority")) < 10){
+                        String strRedeliv = asd.get(a).get("RedeliveryCount") == null ? "" : asd.get(a).get("RedeliveryCount");
                         sql = "INSERT\n" +
                                 "	INTO\n" +
                                 "		bosnet1.dbo.TMS_PreRouteJob(\n" +
@@ -412,7 +413,7 @@ public class AlgoRunner implements BusinessLogic {
                                 + asd.get(a).get("Kodya_Kabupaten") + "','" 
                                 + asd.get(a).get("Batch") + "','" 
                                 + asd.get(a).get("Ket_DO") + "','" 
-                                + asd.get(a).get("RedeliveryCount") + "');";  
+                                + strRedeliv + "');";  
                         System.out.println(sql);
                         try (PreparedStatement ps = con.prepareStatement(sql) ){
                             ps.executeUpdate();
@@ -624,7 +625,7 @@ public class AlgoRunner implements BusinessLogic {
                 "		WHERE\n" +
                 "			va.included = 1\n" +
                 "			and va.Channel in (" + shn + ");";
-        System.out.println(sql);
+        //System.out.println(sql);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -1765,102 +1766,6 @@ public class AlgoRunner implements BusinessLogic {
     
     public List<HashMap<String, String>> selectCust(String prev, String next) throws Exception{
         List<HashMap<String, String>> px = new ArrayList<HashMap<String, String>>();
-        /*String sql = "SELECT\n" +
-                "	'"+next+"' AS RunId,\n" +
-                "	jb.Customer_ID,\n" +
-                "	jb.DO_Number,\n" +
-                "	jb.Long,\n" +
-                "	jb.Lat,\n" +
-                "	jb.Customer_priority,\n" +
-                "	jb.Service_time,\n" +
-                "	jb.deliv_start,\n" +
-                "	jb.deliv_end,\n" +
-                "	jb.vehicle_type_list,\n" +
-                "	jb.total_kg,\n" +
-                "	jb.total_cubication,\n" +
-                "	jb.DeliveryDeadline,\n" +
-                "	jb.DayWinStart,\n" +
-                "	jb.DayWinEnd,\n" +
-                "	CAST(\n" +
-                "		FORMAT(\n" +
-                "			getdate(),\n" +
-                "			'yyyy-MM-dd hh-mm'\n" +
-                "		) AS VARCHAR\n" +
-                "	) AS UpdatevDate,\n" +
-                "	CAST(\n" +
-                "		FORMAT(\n" +
-                "			getdate(),\n" +
-                "			'yyyy-MM-dd hh-mm'\n" +
-                "		) AS VARCHAR\n" +
-                "	) AS CreateDate,\n" +
-                "	jb.isActive,\n" +
-                "	jb.Is_Exclude,\n" +
-                "	jb.Product_Description,\n" +
-                "	jb.Gross_Amount,\n" +
-                "	jb.DOQty,\n" +
-                "	jb.DOQtyUOM,\n" +
-                "	jb.Name1,\n" +
-                "	jb.Street,\n" +
-                "	jb.Distribution_Channel,\n" +
-                "	jb.Customer_Order_Block_all,\n" +
-                "	jb.Customer_Order_Block,\n" +
-                "	jb.Request_Delivery_Date,\n" +
-                "	jb.Desa_Kelurahan,\n" +
-                "	jb.Kecamatan,\n" +
-                "	jb.Kodya_Kabupaten,\n" +
-                "	jb.Batch,\n" +
-                "	jb.Ket_DO,\n" +
-                "	jb.RedeliveryCount\n" +
-                "FROM\n" +
-                "	bosnet1.dbo.TMS_PreRouteJob jb\n" +
-                "INNER JOIN(\n" +
-                "		SELECT\n" +
-                "			DISTINCT DO_Number\n" +
-                "		FROM\n" +
-                "			bosnet1.dbo.TMS_ShipmentPlan\n" +
-                "		WHERE\n" +
-                "			already_shipment = 'N'\n" +
-                "			AND notused_flag IS NULL\n" +
-                "			AND incoterm = 'FCO'\n" +
-                "			AND(\n" +
-                "				Order_Type = 'ZDCO'\n" +
-                "				OR Order_Type = 'ZDTO'\n" +
-                "			)\n" +
-                "			AND create_date >= DATEADD(\n" +
-                "				DAY,\n" +
-                "				"+dy+",\n" +
-                "				GETDATE()\n" +
-                "			)\n" +
-                "	) sp ON\n" +
-                "	jb.DO_Number = sp.DO_Number\n" +
-                "LEFT OUTER JOIN(\n" +
-                "		SELECT\n" +
-                "			tu.Delivery_Number\n" +
-                "		FROM\n" +
-                "			BOSNET1.dbo.TMS_Result_Shipment ty\n" +
-                "		INNER JOIN BOSNET1.dbo.TMS_Status_Shipment tu ON\n" +
-                "			ty.Delivery_Number = tu.Delivery_Number\n" +
-                "		WHERE\n" +
-                "			tu.SAP_Status IS NULL\n" +
-                "	) ss ON\n" +
-                "	sp.DO_Number = ss.Delivery_Number\n" +
-                "LEFT OUTER JOIN(\n" +
-                "		SELECT\n" +
-                "			ty.Delivery_Number\n" +
-                "		FROM\n" +
-                "			BOSNET1.dbo.TMS_Result_Shipment ty\n" +
-                "		LEFT OUTER JOIN BOSNET1.dbo.TMS_Status_Shipment tu ON\n" +
-                "			ty.Delivery_Number = tu.Delivery_Number\n" +
-                "		WHERE\n" +
-                "			tu.Delivery_Number IS NULL\n" +
-                "	) sn ON\n" +
-                "	sp.DO_Number = sn.Delivery_Number\n" +
-                "WHERE\n" +
-                "	ss.Delivery_Number IS NULL\n" +
-                "	AND sn.Delivery_Number IS NULL\n" +
-                "	AND jb.RunId = '"+prev+"'\n" +
-                "	AND jb.Is_Exclude = 'inc'\n" +
-                "	AND jb.Is_Edit = 'edit';";*/
 
         String sql = "{call bosnet1.dbo.TMS_selectCust(?,?,?)}";
         System.out.println(sql + next +" "+prev + " " + dy);
