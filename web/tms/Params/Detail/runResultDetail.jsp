@@ -32,11 +32,11 @@
             }
             .col1 {
                 left:0;
-                width:50px;
+                width:100px;
                 border-right:2px black solid;
             }
             .col2 {
-                left:50px;
+                left:100px;
                 right:0;
             }
             .row1 {
@@ -166,6 +166,7 @@
                         <thead>
                             <tr style="background-color:orange;">
                                 <th style="min-width: 50px" class="fzCol center">color</th>
+                                <th style="min-width: 50px" class="fzCol center"></th>
                             </tr>
                         </thead>
                     </table>
@@ -253,11 +254,19 @@
                                 <%} // for ProgressRecord --%>
                                 <%
                                     List<RouteJob> js = (List<RouteJob>) request.getAttribute("JobList");
-                                    for(RouteJob category : js) {
+                                    for(RouteJob t : js) {
                                         //System.out.println(category.color);
+                                        String glyphicon  = "";
+                                        if(t.bat == "0" || t.bat == null)    glyphicon ="";
+                                        else if(t.bat == "1")    glyphicon ="glyphicon glyphicon-upload";
+                                        else if(t.bat == "2")    glyphicon ="glyphicon glyphicon-repeat";
+                                        
                                         out.println("<tr style=\"height: 73px;\">"
-                                                + "<td class=\"fzCells\" style=\"min-width: 50px; background-color: "+category.color+"\"></td>"
-                                                + "<td class=\"fzCells\" style=\"min-width: 95px;\">"+category.DONum+"</td>"
+                                                + "<td class=\"fzCells\" style=\"min-width: 50px; background-color: "+t.color+"\"></td>"
+                                                + "<td class=\"fzCells\" style=\"min-width: 50px;\">"
+                                                + "<span class=\""+glyphicon+"\" aria-hidden=\"true\"></span>"
+                                                + "</td>"
+                                                + "<td class=\"fzCells\" style=\"min-width: 95px;\">"+t.DONum+"</td>"
                                                 + "</tr>");
                                     }
                                 %>
@@ -284,8 +293,7 @@
                                     <td class="custIDClick center  hover" style="color: blue;min-width: 85px"><%=j.custID%></td>
                                     <td class="fzCell center" style="min-width: 45px"><%=j.arrive%></td>
                                     <td class="fzCell center" style="min-width: 55px"><%=j.depart%></td>                    
-                                    <td class="fzCell center" style="<%if (j.bat == "1" ) {%> 
-                                        background-color: #ffe6e6 <%}%>;min-width: 95px;" ><%=j.DONum%></td>
+                                    <td class="fzCell center" style="min-width: 95px;" ><%=j.DONum%></td>
                                     <td class="fzCell center" style="min-width: 35px"><%=j.getServiceTime()%></td>
                                     <td class="fzCell center" style="min-width: 115px;font-weight: bold;">
                                         <%if (j.arrive.length() > 0) {%>

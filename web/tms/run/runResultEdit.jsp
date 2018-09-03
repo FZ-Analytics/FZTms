@@ -602,8 +602,10 @@
                     style="background-color: lightyellow"
                     <%} else if (j.arrive.length() == 0 && j.storeName.length() == 0) {%>
                     style="background-color: #e6ffe6"
-                    <%} else if (j.isOkay == false) {%>
+                    <%} else if (j.bat == "1") {%>
                     style="background-color: #ffe6e6"
+                    <%} else if (j.bat == "2") {%>
+                    style="background-color: #FFFF66"
                     <%}%> >
                     <td class="color" style="width: 30px; background-color: <%=j.color%>"></td>
                     <td class="index center">

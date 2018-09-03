@@ -165,7 +165,9 @@ public class runResultDetailController implements BusinessLogic {
                     //mark red
                     String mark = FZUtil.getRsString(rs, i++, "");
                     System.out.println(j.custID+"()"+mark);
-                    j.bat = mark.equalsIgnoreCase("1") ? "1" : "";
+                    if(mark.equalsIgnoreCase("1"))  j.bat = "1";
+                    else if(mark.equalsIgnoreCase("2"))  j.bat = "2";
+                    else j.bat = "0";
                     
                     //System.out.println(j.toString());
                     //add break row

@@ -82,106 +82,6 @@ public class LoadDelivery implements BusinessLogic {
 
     public ArrayList<Delivery> getTableData(String runId) throws Exception {
         ArrayList<Delivery> alDelivery = new ArrayList<>();
-        /*try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
-            try (Statement stm = con.createStatement()) {
-                String sql;
-                sql = "SELECT\n"
-                        + "    CASE WHEN rj.depart = '' THEN 0 ELSE rj.jobNb - 1 END No,\n"
-                        + "    rj.vehicle_code,\n"
-                        + "    rj.customer_id,\n"
-                        + "    rj.arrive,\n"
-                        + "    rj.depart,\n"
-                        + "    CASE WHEN prj.DO_Number is null THEN '' ELSE prj.DO_number END DO_Number,\n"
-                        + "    CASE WHEN rj.vehicle_code = 'NA' THEN 0 WHEN prj.Service_time is null THEN '' ELSE prj.Service_time END serviceTime,\n"
-                        + "    CASE WHEN prj.Name1 is null THEN '' ELSE prj.Name1 END Name1,\n"
-                        + "    CASE WHEN prj.Long is null THEN '' ELSE prj.Long END Long,\n"
-                        + "    CASE WHEN prj.Lat is null THEN '' ELSE prj.Lat END Lat,\n"
-                        + "    CASE WHEN prj.Customer_priority is null THEN '' ELSE prj.Customer_priority END Customer_priority,\n"
-                        + "    CASE WHEN prj.Distribution_Channel is null THEN '' ELSE prj.Distribution_Channel END Distribution_Channel,\n"
-                        + "    CASE WHEN prj.Street is null THEN '' ELSE prj.Street END Street,\n"
-                        + "    rj.weight,\n"
-                        + "    rj.volume,\n"
-                        + "    prj.Request_Delivery_Date,\n"
-                        + "    rj.transportCost TransportCost,\n"
-                        + "    rj.Dist,\n"
-                        + "    prj.vehicle_type_list,\n"
-                        + "    prv.startLon,\n"
-                        + "    prv.startLat,\n"
-                        + "    prv1.startTime,\n"
-                        + "    prv1.endTime,\n"
-                        + "    prv1.vehicle_type\n"
-                        + "FROM \n"
-                        + "	[BOSNET1].[dbo].[TMS_RouteJob] rj\n"
-                        + "LEFT JOIN(\n"
-                        + "	SELECT \n"
-                        + "         *\n"
-                        + "	FROM (\n"
-                        + "         SELECT\n"
-                        + " 		prj.customer_ID,\n"
-                        + "		(SELECT\n"
-                        + "                 (stuff(\n"
-                        + "                     (SELECT\n"
-                        + "                         '; ' + DO_Number\n"
-                        + "                      FROM\n"
-                        + "                         bosnet1.dbo.TMS_PreRouteJob\n"
-                        + "                      WHERE\n"
-                        + "                         Is_Edit = 'edit'\n"
-                        + "                      AND Customer_ID = prj.Customer_ID\n"
-                        + "                         AND RunId = '" + runId + "'\n"
-                        + "                      GROUP BY\n"
-                        + "                         DO_Number FOR xml PATH('')\n"
-                        + "			),\n"
-                        + "                     1,\n"
-                        + "                     2,\n"
-                        + "                     ''\n"
-                        + "                     )\n"
-                        + "                 )\n"
-                        + "             ) AS DO_number,\n"
-                        + "             prj.Service_time,\n"
-                        + "             prj.RunId,\n"
-                        + "             prj.Name1,\n"
-                        + "             prj.Long,\n"
-                        + "             prj.Lat,\n"
-                        + "             prj.Customer_priority,\n"
-                        + "             prj.Distribution_Channel,\n"
-                        + "             prj.Street,\n"
-                        + "             prj.Request_Delivery_Date,\n"
-                        + "			 prj.vehicle_type_list,\n"
-                        + "             ROW_NUMBER() OVER(PARTITION BY prj.customer_ID ORDER BY prj.Name1 DESC) rn\n"
-                        + "         FROM \n"
-                        + "             [BOSNET1].[dbo].[TMS_PreRouteJob] prj\n"
-                        + "         WHERE \n"
-                        + "             Is_Edit = 'edit' AND RunId = '" + runId + "'\n"
-                        + "         ) a\n"
-                        + "     WHERE\n"
-                        + "         rn = 1\n"
-                        + ") prj ON rj.runID = prj.RunId and rj.customer_id = prj.Customer_ID\n"
-                        + "LEFT JOIN(\n"
-                        + "	SELECT\n"
-                        + "		prv.vehicle_code,\n"
-                        + "		prv.startLon,\n"
-                        + "		prv.startLat\n"
-                        + "	FROM\n"
-                        + "		[BOSNET1].[dbo].[TMS_PreRouteVehicle] prv\n"
-                        + "	WHERE\n"
-                        + "		prv.RunId = '" + runId + "'\n"
-                        + ") prv ON prv.vehicle_code = rj.vehicle_code and rj.customer_id = ''\n"
-                        + "FULL JOIN(\n"
-                        + "	SELECT\n"
-                        + "		prv1.vehicle_type,\n"
-                        + "		prv1.vehicle_code,\n"
-                        + "		prv1.startTime,\n"
-                        + "		prv1.endTime\n"
-                        + "	FROM\n"
-                        + "		[BOSNET1].[dbo].[TMS_PreRouteVehicle] prv1\n"
-                        + "	WHERE\n"
-                        + "		prv1.RunId = '" + runId + "'\n"
-                        + ") prv1 ON prv1.vehicle_code = rj.vehicle_code\n"
-                        + "WHERE \n"
-                        + "	rj.runID = '" + runId + "'\n"
-                        + "ORDER BY\n"
-                        + "	rj.routeNb, rj.jobNb";
-                try (ResultSet rs = stm.executeQuery(sql)) {*/
         String sql = "{call bosnet1.dbo.TMS_runResultEditResultShow(?,?)}";
         System.out.println(sql + runId);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
@@ -273,6 +173,13 @@ public class LoadDelivery implements BusinessLogic {
                         prevLong = ld.lon2;
                         prevLat = ld.lat2;
                     }
+                    
+                    //mark red
+                    String mark = rs.getString("batch");
+                    
+                    if(mark.equalsIgnoreCase("1"))  ld.bat = "1";
+                    else if(mark.equalsIgnoreCase("2"))  ld.bat = "2";
+                    else ld.bat = "0";
                     
                     alDelivery.add(ld);
 

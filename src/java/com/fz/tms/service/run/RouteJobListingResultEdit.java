@@ -138,6 +138,12 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                     if(ld.doNum.length() > 0) {
                         ld.isOkay = rs.getString("bat").equalsIgnoreCase("0") ? true : false;//isOkay(ld.doNum, runId);
                     }
+                    
+                    String mark = rs.getString("bat");
+                    
+                    if(mark.equalsIgnoreCase("1"))  ld.bat = "1";
+                    else if(mark.equalsIgnoreCase("2"))  ld.bat = "2";
+                    else ld.bat = "0";
 
                     alDelivery.add(ld);
 

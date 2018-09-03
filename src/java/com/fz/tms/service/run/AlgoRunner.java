@@ -216,9 +216,10 @@ public class AlgoRunner implements BusinessLogic {
                     threadName = "QueryCust";
                     chns = chn;
                     br = branchCode;
-                    if(redeliv){
-                        AlgoRunnerThread al = new  AlgoRunnerThread();
-                        al.start();
+                    if(resp.equalsIgnoreCase("OK") && redeliv){
+                        errMsg = "Redelive";
+                        String channels = chn.replace("'", "");
+                        resp = redeliv(runId, channels,branchCode,dy);   
                     }
                     
                     if (resp.equalsIgnoreCase("OK")){
@@ -414,7 +415,7 @@ public class AlgoRunner implements BusinessLogic {
                                 + asd.get(a).get("Batch") + "','" 
                                 + asd.get(a).get("Ket_DO") + "','" 
                                 + strRedeliv + "');";  
-                        System.out.println(sql);
+                        //System.out.println(sql);
                         try (PreparedStatement ps = con.prepareStatement(sql) ){
                             ps.executeUpdate();
                             cds = "OK";
@@ -1825,36 +1826,6 @@ public class AlgoRunner implements BusinessLogic {
         }
         
         return px;
-    }
-}
-    
-class AlgoRunnerThread implements Runnable {
-    private Thread t;
-    private String threadName = AlgoRunner.threadName;
-
-    AlgoRunnerThread() {
-    }
-   
-    public void run() {
-        System.out.println("Thread Running " +  threadName );
-        try {
-            Thread.sleep(50);
-            String channel = AlgoRunner.chns.replace("'", "");
-            if(threadName.equalsIgnoreCase("QueryCust"))
-                redeliv(AlgoRunner.runIdT, channel,AlgoRunner.br,AlgoRunner.dy);            
-            System.out.println("Thread Finnish " +  threadName );
-        } catch (InterruptedException e) {
-           System.out.println("Thread InterruptedException e" +  e.getMessage());
-        } catch (Exception ex) {
-           System.out.println("Thread ex" +  ex.getMessage());
-       }
-    }
-
-    public void start () {
-        if (t == null) {
-            t = new Thread (this, threadName);
-            t.start ();
-        }
     }
     
     public String redeliv(String RunId, String chn, String br, int dt) throws Exception{
