@@ -14,7 +14,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Jobs</title>
+        <%@include file="../appGlobal/headTop.jsp"%>
         <style>
             .hover:hover {
                cursor: pointer; 

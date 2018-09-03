@@ -11,6 +11,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <%@include file="../appGlobal/headTop.jsp"%>
         <style>
             .hover:hover {
                 cursor: pointer; 
