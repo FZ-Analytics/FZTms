@@ -8,6 +8,7 @@ package com.fz.ffbv3.api.TMS;
 import com.fz.generic.Db;
 import com.fz.tms.params.model.ResultShipment;
 import com.fz.tms.params.model.RunResultEditResultSubmitToSap;
+import com.fz.tms.params.service.Other;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.UnsupportedEncodingException;
@@ -16,12 +17,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -83,6 +87,8 @@ public class SubmitToSapAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String ret = "OK";
         ResultShipment rs = new ResultShipment();
+        String doN = "";
+        String err = "";
         try {
             RunResultEditResultSubmitToSap he = gson.fromJson(content.contains("json") ? decodeContent(content) : content, RunResultEditResultSubmitToSap.class);
             vNo = he.vehicle_no;
@@ -115,12 +121,17 @@ public class SubmitToSapAPI {
                 }
             }
             if (isRouteNull == false) {
+                String str = "ERROR";
                 for (int i = 0; i < alCustId.size(); i++) {
 
                     ArrayList<HashMap<String, String>> alSP = getFromShipmentPlan(runId, alCustId.get(i));
                     System.out.println("alcust size: " + alSP.size());
                     for (int j = 0; j < alSP.size(); j++) {
                         HashMap<String, String> hmSP = alSP.get(j); //HashMap Shipment Plan
+                        
+                        doN = hmSP.get("DO_Number");
+                        err = "add model";
+                        
                         rs.Shipment_Type = hmPRV.get("source1");
                         rs.Plant = hmSP.get("Plant");
                         rs.Shipment_Route = route;
@@ -168,19 +179,128 @@ public class SubmitToSapAPI {
                         rs.distanceUnit = "M";
 
                         //untuk test comment disini
-                        insertResultShipment(rs);
+                        err = "insertResultShipment";
+                        str = insertResultShipment(rs);
                     }
-                    if (!ret.equals("OK")) {
+                    if (!ret.equals("OK")) {                        
                         break;
                     }
+                }                
+                if(str.equalsIgnoreCase("OK")){
+                    err = "moveShip";
+                    moveShip(rs);
+                    err = "";
+                }
+                if (!ret.equals("OK")) {
+                    err = ret;
+                    throw new Exception(); 
                 }
             }
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            HashMap<String, String> pl = new HashMap<String, String>();
+            
+            pl.put("ID", runId);
+            pl.put("fileNmethod", "submitToSap Exc");
+            pl.put("datas", "");
+            pl.put("msg", doN+" | "+err+" | "+e.getMessage());
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            Date date = new Date();
+            pl.put("dates", dateFormat.format(date).toString());
+            try { 
+                Other.insertLog(pl);
+            } catch (Exception ex) {
+                
+            }
         }
 
         String jsonOutput = gson.toJson(ret);
         return jsonOutput;
+    }
+    
+    public void moveShip(ResultShipment rs) throws Exception{
+        String sql = "INSERT\n" +
+                "	INTO\n" +
+                "		BOSNET1.dbo.TMS_Result_Shipment(\n" +
+                "			Shipment_Type,\n" +
+                "			Plant,\n" +
+                "			Shipping_Type,\n" +
+                "			Shipment_Route,\n" +
+                "			Shipment_Number_Dummy,\n" +
+                "			Description,\n" +
+                "			Status_Plan,\n" +
+                "			Status_Check_In,\n" +
+                "			Status_Load_Start,\n" +
+                "			Status_Load_End,\n" +
+                "			Status_Complete,\n" +
+                "			Status_Shipment_Start,\n" +
+                "			Status_Shipment_End,\n" +
+                "			Service_Agent_Id,\n" +
+                "			No_Pol,\n" +
+                "			Driver_Name,\n" +
+                "			Delivery_Number,\n" +
+                "			Delivery_Item,\n" +
+                "			Delivery_Quantity_Split,\n" +
+                "			Delivery_Quantity,\n" +
+                "			Delivery_Flag_Split,\n" +
+                "			Material,\n" +
+                "			Batch,\n" +
+                "			Vehicle_Number,\n" +
+                "			Vehicle_Type,\n" +
+                "			Time_Stamp,\n" +
+                "			Shipment_Number_SAP,\n" +
+                "			I_Status,\n" +
+                "			Shipment_Flag,\n" +
+                "			Distance,\n" +
+                "			Distance_Unit\n" +
+                "		)(\n" +
+                "			SELECT\n" +
+                "				Shipment_Type,\n" +
+                "				Plant,\n" +
+                "				Shipping_Type,\n" +
+                "				Shipment_Route,\n" +
+                "				Shipment_Number_Dummy,\n" +
+                "				Description,\n" +
+                "				Status_Plan,\n" +
+                "				Status_Check_In,\n" +
+                "				Status_Load_Start,\n" +
+                "				Status_Load_End,\n" +
+                "				Status_Complete,\n" +
+                "				Status_Shipment_Start,\n" +
+                "				Status_Shipment_End,\n" +
+                "				Service_Agent_Id,\n" +
+                "				No_Pol,\n" +
+                "				Driver_Name,\n" +
+                "				Delivery_Number,\n" +
+                "				Delivery_Item,\n" +
+                "				Delivery_Quantity_Split,\n" +
+                "				Delivery_Quantity,\n" +
+                "				Delivery_Flag_Split,\n" +
+                "				Material,\n" +
+                "				Batch,\n" +
+                "				Vehicle_Number,\n" +
+                "				Vehicle_Type,\n" +
+                "				format(\n" +
+                "					getdate(),\n" +
+                "					'yyyy-MM-dd hh:mm:ss.000'\n" +
+                "				) Time_Stamp,\n" +
+                "				Shipment_Number_SAP,\n" +
+                "				I_Status,\n" +
+                "				Shipment_Flag,\n" +
+                "				Distance,\n" +
+                "				Distance_Unit\n" +
+                "			FROM\n" +
+                "				BOSNET1.dbo.TMS_Result_ShipmentArc\n" +
+                "			WHERE\n" +
+                "				Shipment_Number_Dummy = '"+rs.Shipment_Number_Dummy+"'\n" +
+                "		)";
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                PreparedStatement ps = con.prepareStatement(sql)) {
+
+            con.setAutoCommit(false);
+            ps.executeUpdate();
+            con.setAutoCommit(true);
+            ps.close();
+        }
     }
 
     public static String decodeContent(String content) throws UnsupportedEncodingException {
@@ -318,9 +438,7 @@ public class SubmitToSapAPI {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        } 
         return hm;
     }
 
@@ -333,7 +451,7 @@ public class SubmitToSapAPI {
                         + "     sp.DO_Number,\n"
                         + "     sp.Route,\n"
                         + "     sp.Item_Number,\n"
-                        + "     sp.Plant,\n"
+                        + "	pr.branch Plant,\n"
                         + "     sp.DOQty,\n"
                         + "     sp.Product_ID,\n"
                         + "     sp.Batch,\n"
@@ -373,6 +491,8 @@ public class SubmitToSapAPI {
                         + "			ELSE\n"
                         + "				sp.Request_Delivery_Date\n"
                         + "		END\n"
+                        + "INNER JOIN BOSNET1.dbo.TMS_Progress pr ON"
+                        + "	pr.runId = '" + runId + "'"
                         + "WHERE\n"
                         + "         sp.Customer_ID = '" + custId + "'\n"
                         + "         AND sp.Already_Shipment <> 'Y'\n"
@@ -613,6 +733,27 @@ public class SubmitToSapAPI {
                         + "WHERE\n"
                         + "    rs.Delivery_Number = '" + rs.Delivery_Number + "'\n"
                         + "    AND rs.Delivery_Item = '" + rs.Delivery_Item + "'\n"
+                        + "GROUP BY SAP_Message, rs.I_Status\n"
+                        + "UNION ALL\n"
+                        + "SELECT\n"
+                        + "	COUNT(*) isExist,\n"
+                        + "	ss.SAP_Message error,\n"
+                        + "     rs.I_Status\n"
+                        + "FROM\n"
+                        + "	BOSNET1.dbo.TMS_Result_ShipmentArc rs\n"
+                        + "FULL JOIN (\n"
+                        + "	SELECT \n"
+                        + "		ss.SAP_Message,\n"
+                        + "		ss.Delivery_Number,\n"
+                        + "		ss.Delivery_Item\n"
+                        + "	FROM \n"
+                        + "		bosnet1.dbo.TMS_Status_Shipment ss\n"
+                        + "	WHERE \n"
+                        + "		ss.Delivery_Number = '" + rs.Delivery_Number + "' and ss.Delivery_Item = '" + rs.Delivery_Item + "'\n"
+                        + ") ss ON ss.Delivery_Number = rs.Delivery_Number\n"
+                        + "WHERE\n"
+                        + "    rs.Delivery_Number = '" + rs.Delivery_Number + "'\n"
+                        + "    AND rs.Delivery_Item = '" + rs.Delivery_Item + "'\n"
                         + "GROUP BY SAP_Message, rs.I_Status";
 
                 try (ResultSet rst = stm.executeQuery(sql)) {
@@ -633,56 +774,30 @@ public class SubmitToSapAPI {
         }
 
         String ret = "error";
-        if ((isExist == 0) || (isExist > 0 && error != null)) {
-            String sql = "INSERT INTO bosnet1.dbo.TMS_Result_Shipment "
+        if ((isExist == 0) || (isExist > 0 && error != null)) {            
+            
+            String sql = "INSERT INTO bosnet1.dbo.TMS_Result_ShipmentArc "
                     + "(Shipment_Type, Plant, Shipping_Type, Shipment_Route, Shipment_Number_Dummy, Description, Status_Plan, Status_Check_In, Status_Load_Start, Status_Load_End, "
                     + "Status_Complete, Status_Shipment_Start, Status_Shipment_End, Service_Agent_Id, No_Pol, Driver_Name, Delivery_Number, Delivery_Item, Delivery_Quantity_Split, "
                     + "Delivery_Quantity, Delivery_Flag_Split, Material, Batch, Vehicle_Number, Vehicle_Type, Time_Stamp, Shipment_Number_SAP, I_Status, Shipment_Flag, Distance, Distance_Unit) "
-                    + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-
-            try (Connection con = (new Db()).getConnection("jdbc/fztms"); PreparedStatement psHdr = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
-                psHdr.setString(1, rs.Shipment_Type);
-                psHdr.setString(2, rs.Plant);
-                psHdr.setString(3, rs.Shipping_Type);
-                psHdr.setString(4, rs.Shipment_Route);
-                psHdr.setString(5, rs.Shipment_Number_Dummy);
-                psHdr.setString(6, rs.Description);
-                psHdr.setString(7, rs.Status_Plan);
-                psHdr.setString(8, rs.Status_Check_In);
-                psHdr.setString(9, rs.Status_Load_Start);
-                psHdr.setString(10, rs.Status_Load_End);
-                psHdr.setString(11, rs.Status_Complete);
-                psHdr.setString(12, rs.Status_Shipment_Start);
-                psHdr.setString(13, rs.Status_Shipment_End);
-                psHdr.setString(14, rs.Service_Agent_Id);
-                psHdr.setString(15, rs.No_Pol);
-                psHdr.setString(16, rs.Driver_Name);
-                psHdr.setString(17, rs.Delivery_Number);
-                psHdr.setString(18, rs.Delivery_Item);
-                psHdr.setDouble(19, rs.Delivery_Quantity_Split);
-                psHdr.setDouble(20, rs.Delivery_Quantity);
-                psHdr.setString(21, rs.Delivery_Flag_Split);
-                psHdr.setString(22, rs.Material);
-                psHdr.setString(23, rs.Batch);
-                psHdr.setString(24, rs.Vehicle_Number);
-                psHdr.setString(25, rs.Vehicle_Type);
-                psHdr.setTimestamp(26, rs.Time_Stamp);
-                psHdr.setString(27, rs.Shipment_Number_SAP);
-                psHdr.setString(28, rs.I_Status);
-                psHdr.setString(29, rs.Shipment_Flag);
-                psHdr.setString(30, rs.distance);
-                psHdr.setString(31, rs.distanceUnit);
-
+                    + "values('"+rs.Shipment_Type+"','"+rs.Plant+"',"+rs.Shipping_Type+",'"+rs.Shipment_Route+"','"+rs.Shipment_Number_Dummy+"'"
+                    + ",'"+rs.Description+"','"+rs.Status_Plan+"',"+rs.Status_Check_In+","+rs.Status_Load_Start+","+rs.Status_Load_End+","+rs.Status_Complete+""
+                    + ",'"+rs.Status_Shipment_Start+"','"+rs.Status_Shipment_End+"','"+rs.Service_Agent_Id+"','"+rs.No_Pol+"','"+rs.Driver_Name+"'"
+                    + ",'"+rs.Delivery_Number+"','"+rs.Delivery_Item+"',"+rs.Delivery_Quantity_Split+","+rs.Delivery_Quantity+",'"+rs.Delivery_Flag_Split+"'"
+                    + ",'"+rs.Material+"','"+rs.Batch+"','"+rs.Vehicle_Number+"','"+rs.Vehicle_Type+"',(select format(getdate(),'yyyy-MM-dd hh:mm:ss.000') Time_Stamp)"
+                    + ",'"+rs.Shipment_Number_SAP+"','"+rs.I_Status+"','"+rs.Shipment_Flag+"',"+rs.distance+",'"+rs.distanceUnit+"');";
+            System.out.println("insert TMS_Result_Shipment "+sql);
+            try (Connection con = (new Db()).getConnection("jdbc/fztms"); 
+                    PreparedStatement psHdr = con.prepareStatement(sql);) {
                 psHdr.executeUpdate();
-
-                ret = "ok";
-                psHdr.close();
+                psHdr.close();  
+                ret = "OK";
             }
         }
         return ret;
     }
 
-    public int deleteFromStatusShipment(ResultShipment rs) {
+    public int deleteFromStatusShipment(ResultShipment rs) throws Exception {
         int ret = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
@@ -695,13 +810,11 @@ public class SubmitToSapAPI {
                         + "   AND Delivery_Item = '" + rs.Delivery_Item + "';";
                 ret = stm.executeUpdate(sql);
             }
-        } catch (Exception e) {
-
         }
         return ret;
     }
 
-    public int deleteFromResultShipment(ResultShipment rs) {
+    public int deleteFromResultShipment(ResultShipment rs) throws Exception {
         int ret = 0;
         try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
             try (Statement stm = con.createStatement()) {
@@ -714,9 +827,19 @@ public class SubmitToSapAPI {
                         + "   AND Delivery_Item = '" + rs.Delivery_Item + "';";
                 stm.executeQuery(sql);
             }
-        } catch (Exception e) {
-
         }
+        try (Connection con = (new Db()).getConnection("jdbc/fztms")) {
+            try (Statement stm = con.createStatement()) {
+                String sql
+                        = "DELETE "
+                        + "FROM "
+                        + "   bosnet1.dbo.TMS_Result_ShipmentArc "
+                        + "WHERE "
+                        + "   Delivery_Number = '" + rs.Delivery_Number + "'"
+                        + "   AND Delivery_Item = '" + rs.Delivery_Item + "';";
+                stm.executeQuery(sql);
+            }
+        } 
         return ret;
     }
 }

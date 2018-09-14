@@ -110,9 +110,15 @@
                     $('#NamaDriver').val(data.NamaDriver);
                     $('#agent_priority').val(data.agent_priority);
                     $('#max_cust').val(data.max_cust);
-                    $('#btn').text(data.flag);
+                    $('#btn').text(data.flag);                    
                     
-                    
+                    if(data.source1 == 'EXT'){
+                        $('#weight').attr('readonly', false);
+                        $('#volume').attr('readonly', false);
+                    }else{
+                        $('#weight').attr('readonly', true);
+                        $('#volume').attr('readonly', true);
+                    }
                     /*
                     if(data == 'OK'){
                         alert( 'sukses' );
