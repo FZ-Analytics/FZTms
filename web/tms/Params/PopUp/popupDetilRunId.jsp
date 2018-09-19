@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <%@include file="../appGlobal/headTop.jsp"%>
+        <title>JSP Page</title>
     </head>
     <body>
         <%@include file="../appGlobal/bodyTop.jsp"%>
@@ -19,7 +19,6 @@
             .hover:hover {
                cursor: pointer; 
             }
-
             .lds-ellipsis {
                 display: inline-block;
                 position: relative;
@@ -75,20 +74,16 @@
                     transform: translate(19px, 0);
                 }
             }
-
         </style>
         <script>
             $(document).ready(function () {
                 $("#loader").hide();
                 $(".submitBtn").click(function () {
                     var vNo = $(this).val();
-
                     var $apiAddress = '../../../api/submitToSap/submitToSap';
-
                     //if opened from runResult, runID is run id and oriRunID is next run id
                     //if opened from whatIf, runID is run id and ori run id is ori run id
                     var jsonForServer = '{\"runId\": \"' + $("#runID").text() + '\", \"oriRunId\":\"' + $("#oriRunID").val() + '\", \"vehicle_no\":\"' + vNo + '\", \"flag\":\"' + $("#flag").val() + '\"}';
-
                     $("#body").fadeOut();
                     $("#loader").fadeIn();
                     //Submit to Result_Shipment
@@ -158,23 +153,23 @@
                     <th width="100px" class="fzCol"><%=s.DOcount%></th>
                     <th width="100px" class="fzCol"><%=s.transportCost%></th>
                     <%if (s.isFix.equals("1")) {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-success btn-xs disabled">Submitting</button>
-                        <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-success btn-xs disabled">Submitting</button>
+                            <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
+                        </th>
                     <%} else if (Character.isDigit(s.isFix.charAt(0)) && s.isFix.length() == 10) {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>"><%=s.isFix%></button>
-                        <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>"><%=s.isFix%></button>
+                            <!--<button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>-->
+                        </th>
                     <%} else if(s.isFix.equals("er")) {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>">Submit</button>
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-default btn-xs disabled" value="<%=s.isFix%>">Submit</button>
+                        </th>
                     <%} else {%>
-                    <th class="" onclick="" style="">
-                        <button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>
-                    </th>
+                        <th class="" onclick="" style="">
+                            <button id="<%=s.truckid%>" class="btn btn-success btn-xs submitBtn" type="submit" value="<%=s.truckid%>">Submit</button>
+                        </th>
                     <%}%>
                     <th class="fzCell" style="font-size: 10px;"><%=s.error%></th>
                 </tr>

@@ -15,7 +15,6 @@
             td {
                 border: 1px solid lightgray;
             }
-
             th {
                 border: 1px solid black;
             }
@@ -24,7 +23,6 @@
                 display:none;
                 visibility:hidden;
             }
-
             .menu {
                 width: 170px;
                 background-color: #FFFFFF;
@@ -38,28 +36,23 @@
                 padding: 0;
                 margin:0;
             }
-
             .menu ul {
                 text-decoration: none;
             }
-
             .menu ul li {
                 padding: 6%;
                 background-color: #FFFFFF;
                 color: #000000;
                 font-size: 10px;
             }
-
             .menu ul li:hover {
                 background-color: orange;
                 color: black;
                 cursor: pointer;
             }
-
             .hover:hover {
                 cursor: pointer; 
             }
-
             .center {
                 text-align: center;
             }
@@ -82,7 +75,6 @@
             var klikStatus = 1;
             var vehicleCode = "";
             var arrSignedIndex = [];
-
             $(document).ready(function () {
                 $('.custIDClick').click(function () {
                     if ($(this).text().length > 0) {
@@ -105,16 +97,13 @@
                         return true;
                     }
                 });
-
                 initContextMenu();
             });
-
             function initContextMenu() {
                 klikStatus = 1;
                 $(".tableRows").on("contextmenu", function (e) {
                     //prevent default context menu for right click
                     e.preventDefault();
-
                     rowIdx = this.rowIndex;
                     vNoTop = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
                     vNoBottom = document.getElementById('table').rows[rowIdx + 1].cells[2].innerHTML;
@@ -123,64 +112,50 @@
                     custIdTop = document.getElementById('table').rows[rowIdx - 1].cells[3].innerHTML;
                     custIdBottom = document.getElementById('table').rows[rowIdx + 1].cells[3].innerHTML;
                     arriveBottom = document.getElementById('table').rows[rowIdx + 1].cells[4].innerHTML;
-
                     var menu = $(".menu");
-
                     //hide menu if already shown
                     menu.hide();
-
                     //get x and y values of the click event
                     var pageX = e.pageX;
                     var pageY = e.pageY;
-
                     //position menu div near mouse cliked area
                     menu.css({top: pageY, left: pageX});
-
                     var mwidth = menu.width();
                     var mheight = menu.height();
                     var screenWidth = $(window).width();
                     var screenHeight = $(window).height();
-
                     //if window is scrolled
                     var scrTop = $(window).scrollTop();
-
                     //if the menu is close to right edge of the window
                     if (pageX + mwidth > screenWidth) {
                         menu.css({left: pageX - mwidth});
                     }
-
                     //if the menu is close to bottom edge of the window
                     if (pageY + mheight > screenHeight + scrTop) {
                         menu.css({top: pageY - mheight});
                     }
-
                     if (klikStatus === 1) {
                         $("#pasteAtTop").css("color", "grey");
                         $("#pasteAtBottom").css("color", "grey");
                         $("#cut").css("color", "black");
-
                         $("#switchHelper").css("color", "grey");
                         $("#switch").css("color", "black");
                     } else if (klikStatus === 2) {
                         $("#pasteAtTop").css("color", "black");
                         $("#pasteAtBottom").css("color", "black");
                         $("#cut").css("color", "grey");
-
                         $("#switchHelper").css("color", "grey");
                         $("#switch").css("color", "grey");
                     } else if (klikStatus === 3) {
                         $("#pasteAtTop").css("color", "grey");
                         $("#pasteAtBottom").css("color", "grey");
                         $("#cut").css("color", "grey");
-
                         $("#switchHelper").css("color", "black");
                         $("#switch").css("color", "grey");
                     }
-
                     //finally show the menu
                     menu.show();
                 });
-
                 $("html").on("click", function () {
                     $(".menu").hide();
                 });
@@ -193,11 +168,9 @@
                 }
                 return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
             }
-
             function switchTruck() {
                 if (klikStatus === 1) {
                     vehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
-
                     var tableLength = document.getElementById('table').rows.length - 1;
                     for (var i = 0; i <= tableLength; i++) {
                         var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
@@ -210,7 +183,6 @@
                     klikStatus = 3;
                 }
             }
-
             function switchHelper() {
                 if (klikStatus === 3) {
                     switchWithThisTruck();
@@ -218,7 +190,6 @@
                     klikStatus = 1;
                 }
             }
-
             function switchWithThisTruck() {
                 var vCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
                 for (var i = arrSignedIndex[0]; i < arrSignedIndex[arrSignedIndex.length - 1] + 1; i++) {
@@ -228,7 +199,6 @@
                         document.getElementById('table').rows[i].cells[2].innerHTML = vCode;
                     }
                 }
-
                 var tableLength = document.getElementById('table').rows.length - 1;
                 for (var i = 0; i <= tableLength; i++) {
                     var currentVehicleCode = document.getElementById('table').rows[i].cells[2].innerHTML;
@@ -237,13 +207,11 @@
                     }
                 }
             }
-
             function emptyArrSignedIndex() {
                 while (arrSignedIndex.length > 0) {
                     arrSignedIndex.pop();
                 }
             }
-
             function deleteRow() {
                 vehicleCode = document.getElementById('table').rows[rowIdx].cells[2].innerHTML;
                 if (klikStatus === 1) {
@@ -264,7 +232,6 @@
                         klikStatus = 2;
                         orderNo();
                     }
-
                     //remove break row: case 2
                     try {
                         var prevVehicleCode = document.getElementById('table').rows[rowIdx - 1].cells[2].innerHTML;
@@ -285,7 +252,6 @@
                 klikStatus = 2;
                 orderNo();
             }
-
             function paste(s) {
                 if (klikStatus === 2) {
                     var table = document.getElementById("table");
@@ -435,7 +401,6 @@
                 initContextMenu();
                 orderNo();
             }
-
             function orderNo() {
                 var tableLength = document.getElementById('table').rows.length;
                 var idx = 1;
@@ -453,10 +418,8 @@
                     }
                 }
             }
-
             function jumpToResult() {
                 var table = document.getElementById("table");
-
                 var tableArr2 = [];
                 for (var i = 1; i < table.rows.length; i++) {
                     //var no = table.rows[i].cells[0].innerHTML; //no
@@ -464,7 +427,6 @@
                     var custId = "";
                     //if ((table.rows[i].cells[1].innerHTML !== "") && (table.rows[i].cells[2].innerHTML === "") && (table.rows[i].cells[4].innerHTML !== "")) {
                     //custId = "start" + "split";
-
                     var curArrv = table.rows[i].cells[4].innerHTML;
                     var curDepart = table.rows[i].cells[5].innerHTML;
                     var nextArrv = "";
@@ -493,7 +455,6 @@
                                 truck,
                                 custId
                                 );
-
                     }
                 }
                 document.getElementById("submit").disabled = true;
@@ -519,17 +480,14 @@
                     }
                 });
             }
-
             function klik(kode) {
                 window.open("../Params/PopUp/popupEditCust.jsp?runId=" + $("#RunIdClick").text() + "&custId=" + kode, null,
                         "scrollbars=1,resizable=1,height=500,width=750");
             }
-
             function saveHistory() {
                 var $apiAddress = '../../api/popupEditCustBfror/savehistory';
                 var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
                 var data = [];
-
                 $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                     if (data == 'OK') {
                         alert('sukses');
@@ -602,8 +560,10 @@
                     style="background-color: lightyellow"
                     <%} else if (j.arrive.length() == 0 && j.storeName.length() == 0) {%>
                     style="background-color: #e6ffe6"
-                    <%} else if (j.isOkay == false) {%>
+                    <%} else if (j.bat == "1") {%>
                     style="background-color: #ffe6e6"
+                    <%} else if (j.bat == "2") {%>
+                    style="background-color: #FFFF66"
                     <%}%> >
                     <td class="color" style="width: 30px; background-color: <%=j.color%>"></td>
                     <td class="index center">

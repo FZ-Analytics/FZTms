@@ -30,6 +30,14 @@ import java.util.HashMap;
 
 
 public class AlgoRunner implements BusinessLogic {
+    
+    public static int dy = -90;
+    
+    //thread
+    public static String runIdT;
+    public static String chns;
+    public static String threadName;
+    public static String br;
 
     @Override
     public void run(HttpServletRequest request, HttpServletResponse response,
@@ -44,6 +52,8 @@ public class AlgoRunner implements BusinessLogic {
         String oriRunID = FZUtil.getHttpParam(request, "oriRunID");
         String channel = FZUtil.getHttpParam(request, "channel");
         String urls = FZUtil.getHttpParam(request, "url");
+        
+        Boolean redeliv = FZUtil.getHttpParam(request, "reDeliv") == null ? false : Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv"));
         
         
         //param
@@ -139,6 +149,8 @@ public class AlgoRunner implements BusinessLogic {
             if (success) {     
                 if (reRun.equals("A")) {
                     List<HashMap<String, String>> px = selectCust(runId, runID);
+                    List<HashMap<String, String>> dx = new ArrayList<HashMap<String, String>>();
+                    dx.addAll(px);
                     
                     if(px.size() == 0){
                         errMsg = "Error Select cust algorunner";
@@ -164,15 +176,15 @@ public class AlgoRunner implements BusinessLogic {
                     }
                     
                     if (resp.equalsIgnoreCase("OK")){
-                        px = selectCust(runId, runID);
-                        px = replace(px);
+                        //px = selectCust(runId, runID);
+                        //px = replace(px);
                         errMsg = "Insert PreRouteJob Copy ori Error";
-                        resp = insertPreRouteJobCopy(runID, runId, branchCode, dateDeliv, "ori", px);
+                        resp = insertPreRouteJobCopy(runID, runId, branchCode, dateDeliv, "ori", dx);
                     }
                     
                     if (resp.equalsIgnoreCase("OK")){
                         errMsg = "Insert PreRouteJob Copy edit Error";
-                        resp = insertPreRouteJobCopy(runID, runId, branchCode, dateDeliv, "edit", px);
+                        resp = insertPreRouteJobCopy(runID, runId, branchCode, dateDeliv, "edit", dx);
                     }
                     
                     if (resp.equalsIgnoreCase("OK")){
@@ -198,6 +210,17 @@ public class AlgoRunner implements BusinessLogic {
                 } else if (reRun.equals("N")) {
                     errMsg = "TMS_GetCustLongLat Error";
                     resp = prepareCustTable(branchCode);
+                    
+                    //redeliv            
+                    runIdT = runId;
+                    threadName = "QueryCust";
+                    chns = chn;
+                    br = branchCode;
+                    if(resp.equalsIgnoreCase("OK") && redeliv){
+                        errMsg = "Redelive";
+                        String channels = chn.replace("'", "");
+                        resp = redeliv(runId, channels,branchCode,dy);   
+                    }
                     
                     if (resp.equalsIgnoreCase("OK")){
                         errMsg = "Insert Param";
@@ -310,94 +333,94 @@ public class AlgoRunner implements BusinessLogic {
         String sql = "";
         
         if(asd.size() > 0){
-            sql = "INSERT\n" +
-            "	INTO\n" +
-            "		bosnet1.dbo.TMS_PreRouteJob(\n" +
-            "			RunId,\n" +
-            "			Customer_ID,\n" +
-            "			DO_Number,\n" +
-            "			Long,\n" +
-            "			Lat,\n" +
-            "			Customer_priority,\n" +
-            "			Service_time,\n" +
-            "			deliv_start,\n" +
-            "			deliv_end,\n" +
-            "			vehicle_type_list,\n" +
-            "			total_kg,\n" +
-            "			total_cubication,\n" +
-            "			DeliveryDeadline,\n" +
-            "			DayWinStart,\n" +
-            "			DayWinEnd,\n" +
-            "			UpdatevDate,\n" +
-            "			CreateDate,\n" +
-            "			isActive,\n" +
-            "			Is_Exclude,\n" +
-            "			Is_Edit,\n" +
-            "			Product_Description,\n" +
-            "			Gross_Amount,\n" +
-            "			DOQty,\n" +
-            "			DOQtyUOM,\n" +
-            "			Name1,\n" +
-            "			Street,\n" +
-            "			Distribution_Channel,\n" +
-            "			Customer_Order_Block_all,\n" +
-            "			Customer_Order_Block,\n" +
-            "			Request_Delivery_Date,\n" +
-            "			Desa_Kelurahan,\n" +
-            "			Kecamatan,\n" +
-            "			Kodya_Kabupaten,\n" +
-            "			Batch,\n" +
-            "			Ket_DO\n" +
-            "		)  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-            
-            asd = treeSAP(asd);
-            try (Connection con = (new Db()).getConnection("jdbc/fztms")){
-                try (PreparedStatement ps = con.prepareStatement(sql) ){
-                    ps.clearParameters(); 
-                    for(int a = 0;a<asd.size();a++){ 
-                        if(asd.get(a).size() > 0 && Integer.valueOf(asd.get(a).get("Customer_priority")) < 10){
-                            int i = 1;
-                            ps.setString(i++, asd.get(a).get("RunId"));
-                            ps.setString(i++, asd.get(a).get("Customer_ID"));
-                            ps.setString(i++, asd.get(a).get("DO_Number"));
-                            ps.setString(i++, asd.get(a).get("Long").replaceAll("\\s+",""));
-                            ps.setString(i++, asd.get(a).get("Lat").replaceAll("\\s+",""));                        
-                            ps.setInt(i++, Integer.parseInt(asd.get(a).get("Customer_priority")));
-                            ps.setInt(i++, Integer.parseInt(asd.get(a).get("Service_time")));
-                            ps.setString(i++, asd.get(a).get("deliv_start"));
-                            ps.setString(i++, asd.get(a).get("deliv_end"));
-                            ps.setString(i++, asd.get(a).get("vehicle_type_list"));
-                            ps.setDouble(i++, Double.valueOf(asd.get(a).get("total_kg")));
-                            ps.setDouble(i++, Double.valueOf(asd.get(a).get("total_cubication")));
-                            ps.setString(i++, asd.get(a).get("DeliveryDeadline"));
-                            ps.setString(i++, asd.get(a).get("DayWinStart"));
-                            ps.setString(i++, asd.get(a).get("DayWinEnd"));
-                            ps.setString(i++, asd.get(a).get("UpdatevDate"));
-                            ps.setString(i++, asd.get(a).get("CreateDate"));   
-                            ps.setString(i++, "1");
-                            ps.setString(i++, "inc");
-                            ps.setString(i++, str);
-                            ps.setString(i++, asd.get(a).get("Product_Description"));
-                            ps.setDouble(i++, Double.valueOf(asd.get(a).get("Gross_Amount")));
-                            ps.setDouble(i++, Double.valueOf(asd.get(a).get("DOQty")));
-                            ps.setString(i++, asd.get(a).get("DOQtyUOM"));  
-                            ps.setString(i++, asd.get(a).get("Name1"));
-                            ps.setString(i++, asd.get(a).get("Street"));
-                            ps.setString(i++, asd.get(a).get("Distribution_Channel"));
-                            ps.setString(i++, asd.get(a).get("Customer_Order_Block_all"));
-                            ps.setString(i++, asd.get(a).get("Customer_Order_Block"));   
-                            ps.setString(i++, asd.get(a).get("Request_Delivery_Date")); 
-                            //ps.setString(i++, asd.get(a).get("marketId")); 
-                            ps.setString(i++, asd.get(a).get("Desa_Kelurahan"));   
-                            ps.setString(i++, asd.get(a).get("Kecamatan")); 
-                            ps.setString(i++, asd.get(a).get("Kodya_Kabupaten")); 
-                            ps.setString(i++, asd.get(a).get("Batch")); 
-                            ps.setString(i++, asd.get(a).get("Ket_DO")); 
-                            ps.addBatch();
+            asd = treeSAP(asd); 
+            try (Connection con = (new Db()).getConnection("jdbc/fztms")){                
+                for(int a = 0;a<asd.size();a++){ 
+                    System.out.println(asd.get(a).size() + " " + asd.get(a).get("Customer_priority"));
+                    if(asd.get(a).size() > 0 && Integer.valueOf(asd.get(a).get("Customer_priority")) < 10){
+                        String strRedeliv = asd.get(a).get("RedeliveryCount") == null ? "" : asd.get(a).get("RedeliveryCount");
+                        sql = "INSERT\n" +
+                                "	INTO\n" +
+                                "		bosnet1.dbo.TMS_PreRouteJob(\n" +
+                                "			RunId,\n" +
+                                "			Customer_ID,\n" +
+                                "			DO_Number,\n" +
+                                "			Long,\n" +
+                                "			Lat,\n" +
+                                "			Customer_priority,\n" +
+                                "			Service_time,\n" +
+                                "			deliv_start,\n" +
+                                "			deliv_end,\n" +
+                                "			vehicle_type_list,\n" +
+                                "			total_kg,\n" +
+                                "			total_cubication,\n" +
+                                "			DeliveryDeadline,\n" +
+                                "			DayWinStart,\n" +
+                                "			DayWinEnd,\n" +
+                                "			UpdatevDate,\n" +
+                                "			CreateDate,\n" +
+                                "			isActive,\n" +
+                                "			Is_Exclude,\n" +
+                                "			Is_Edit,\n" +
+                                "			Product_Description,\n" +
+                                "			Gross_Amount,\n" +
+                                "			DOQty,\n" +
+                                "			DOQtyUOM,\n" +
+                                "			Name1,\n" +
+                                "			Street,\n" +
+                                "			Distribution_Channel,\n" +
+                                "			Customer_Order_Block_all,\n" +
+                                "			Customer_Order_Block,\n" +
+                                "			Request_Delivery_Date,\n" +
+                                "			Desa_Kelurahan,\n" +
+                                "			Kecamatan,\n" +
+                                "			Kodya_Kabupaten,\n" +
+                                "			Batch,\n" +
+                                "			Ket_DO,\n" +
+                                "			RedeliveryCount\n" +
+                                "		)  values('"
+                                + asd.get(a).get("RunId") + "','"
+                                + asd.get(a).get("Customer_ID") + "','"
+                                + asd.get(a).get("DO_Number") + "','"
+                                + asd.get(a).get("Long").replaceAll("\\s+","") + "','"
+                                + asd.get(a).get("Lat").replaceAll("\\s+","") + "',"
+                                + Integer.parseInt(asd.get(a).get("Customer_priority")) + ","
+                                + Integer.parseInt(asd.get(a).get("Service_time")) + ",'"
+                                + asd.get(a).get("deliv_start") + "','" 
+                                + asd.get(a).get("deliv_end") + "','" 
+                                + asd.get(a).get("vehicle_type_list") + "'," 
+                                + Double.valueOf(asd.get(a).get("total_kg")) + "," 
+                                + Double.valueOf(asd.get(a).get("total_cubication")) + ",'" 
+                                + asd.get(a).get("DeliveryDeadline") + "','" 
+                                + asd.get(a).get("DayWinStart") + "','" 
+                                + asd.get(a).get("DayWinEnd") + "','" 
+                                + asd.get(a).get("UpdatevDate") + "','" 
+                                + asd.get(a).get("CreateDate") + "','"    
+                                + "1" + "','" 
+                                + "inc" + "','" 
+                                + str + "','" 
+                                + asd.get(a).get("Product_Description") + "'," 
+                                + Double.valueOf(asd.get(a).get("Gross_Amount")) + "," 
+                                + Double.valueOf(asd.get(a).get("DOQty")) + ",'" 
+                                + asd.get(a).get("DOQtyUOM") + "','"  
+                                + asd.get(a).get("Name1") + "','" 
+                                + asd.get(a).get("Street") + "','" 
+                                + asd.get(a).get("Distribution_Channel") + "','" 
+                                + asd.get(a).get("Customer_Order_Block_all") + "','" 
+                                + asd.get(a).get("Customer_Order_Block") + "','"    
+                                + asd.get(a).get("Request_Delivery_Date") + "','"  
+                                + asd.get(a).get("Desa_Kelurahan") + "','"    
+                                + asd.get(a).get("Kecamatan") + "','" 
+                                + asd.get(a).get("Kodya_Kabupaten") + "','" 
+                                + asd.get(a).get("Batch") + "','" 
+                                + asd.get(a).get("Ket_DO") + "','" 
+                                + strRedeliv + "');";  
+                        //System.out.println(sql);
+                        try (PreparedStatement ps = con.prepareStatement(sql) ){
+                            ps.executeUpdate();
+                            cds = "OK";
                         }
                     }
-                    ps.executeBatch();
-                    ps.close();
                 }
             }
             cds = "OK";
@@ -936,7 +959,7 @@ public class AlgoRunner implements BusinessLogic {
                 "	)\n" +
                 "	AND sp.create_date >= DATEADD(\n" +
                 "		DAY,\n" +
-                "		- 90,\n" +
+                "		"+dy+",\n" +
                 "		GETDATE()\n" +
                 "	)\n" +
                 "	AND ss.Delivery_Number IS NULL\n" +
@@ -986,6 +1009,7 @@ public class AlgoRunner implements BusinessLogic {
                     pl.put("Kecamatan", rs.getString("Kecamatan"));
                     pl.put("Kodya_Kabupaten", rs.getString("Kodya_Kabupaten"));
                     pl.put("Batch", rs.getString("Batch"));
+                    pl.put("RedeliveryCount", "");
                     //pl.put("DOCreationDate", rs.getString("DOCreationDate"));                    
                     asd.add(pl);
                     //System.out.println(pl.toString());
@@ -1738,107 +1762,17 @@ public class AlgoRunner implements BusinessLogic {
     
     public List<HashMap<String, String>> selectCust(String prev, String next) throws Exception{
         List<HashMap<String, String>> px = new ArrayList<HashMap<String, String>>();
-        String sql = "SELECT\n" +
-                "	'"+next+"' AS RunId,\n" +
-                "	jb.Customer_ID,\n" +
-                "	jb.DO_Number,\n" +
-                "	jb.Long,\n" +
-                "	jb.Lat,\n" +
-                "	jb.Customer_priority,\n" +
-                "	jb.Service_time,\n" +
-                "	jb.deliv_start,\n" +
-                "	jb.deliv_end,\n" +
-                "	jb.vehicle_type_list,\n" +
-                "	jb.total_kg,\n" +
-                "	jb.total_cubication,\n" +
-                "	jb.DeliveryDeadline,\n" +
-                "	jb.DayWinStart,\n" +
-                "	jb.DayWinEnd,\n" +
-                "	CAST(\n" +
-                "		FORMAT(\n" +
-                "			getdate(),\n" +
-                "			'yyyy-MM-dd hh-mm'\n" +
-                "		) AS VARCHAR\n" +
-                "	) AS UpdatevDate,\n" +
-                "	CAST(\n" +
-                "		FORMAT(\n" +
-                "			getdate(),\n" +
-                "			'yyyy-MM-dd hh-mm'\n" +
-                "		) AS VARCHAR\n" +
-                "	) AS CreateDate,\n" +
-                "	jb.isActive,\n" +
-                "	jb.Is_Exclude,\n" +
-                "	jb.Product_Description,\n" +
-                "	jb.Gross_Amount,\n" +
-                "	jb.DOQty,\n" +
-                "	jb.DOQtyUOM,\n" +
-                "	jb.Name1,\n" +
-                "	jb.Street,\n" +
-                "	jb.Distribution_Channel,\n" +
-                "	jb.Customer_Order_Block_all,\n" +
-                "	jb.Customer_Order_Block,\n" +
-                "	jb.Request_Delivery_Date,\n" +
-                "	jb.Desa_Kelurahan,\n" +
-                "	jb.Kecamatan,\n" +
-                "	jb.Kodya_Kabupaten,\n" +
-                "	jb.Batch,\n" +
-                "	jb.Ket_DO\n" +
-                "FROM\n" +
-                "	bosnet1.dbo.TMS_PreRouteJob jb\n" +
-                "INNER JOIN(\n" +
-                "		SELECT\n" +
-                "			DISTINCT DO_Number\n" +
-                "		FROM\n" +
-                "			bosnet1.dbo.TMS_ShipmentPlan\n" +
-                "		WHERE\n" +
-                "			already_shipment = 'N'\n" +
-                "			AND notused_flag IS NULL\n" +
-                "			AND incoterm = 'FCO'\n" +
-                "			AND(\n" +
-                "				Order_Type = 'ZDCO'\n" +
-                "				OR Order_Type = 'ZDTO'\n" +
-                "			)\n" +
-                "			AND create_date >= DATEADD(\n" +
-                "				DAY,\n" +
-                "				- 90,\n" +
-                "				GETDATE()\n" +
-                "			)\n" +
-                "	) sp ON\n" +
-                "	jb.DO_Number = sp.DO_Number\n" +
-                "LEFT OUTER JOIN(\n" +
-                "		SELECT\n" +
-                "			tu.Delivery_Number\n" +
-                "		FROM\n" +
-                "			BOSNET1.dbo.TMS_Result_Shipment ty\n" +
-                "		INNER JOIN BOSNET1.dbo.TMS_Status_Shipment tu ON\n" +
-                "			ty.Delivery_Number = tu.Delivery_Number\n" +
-                "		WHERE\n" +
-                "			tu.SAP_Status IS NULL\n" +
-                "	) ss ON\n" +
-                "	sp.DO_Number = ss.Delivery_Number\n" +
-                "LEFT OUTER JOIN(\n" +
-                "		SELECT\n" +
-                "			ty.Delivery_Number\n" +
-                "		FROM\n" +
-                "			BOSNET1.dbo.TMS_Result_Shipment ty\n" +
-                "		LEFT OUTER JOIN BOSNET1.dbo.TMS_Status_Shipment tu ON\n" +
-                "			ty.Delivery_Number = tu.Delivery_Number\n" +
-                "		WHERE\n" +
-                "			tu.Delivery_Number IS NULL\n" +
-                "	) sn ON\n" +
-                "	sp.DO_Number = sn.Delivery_Number\n" +
-                "WHERE\n" +
-                "	ss.Delivery_Number IS NULL\n" +
-                "	AND sn.Delivery_Number IS NULL\n" +
-                "	AND jb.RunId = '"+prev+"'\n" +
-                "	AND jb.Is_Exclude = 'inc'\n" +
-                "	AND jb.Is_Edit = 'edit';";
 
-        HashMap<String, String> pl = new HashMap<String, String>();
+        String sql = "{call bosnet1.dbo.TMS_selectCust(?,?,?)}";
+        System.out.println(sql + next +" "+prev + " " + dy);
         try (Connection con = (new Db()).getConnection("jdbc/fztms");
-                PreparedStatement ps = con.prepareStatement(sql)) {
-            //System.out.println(sql);
-            try (ResultSet rs = ps.executeQuery()){
+                java.sql.CallableStatement stmt =
+                con.prepareCall(sql)) {
+            stmt.setString(1, next);
+            stmt.setString(2, prev);
+            stmt.setInt(3, dy);
+            HashMap<String, String> pl = new HashMap<String, String>();
+            try(ResultSet rs = stmt.executeQuery()){
                 while (rs.next()) {
                     pl = new HashMap<String, String>();
                     pl.put("RunId", rs.getString("RunId"));
@@ -1875,16 +1809,39 @@ public class AlgoRunner implements BusinessLogic {
                     pl.put("Kodya_Kabupaten", rs.getString("Kodya_Kabupaten"));
                     pl.put("Batch", rs.getString("Batch"));
                     pl.put("Ket_DO", rs.getString("Ket_DO"));
+                    pl.put("RedeliveryCount", rs.getString("RedeliveryCount"));
                     px.add(pl);
 
                     //con.setAutoCommit(false);
                     //ps.executeUpdate();
                     //con.setAutoCommit(true);
                 }
-                ps.close();
+                stmt.close();
             }    
         }
         
         return px;
+    }
+    
+    public String redeliv(String RunId, String chn, String br, int dt) throws Exception{
+       String str = "error";
+       
+        String sql = "{call bosnet1.dbo.TMS_QueryCust_Redeliv(?,?,?,?)}";
+        System.out.println("redeliv"+sql+RunId+chn+br+dt);
+        try (Connection con = (new Db()).getConnection("jdbc/fztms");
+                java.sql.CallableStatement stmt =
+                con.prepareCall(sql)) {
+            stmt.setString(1, RunId);
+            stmt.setString(2, chn);
+            stmt.setString(3, br);
+            stmt.setInt(4, dt);
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next()) {
+                    str = "OK";
+                }
+            }
+        }
+        
+        return str;
     }
 }

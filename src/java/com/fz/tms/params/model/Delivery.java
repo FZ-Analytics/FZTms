@@ -46,6 +46,7 @@ public class Delivery {
     public String color = "";
     public String deliv_start = "";
     public String deliv_end = "";
+    public String bat = "";
     
     public String getMapLink() {
         String s = "https://www.google.com/maps/dir/"

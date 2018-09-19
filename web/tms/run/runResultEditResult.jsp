@@ -80,30 +80,24 @@
                     }
                 });
             });
-
             function klik(kode) {
                 window.open("../Params/PopUp/popupEditCust.jsp?runId=" + $("#RunIdClick").text() + "&custId=" + kode, null,
                         "scrollbars=1,resizable=1,height=500,width=750");
             }
-
             function fnExcelReport() {
                 var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
                 var j = 0;
                 tab = document.getElementById('t_table'); // id of table
-
                 for (j = 0; j < tab.rows.length; j++)
                 {
                     tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
                 }
-
                 tab_text = tab_text + "</table>";
                 tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
                 tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // remove if u want images in your table
                 tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
-
                 var ua = window.navigator.userAgent;
                 var msie = ua.indexOf("MSIE ");
-
                 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
                 {
                     txtArea1.document.open("txt/html", "replace");
@@ -113,14 +107,12 @@
                     sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
                 } else                 //other browser not tested on IE 11
                     sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
-
                 return (sa);
             }
             function saveHistory() {
                 var $apiAddress = '../../api/popupEditCustBfror/savehistory';
                 var jsonForServer = '{\"Value\": \"' + '<%=urls%>' + '\",\"NIK\":\"' + '<%=EmpyID%>' + '"}';
                 var data = [];
-
                 $.post($apiAddress, {json: jsonForServer}).done(function (data) {
                     if (data == 'OK') {
                         alert('sukses');
@@ -130,7 +122,6 @@
                     }
                 });
             }
-
         </script>
         <div id="body">
             <h4>Routing Result
@@ -195,6 +186,10 @@
                         style="background-color: lightyellow"
                         <%} else if (j.arrive.length() == 0 && j.storeName.length() == 0) {%>
                         style="background-color: #e6ffe6"
+                        <%} else if (j.bat == "1") {%>
+                        style="background-color: #ffe6e6"
+                        <%} else if (j.bat == "2") {%>
+                        style="background-color: #FFFF66"
                         <%}%> >
                         <td class="fzCell index center" style="background-color: <%=j.color%>"></td>
                         <td class="fzCell index center">
@@ -283,10 +278,8 @@
                     <%} // for ProgressRecord %>
                 </tbody>
             </table>
-
             <br>
             <br>
-
             <iframe id="txtArea1" style="display:none"></iframe>
             <table id="t_table" border1="1" style="border-color: lightgray;" hidden="true">
                 <tr>
@@ -379,7 +372,6 @@
                     </td>
                 </tr>
             </table>
-
             <%@include file="../appGlobal/bodyBottom.jsp"%>
         </div>
     </body>
