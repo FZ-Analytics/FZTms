@@ -584,6 +584,7 @@
                     <th width="100px" class="center">Prty</th>
                     <th width="100px" class="center">Dist. Chl</th>
                     <th width="100px" class="center">Street</th>
+                    <th width="100px" class="center">Kecamatan</th>
                     <th width="100px" class="center">Weight (KG)</th>
                     <th width="100px" class="center">Volume (M3)</th>
                     <th width="100px" class="center">RDD</th>
@@ -643,6 +644,7 @@
                     </td>
                     <td class="center"><%=j.distChannel%></td>
                     <td class="center"><%=j.street%></td>
+                    <td class="center"><%=j.kecamatan%></td>
                     <td class="center"><%=j.weight%></td>
                     <td class="center"><%=j.volume%></td>
                     <td class="center">

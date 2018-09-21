@@ -185,7 +185,7 @@ public class SubmitToSapAPI {
                     if (!ret.equals("OK")) {                        
                         break;
                     }
-                }                
+                }
                 if(str.equalsIgnoreCase("OK")){
                     err = "moveShip";
                     moveShip(rs);

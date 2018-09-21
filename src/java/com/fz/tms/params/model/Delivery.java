@@ -22,6 +22,7 @@ public class Delivery {
     public String priority;
     public String distChannel;
     public String street;
+    public String kecamatan;
     public String weight;
     public String volume;
     public int transportCost = 0;
