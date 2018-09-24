@@ -1,12 +1,15 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_RouteJobListingResultEditShow]    Script Date: 14/08/2018 17:35:28 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_RouteJobListingResultEditShow]    Script Date: 24/09/2018 14:03:15 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 ALTER PROCEDURE [dbo].[TMS_RouteJobListingResultEditShow] --exec [dbo].[TMS_RouteJobListingResultEditShow] '20180621_154747795'
 @RunId varchar(100), @OriRunId VARCHAR(100)
+--declare @RunId varchar(100), @OriRunId VARCHAR(100);
+--set @RunId = '20180920_150557026';
+--set @OriRunId = '20180920_150557025'
 AS
 SET NOCOUNT ON;
 --DECLARE @RunId VARCHAR(100)= '20180621_154747795';
@@ -201,6 +204,10 @@ SELECT
 		WHEN prj.Street IS NULL THEN ''
 		ELSE prj.Street
 	END Street,
+	CASE
+		WHEN prj.Kecamatan IS NULL THEN ''
+		ELSE prj.Kecamatan
+	END Kecamatan,
 	rj.weight,
 	rj.volume,
 	prj.Request_Delivery_Date,
@@ -225,6 +232,7 @@ LEFT JOIN(
 			MIN( Customer_priority ) Customer_priority,
 			Distribution_Channel,
 			Street,
+			Kecamatan,
 			MIN( Request_Delivery_Date ) Request_Delivery_Date
 		FROM
 			(
@@ -258,6 +266,7 @@ LEFT JOIN(
 					prj.Customer_priority,
 					prj.Distribution_Channel,
 					prj.Street,
+					prj.Kecamatan,
 					prj.Request_Delivery_Date
 				FROM
 					BOSNET1.dbo.TMS_PreRouteJob prj
@@ -272,7 +281,8 @@ LEFT JOIN(
 			RunId,
 			Name1,
 			Distribution_Channel,
-			Street
+			Street,
+			Kecamatan
 	) prj ON
 	rj.runID = prj.RunId
 	AND rj.customer_id = prj.Customer_ID

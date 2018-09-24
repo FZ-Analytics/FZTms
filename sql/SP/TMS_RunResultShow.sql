@@ -1,6 +1,6 @@
 USE [BOSNET1]
 GO
-/****** Object:  StoredProcedure [dbo].[TMS_RunResultShow]    Script Date: 14/08/2018 17:37:34 ******/
+/****** Object:  StoredProcedure [dbo].[TMS_RunResultShow]    Script Date: 24/09/2018 13:59:45 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
