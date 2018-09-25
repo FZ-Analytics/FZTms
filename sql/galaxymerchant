@@ -1,0 +1,301 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package galaxymerchant;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ *
+ * @author dwi.oktaviandi
+ */
+public class GALAXYMERCHANT {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
+        
+        //original value
+        HashMap<String, String> pl = new HashMap<String, String>();
+        pl.put("I", "1");
+        pl.put("V", "5");
+        pl.put("X", "10");
+        pl.put("L", "50");
+        pl.put("C", "100");
+        pl.put("D", "500");
+        pl.put("M", "1000");
+        
+        //input
+        String[] myList = new String[]{"glob is I", "prok is V", "pish is X", "tegj is L"
+                , "glob glob Silver is 34 Credits"
+                //, "glob glob prok pish glob is 16 Credits"//
+                , "glob glob prok pish glob Ore is 57800 Credits"//
+                , "glob prok glob glob prok pish glob Tita is 57800 Credits"//
+                , "glob prok Gold is 57800 Credits", "pish pish Iron is 3910 Credits"
+                , "how much is pish tegj glob glob ?"
+                , "how many Credits is glob prok Silver ?"
+                , "how many Credits is glob prok Gold ?"
+                , "how many Credits is glob prok Iron ?"
+                , "how much wood could a woodchuck chuck if a woodchuck could chuck wood ?"
+        };
+        
+        
+        //get input
+        for(int a = 0; a < myList.length; a++){
+            try{
+                String str = compare(myList[a], pl);
+                System.out.println(str);                
+            }catch(Exception e){
+                System.out.println("I have no idea what you are talking about");
+            }
+            
+        }
+        
+        
+    }   
+    
+    //look if its value OR question
+    public static String compare(String myList, HashMap<String, String> pl) throws Exception{
+        String str = "";        
+        Boolean isQuest = false;
+        
+        isQuest = String.valueOf( myList.charAt(myList.length() -1) ).equals("?");
+
+        if( isQuest ){
+            str = quest(pl, myList);
+
+        }else{
+            //add new value
+            String tmp = myList;
+            String[] arr = tmp.split(" is ");
+
+            Boolean isMore = arr[0].replaceAll("[a-zA-Z]", "").length() > 0;
+            if(isMore){
+                //more variable
+                pl = Calc(tmp, pl);
+            }else{
+                //one variable
+                pl = isOne(arr, pl);
+            }
+        }
+        
+        return str;        
+    }
+    
+    public static String quest(HashMap<String, String> pl, String q){
+        String str = "";
+        
+        String ss = q.substring( q.indexOf("is") + 3
+                , q.length() - 2 );
+
+        HashMap<String, String> pk = new HashMap<String, String>();
+        pk.put("str", ss);
+        
+        String[] ar = ss.split(" ");
+        
+        String tVal = realValue(pl, ar);
+        
+        String full = tVal;
+        pk.put("full", full);
+        
+        String rule = getRule(pl, pk);
+        pk.put("rule", rule);
+        
+        int r = formulate(pl, pk);
+
+        String tr = q.indexOf("Credits") < 0 ? "" : " Credits";
+        str = ss + " is " + r + tr;
+        
+        return str;
+    }
+    
+    public static HashMap<String, String> Calc(String str, HashMap<String, String> pl){
+        HashMap<String, String> pk = new HashMap<String, String>();
+        pk.put("str", str);
+        
+        String[] arr = str.split(" is ");
+        String[] ar = arr[0].split(" ");
+        
+        String tVal = realValue(pl, ar);
+        
+        String full = tVal+" is "+arr[1];
+        pk.put("full", full);
+        
+        String rule = getRule(pl, pk);        
+        pk.put("rule", rule);
+        
+        int r = formulate(pl, pk);
+        
+        String[] last = arr[1].split(" ");
+        int crt = Integer.valueOf(last[0]) - r;
+        String[] tVals = tVal.split("_");
+        String strs = tVals[tVals.length-1] + " is " + crt + " Credits";
+        
+        String[] temp = strs.split(" is ");
+        pl = isOne(temp, pl);
+        
+        
+        return pl;
+    }
+    
+    //get full rule add or reduce or other
+    public static String getRule(HashMap<String, String> pl, HashMap<String, String> pk){
+        String[] fs = pk.get("full").split(" is ");
+        String[] tVals = fs[0].split("_");
+        
+        String[] arr = pk.get("str").split(" is ");
+        String[] ar = arr[0].split(" ");
+        
+        String roman = getRoman(pl, ar);
+        String[] rm = roman.split("_");
+        
+        String trys = "";
+        for(int x = 0; x < (tVals.length - 1); x++){
+            trys += x > 0 ? "_" : "";
+            if(pl.get(ar[x]) != null && pl.get(ar[x+1]) != null){
+                if(Integer.valueOf(tVals[x]) > Integer.valueOf(tVals[x+1])){
+                    trys += "true";
+                }else if(Integer.valueOf(tVals[x]) < Integer.valueOf(tVals[x+1])
+                        && ((rm[x].equals("I") && (rm[x+1].equals("V") || rm[x+1].equals("X")))
+                            || (rm[x].equals("X") && (rm[x+1].equals("L") || rm[x+1].equals("C")))
+                            || (rm[x].equals("C") && (rm[x+1].equals("D") || rm[x+1].equals("M")))
+                            || rm[x].equals("V") || rm[x].equals("L") || rm[x].equals("D"))
+                        ){
+                    trys += "false";
+                }else{
+                    trys += "other";
+                }
+            }else{
+                trys += "null";
+            }            
+        }        
+        return trys;
+    }
+    
+    public static String getRoman(HashMap<String, String> pl, String[] ar){
+        String str = "";
+        
+        for(int a = 0; a < ar.length; a++){
+            str += a > 0 ? "_" : "";
+            
+            str += pl.get(ar[a]);
+        }
+        
+        return str;
+    }
+    
+    //create new value from formula
+    public static int formulate(HashMap<String, String> pl, HashMap<String, String> pk){
+        String[] fs = pk.get("full").split(" is ");
+        String[] tVals = fs[0].split("_");
+        
+        String[] trx = pk.get("rule").split("_");
+        String nFull = "";
+        
+        for(int a = 0; a < (trx.length - 1); a++){
+            nFull += a > 0 ? "_" : "";
+            
+            if(trx[a].equals("false") 
+                    && (!trx[a+1].equals("false") ||  trx[a].equals("false"))){
+                nFull += Integer.valueOf(tVals[a+1]) - Integer.valueOf(tVals[a]);
+                a += 1;
+            }else if(!trx[a].equals("false") && trx[a+1].equals("false")){
+                nFull += Integer.valueOf(tVals[a]);
+            }else if(!trx[a].equals("false") && !trx[a+1].equals("false")){
+                nFull += Integer.valueOf(tVals[a]) + Integer.valueOf(tVals[a+1]);
+            }
+            
+            String sys = pk.get("str");
+            /*if(sys.equals("pish tegj glob glob")){
+                System.out.println(a +" trx.length "+(trx.length - 1));
+            }*/
+            
+            if(!trx[trx.length-1].equals("null")){
+                if(trx.length - a == 2){
+                    if(!trx[a+1].equals("false"))
+                        nFull += "_" + (Integer.valueOf(tVals[a+1]) + Integer.valueOf(tVals[a+2]));
+                    else if(trx[a+1].equals("false"))
+                        nFull += "_" + (Integer.valueOf(tVals[a+2]) - Integer.valueOf(tVals[a+1]));
+
+                }else if(trx.length - a == 1){
+                    nFull += "_" + Integer.valueOf(tVals[a+1]);
+                }
+            }
+            
+        }
+        
+        String[] tfull = nFull.split("_");
+        int fulls = 0;
+        for(int a = 0; a < tfull.length; a++){
+            fulls += Integer.valueOf(tfull[a]);
+        } 
+                
+        return fulls;
+    }
+    
+    //turn key to real VALUE
+    public static String realValue(HashMap<String, String> pl, String[] ar){
+        String str = "";
+        
+        //true value
+        for(int a = 0; a < ar.length; a++){
+            str += a > 0 ? "_" : "";
+            if( pl.get(ar[a]) != null){
+                int i = 0;
+                String tu = pl.get(ar[a]);
+                while(i == 0){
+                    try{                        
+                        i = Integer.valueOf(tu);                    
+                    }catch(Exception e){
+                        tu = pl.get(tu);
+                    }
+                }
+                
+                str += i;
+            }else{
+                str += ar[a];
+            }
+        }
+        return str;
+    }
+    
+    public static HashMap<String, String> isOne(String[] arr, HashMap<String, String> pl){ 
+        if(pl.get(arr[1]) != null){
+            pl.put(arr[0], arr[1]);
+        }else{
+            String[] str = arr[1].split(" ");
+            pl.put(arr[0], str[0]);
+        }
+        return pl;
+    }
+    
+    public static String getKey(HashMap<String, String> pl, String[] arr, String[] key){
+        String[] ar = arr[0].split(" ");
+        
+        String str = "";
+        for(int a = 0; a < ar.length; a++){
+            //get combination roman
+            int x = 0;
+            Boolean isRight = true;
+            while( x < key.length ){
+                if(ar[a].equals(key[x])){
+                    str += pl.get(ar[a])+" ";                    
+                    break;
+                }else{
+                    isRight = false;
+                }
+                if(!isRight && x == (key.length - 1)){
+                    str += ar[a] + " is " + arr[1];
+                }
+                x++;
+            }
+        }
+        return str;
+    }
+}
