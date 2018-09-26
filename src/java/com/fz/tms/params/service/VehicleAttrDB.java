@@ -521,7 +521,7 @@ public class VehicleAttrDB {
                         "WHERE\n" +
                         "	TypeID = 10\n" +
                         "	AND Active = 1\n" +
-                        "	AND SFA = 0\n" +
+                        //"	AND SFA = 0\n" +
                         "	AND WorkplaceId = '"+str+"'\n" +nt;
                 // query
                 try (ResultSet rs = stm.executeQuery(sql)){

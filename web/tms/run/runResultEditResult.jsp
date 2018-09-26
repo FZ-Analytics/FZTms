@@ -29,6 +29,16 @@
             th {
                 border: 1px solid black;
             }
+            .button {
+                background-color: orange; /* Green */
+                border: none;
+                color: white;
+                padding: 10px 25px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 8px;
+            }
         </style>
     </head>
     <body>
@@ -122,6 +132,15 @@
                     }
                 });
             }
+            
+            function openRedelive() {
+                var win = window.open("../Params/PopUp/ShowRedeliv.jsp?runId=" + $("#RunIdClick").text() + "&branch=" + $('#branch').text() ,"Report Redelive",'height=500,width=400');
+                 //+ '&tableArr=' + tableArr);
+                if (win) {
+                    //Browser has allowed it to be opened
+                    win.focus();
+                }
+            }
         </script>
         <div id="body">
             <h4>Routing Result
@@ -149,6 +168,7 @@
             <br>
             <label class="fzLabel hover" id="mapAll" style="color: blue;">Map</label>
             <label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>
+            <input type="button" class="button" value="Show redelive" onclick="openRedelive();">
             <br><br>
 
             <table id="table" border1="1" style="border-color: lightgray;">

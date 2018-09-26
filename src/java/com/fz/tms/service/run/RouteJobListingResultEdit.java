@@ -122,6 +122,7 @@ public class RouteJobListingResultEdit implements BusinessLogic {
                     ld.priority = rs.getString("Customer_priority");
                     ld.distChannel = rs.getString("Distribution_Channel");
                     ld.street = rs.getString("Street");
+                    ld.kecamatan = rs.getString("Kecamatan");
                     try {
                         ld.weight = "" + Math.round((rs.getDouble("weight")) * 10) / 10.0;
                     } catch (Exception e) {

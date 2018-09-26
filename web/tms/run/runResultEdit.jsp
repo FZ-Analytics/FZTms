@@ -56,6 +56,16 @@
             .center {
                 text-align: center;
             }
+            .button {
+                background-color: orange; /* Green */
+                border: none;
+                color: white;
+                padding: 10px 25px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 8px;
+            }
         </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
         <%
@@ -497,6 +507,14 @@
                     }
                 });
             }
+            function openRedelive() {
+                var win = window.open("../Params/PopUp/ShowRedeliv.jsp?runId=" + $("#RunIdClick").text() + "&branch=" + $('#branch').text() ,"Report Redelive",'height=500,width=400');
+                 //+ '&tableArr=' + tableArr);
+                if (win) {
+                    //Browser has allowed it to be opened
+                    win.focus();
+                }
+            }
         </script>
         <h4>Route Editor
             <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
@@ -524,6 +542,7 @@
 
         <br>
         <label class="fzLabel hover" id="mapAll" style="color: blue;">Map</label> 
+        <input type="button" class="button" value="Show redelive" onclick="openRedelive();">
 
         <br><br>
 
@@ -542,6 +561,7 @@
                     <th width="100px" class="center">Prty</th>
                     <th width="100px" class="center">Dist. Chl</th>
                     <th width="100px" class="center">Street</th>
+                    <th width="100px" class="center">Kecamatan</th>
                     <th width="100px" class="center">Weight (KG)</th>
                     <th width="100px" class="center">Volume (M3)</th>
                     <th width="100px" class="center">RDD</th>
@@ -603,6 +623,7 @@
                     </td>
                     <td class="center"><%=j.distChannel%></td>
                     <td class="center"><%=j.street%></td>
+                    <td class="center"><%=j.kecamatan%></td>
                     <td class="center"><%=j.weight%></td>
                     <td class="center"><%=j.volume%></td>
                     <td class="center">

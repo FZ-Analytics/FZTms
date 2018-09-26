@@ -53,7 +53,7 @@ public class AlgoRunner implements BusinessLogic {
         String channel = FZUtil.getHttpParam(request, "channel");
         String urls = FZUtil.getHttpParam(request, "url");
         
-        Boolean redeliv = FZUtil.getHttpParam(request, "reDeliv") == null ? false : Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv"));
+        Boolean redeliv = FZUtil.getHttpParam(request, "reDeliv") == null || Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv")) == false ? false : Boolean.valueOf(FZUtil.getHttpParam(request, "reDeliv"));
         
         
         //param

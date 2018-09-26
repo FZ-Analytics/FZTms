@@ -21,6 +21,17 @@
             .center {
                 text-align: center;
             }
+            
+            .button {
+                background-color: orange; /* Green */
+                border: none;
+                color: white;
+                padding: 10px 25px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 8px;
+            }
         </style>
         <%@include file="../appGlobal/bodyTop.jsp"%>
         <%
@@ -428,6 +439,15 @@
                 var link2 = "../Params/Detail/runResultMapDetail.jsp?runID="+$("#RunIdClick").text()+"&OriRunID="+$("#OriRunID").val();
                 $('#iframe2').attr('src', link2);
             }
+            
+            function openRedelive() {
+                var win = window.open("../Params/PopUp/ShowRedeliv.jsp?runId=" + $("#RunIdClick").text() + "&branch=" + $('#branch').text() ,"Report Redelive",'height=500,width=400');
+                 //+ '&tableArr=' + tableArr);
+                if (win) {
+                    //Browser has allowed it to be opened
+                    win.focus();
+                }
+            }
         </script>
         <h4>Routing Result 
             <span class="glyphicon glyphicon-refresh hover" aria-hidden="true" onclick="location.reload();"></span>
@@ -454,7 +474,8 @@
             <label class="fzLabel hover" id="reRun" style="color: blue;">Re-Routing</label>
             <%--<label class="fzLabel hover" id="test" style="color: blue;" onclick="fnExcelReport()">Convert Excel</label>--%>
 
-            <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />            
+            <input id="clickMe" class="btn fzButton" type="button" value="Edit Route Manually" onclick="openEditRoutePage();" />   
+            <input type="button" class="button" value="Show redelive" onclick="openRedelive();">
         </div>
         
         <div style="float: left; width: 50%">

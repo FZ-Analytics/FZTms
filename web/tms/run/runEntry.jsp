@@ -85,9 +85,9 @@
                     </select>
                 </div>
                 <div style="float: left; width: 50%">
-                    <br><br>            
-                    <label class="fzLabel">reDeliv</label>
-                    <select class="fzInput" id="reDeliv" name="reDeliv" />
+                    <br><br><br>          
+                    <%--<label class="fzLabel" >reDeliv</label>--%>
+                    <select class="fzInput" id="reDeliv" name="reDeliv" hidden="true"/>
                         <option value="true">yes</option>
                         <option value="false" selected="true">no</option>                   
                     </select>
